@@ -17,6 +17,7 @@ export default function NewProject() {
   const [paymentLink, setPaymentLink] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   function addDeliverable() {
     setDeliverables([...deliverables, ""]);
@@ -41,9 +42,12 @@ export default function NewProject() {
     if (filteredDeliverables.length === 0) return;
 
     setSaving(true);
+    const projectId = crypto.randomUUID();
     try {
+      const projectPrice = parseFloat(price) || 0;
+
       await saveProject({
-        id: crypto.randomUUID(),
+        id: projectId,
         name,
         clientName,
         clientEmail,
@@ -54,7 +58,7 @@ export default function NewProject() {
         })),
         revisionLimit,
         revisionsUsed: 0,
-        price: parseFloat(price) || 0,
+        price: projectPrice,
         status: "Active",
         changeRequests: [],
         createdAt: new Date().toISOString(),
@@ -63,7 +67,35 @@ export default function NewProject() {
         ...(paymentLink.trim() ? { paymentLink: paymentLink.trim() } : {}),
       });
 
-      router.push("/");
+      // Send email to client
+      const portalUrl = `https://scope-guard-fawn.vercel.app/portal/${projectId}`;
+      const emailRes = await fetch("/api/send-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          clientName,
+          clientEmail,
+          projectName: name,
+          deliverables: filteredDeliverables,
+          revisionLimit,
+          price: projectPrice,
+          deadline: deadline || undefined,
+          portalUrl,
+        }),
+      });
+
+      if (!emailRes.ok) {
+        const emailErr = await emailRes.json();
+        console.log("Email send error:", emailErr);
+        // Project saved successfully but email failed — still show success with warning
+        setSuccess(true);
+        setError(`Project created but email failed to send: ${emailErr.error || "Unknown error"}`);
+        setSaving(false);
+        return;
+      }
+
+      setSuccess(true);
+      setSaving(false);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to save project";
       console.log("Save project error:", err);
@@ -75,6 +107,46 @@ export default function NewProject() {
   const inputClass =
     "w-full bg-[#0F172A] border border-[#475569] rounded-lg px-4 py-3 text-[#F1F5F9] placeholder-[#94A3B8]/50 focus:outline-none focus:border-[#6366F1] focus:ring-1 focus:ring-[#6366F1] transition-colors";
   const labelClass = "block text-sm font-medium text-[#94A3B8] mb-2";
+
+  if (success) {
+    return (
+      <div className="max-w-2xl mx-auto">
+        <div className="bg-[#1E293B] border border-[#475569] rounded-xl p-8 text-center">
+          <div className="w-16 h-16 bg-[#34D399]/15 rounded-2xl flex items-center justify-center mx-auto mb-5">
+            <svg className="w-8 h-8 text-[#34D399]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h1 className="text-2xl font-bold text-[#F1F5F9] mb-2">Project Created</h1>
+          <p className="text-[#94A3B8] mb-2">
+            <strong className="text-[#F1F5F9]">{name}</strong> has been saved and a scope review email has been sent to <strong className="text-[#F1F5F9]">{clientEmail}</strong>.
+          </p>
+
+          {error && (
+            <div className="bg-[#FBBF24]/10 border border-[#FBBF24]/30 rounded-lg px-4 py-3 mb-6 mt-4 text-left">
+              <p className="text-[#FBBF24] text-sm font-medium">Warning</p>
+              <p className="text-[#FBBF24]/70 text-sm mt-0.5">{error}</p>
+            </div>
+          )}
+
+          <div className="flex gap-3 justify-center mt-6">
+            <button
+              onClick={() => router.push("/")}
+              className="bg-[#6366F1] hover:bg-[#5558E6] text-[#F1F5F9] font-semibold px-6 py-3 rounded-xl transition-colors text-sm"
+            >
+              Back to Dashboard
+            </button>
+            <button
+              onClick={() => router.push("/projects")}
+              className="bg-[#334155] hover:bg-[#475569] text-[#F1F5F9] font-semibold px-6 py-3 rounded-xl transition-colors text-sm"
+            >
+              View Projects
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -266,7 +338,7 @@ export default function NewProject() {
           disabled={saving}
           className="w-full bg-[#6366F1] hover:bg-[#5558E6] disabled:opacity-50 disabled:cursor-not-allowed text-[#F1F5F9] font-semibold py-3.5 rounded-xl transition-colors text-base"
         >
-          {saving ? "Saving..." : "Create Project & Send to Client"}
+          {saving ? "Creating & Sending Email..." : "Create Project & Send to Client"}
         </button>
       </form>
     </div>
