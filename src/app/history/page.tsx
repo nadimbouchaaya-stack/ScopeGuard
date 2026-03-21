@@ -7,21 +7,23 @@ import { getProjects } from "@/lib/storage";
 
 export default function ProjectHistory() {
   const [grouped, setGrouped] = useState<Record<string, Project[]>>({});
-  const [mounted, setMounted] = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    const completed = getProjects().filter((p) => p.status === "Completed");
-    const groups: Record<string, Project[]> = {};
-    for (const project of completed) {
-      const key = project.clientName;
-      if (!groups[key]) groups[key] = [];
-      groups[key].push(project);
-    }
-    setGrouped(groups);
-    setMounted(true);
+    getProjects().then((all) => {
+      const completed = all.filter((p) => p.status === "Completed");
+      const groups: Record<string, Project[]> = {};
+      for (const project of completed) {
+        const key = project.clientName;
+        if (!groups[key]) groups[key] = [];
+        groups[key].push(project);
+      }
+      setGrouped(groups);
+      setLoaded(true);
+    });
   }, []);
 
-  if (!mounted) return null;
+  if (!loaded) return null;
 
   const clientNames = Object.keys(grouped).sort();
 

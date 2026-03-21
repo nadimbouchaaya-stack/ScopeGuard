@@ -22,15 +22,16 @@ export default function ClientPortal() {
   const projectId = params.projectId as string;
 
   const [project, setProject] = useState<Project | null>(null);
-  const [mounted, setMounted] = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    const p = getProject(projectId);
-    if (p) setProject(p);
-    setMounted(true);
+    getProject(projectId).then((p) => {
+      if (p) setProject(p);
+      setLoaded(true);
+    });
   }, [projectId]);
 
-  function handleChangeRequest(crId: string, action: "Approved" | "Declined") {
+  async function handleChangeRequest(crId: string, action: "Approved" | "Declined") {
     if (!project) return;
 
     const cr = project.changeRequests.find((c) => c.id === crId);
@@ -50,11 +51,11 @@ export default function ClientPortal() {
       ),
     };
 
-    saveProject(updatedProject);
+    await saveProject(updatedProject);
     setProject(updatedProject);
   }
 
-  if (!mounted) return null;
+  if (!loaded) return null;
 
   if (!project) {
     return (

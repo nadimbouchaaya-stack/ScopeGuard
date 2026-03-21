@@ -14,16 +14,16 @@ const statusColors: Record<string, string> = {
 
 export default function ActiveProjects() {
   const [projects, setProjects] = useState<Project[]>([]);
-  const [mounted, setMounted] = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    setProjects(
-      getProjects().filter((p) => p.status !== "Completed")
-    );
-    setMounted(true);
+    getProjects().then((all) => {
+      setProjects(all.filter((p) => p.status !== "Completed"));
+      setLoaded(true);
+    });
   }, []);
 
-  if (!mounted) return null;
+  if (!loaded) return null;
 
   return (
     <div>

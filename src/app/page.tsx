@@ -7,14 +7,16 @@ import { getProjects } from "@/lib/storage";
 
 export default function Dashboard() {
   const [projects, setProjects] = useState<Project[]>([]);
-  const [mounted, setMounted] = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    setProjects(getProjects());
-    setMounted(true);
+    getProjects().then((p) => {
+      setProjects(p);
+      setLoaded(true);
+    });
   }, []);
 
-  if (!mounted) return null;
+  if (!loaded) return null;
 
   const activeCount = projects.filter(
     (p) => p.status === "Active" || p.status === "Pending Approval"

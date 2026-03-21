@@ -16,17 +16,16 @@ export default function ChangeRequestPage() {
   const [additionalCost, setAdditionalCost] = useState("");
   const [timeImpactDays, setTimeImpactDays] = useState("");
   const [submitted, setSubmitted] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    const p = getProject(projectId);
-    if (p) {
-      setProject(p);
-    }
-    setMounted(true);
+    getProject(projectId).then((p) => {
+      if (p) setProject(p);
+      setLoaded(true);
+    });
   }, [projectId]);
 
-  if (!mounted) return null;
+  if (!loaded) return null;
 
   if (!project) {
     return (
@@ -49,7 +48,7 @@ export default function ChangeRequestPage() {
 
   const atLimit = project.revisionsUsed >= project.revisionLimit;
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!project || atLimit) return;
 
@@ -74,7 +73,7 @@ export default function ChangeRequestPage() {
       ],
     };
 
-    saveProject(updatedProject);
+    await saveProject(updatedProject);
     setSubmitted(true);
   }
 

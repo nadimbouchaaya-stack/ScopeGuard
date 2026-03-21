@@ -21,17 +21,19 @@ function getDeadlineColor(days: number) {
 
 export default function Deadlines() {
   const [projects, setProjects] = useState<Project[]>([]);
-  const [mounted, setMounted] = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    const active = getProjects()
-      .filter((p) => p.status !== "Completed" && p.deadline)
-      .sort((a, b) => new Date(a.deadline!).getTime() - new Date(b.deadline!).getTime());
-    setProjects(active);
-    setMounted(true);
+    getProjects().then((all) => {
+      const active = all
+        .filter((p) => p.status !== "Completed" && p.deadline)
+        .sort((a, b) => new Date(a.deadline!).getTime() - new Date(b.deadline!).getTime());
+      setProjects(active);
+      setLoaded(true);
+    });
   }, []);
 
-  if (!mounted) return null;
+  if (!loaded) return null;
 
   const weekRevenue = projects
     .filter((p) => {

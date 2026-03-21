@@ -31,13 +31,13 @@ export default function NewProject() {
     setDeliverables(deliverables.filter((_, i) => i !== index));
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
     const filteredDeliverables = deliverables.filter((d) => d.trim() !== "");
     if (filteredDeliverables.length === 0) return;
 
-    saveProject({
+    await saveProject({
       id: crypto.randomUUID(),
       name,
       clientName,
