@@ -60,12 +60,20 @@ export async function getProjects(): Promise<Project[]> {
     .select("*")
     .order("created_at", { ascending: false });
 
-  if (pErr || !projects) return [];
+  if (pErr) {
+    console.error("Failed to fetch projects:", pErr);
+    throw new Error(pErr.message);
+  }
 
-  const { data: crs } = await supabase
+  const { data: crs, error: crErr } = await supabase
     .from("change_requests")
     .select("*")
     .order("created_at", { ascending: true });
+
+  if (crErr) {
+    console.error("Failed to fetch change requests:", crErr);
+    throw new Error(crErr.message);
+  }
 
   const crsByProject: Record<string, DbChangeRequest[]> = {};
   for (const cr of crs || []) {
@@ -73,7 +81,7 @@ export async function getProjects(): Promise<Project[]> {
     crsByProject[cr.project_id].push(cr);
   }
 
-  return projects.map((p: DbProject) => mapProject(p, crsByProject[p.id] || []));
+  return (projects || []).map((p: DbProject) => mapProject(p, crsByProject[p.id] || []));
 }
 
 export async function getProject(id: string): Promise<Project | undefined> {
@@ -83,21 +91,26 @@ export async function getProject(id: string): Promise<Project | undefined> {
     .eq("id", id)
     .single();
 
-  if (pErr || !project) return undefined;
+  if (pErr || !project) {
+    if (pErr) console.error("Failed to fetch project:", pErr);
+    return undefined;
+  }
 
-  const { data: crs } = await supabase
+  const { data: crs, error: crErr } = await supabase
     .from("change_requests")
     .select("*")
     .eq("project_id", id)
     .order("created_at", { ascending: true });
 
-  return mapProject(project as DbProject, (crs || []) as DbChangeRequest[]);
+  if (crErr) console.error("Failed to fetch change requests for project:", crErr);
+
+  return mapProject(project as DbProject, ((crs || []) as DbChangeRequest[]));
 }
 
 export async function saveProject(project: Project): Promise<void> {
   const { changeRequests, ...rest } = project;
 
-  await supabase.from("projects").upsert({
+  const { error: projectErr } = await supabase.from("projects").upsert({
     id: rest.id,
     name: rest.name,
     client_name: rest.clientName,
@@ -113,9 +126,13 @@ export async function saveProject(project: Project): Promise<void> {
     created_at: rest.createdAt,
   });
 
-  // Upsert all change requests for this project
+  if (projectErr) {
+    console.error("Failed to save project:", projectErr);
+    throw new Error(projectErr.message);
+  }
+
   if (changeRequests.length > 0) {
-    await supabase.from("change_requests").upsert(
+    const { error: crErr } = await supabase.from("change_requests").upsert(
       changeRequests.map((cr) => ({
         id: cr.id,
         project_id: cr.projectId,
@@ -126,9 +143,18 @@ export async function saveProject(project: Project): Promise<void> {
         created_at: cr.createdAt,
       }))
     );
+
+    if (crErr) {
+      console.error("Failed to save change requests:", crErr);
+      throw new Error(crErr.message);
+    }
   }
 }
 
 export async function deleteProject(id: string): Promise<void> {
-  await supabase.from("projects").delete().eq("id", id);
+  const { error } = await supabase.from("projects").delete().eq("id", id);
+  if (error) {
+    console.error("Failed to delete project:", error);
+    throw new Error(error.message);
+  }
 }

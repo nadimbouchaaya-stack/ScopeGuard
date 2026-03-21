@@ -15,6 +15,8 @@ export default function NewProject() {
   const [deadline, setDeadline] = useState("");
   const [deliverablesLink, setDeliverablesLink] = useState("");
   const [paymentLink, setPaymentLink] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
   function addDeliverable() {
     setDeliverables([...deliverables, ""]);
@@ -33,32 +35,41 @@ export default function NewProject() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setError(null);
 
     const filteredDeliverables = deliverables.filter((d) => d.trim() !== "");
     if (filteredDeliverables.length === 0) return;
 
-    await saveProject({
-      id: crypto.randomUUID(),
-      name,
-      clientName,
-      clientEmail,
-      deliverables: filteredDeliverables.map((d) => ({
+    setSaving(true);
+    try {
+      await saveProject({
         id: crypto.randomUUID(),
-        description: d,
-        completed: false,
-      })),
-      revisionLimit,
-      revisionsUsed: 0,
-      price: parseFloat(price) || 0,
-      status: "Active",
-      changeRequests: [],
-      createdAt: new Date().toISOString(),
-      ...(deadline ? { deadline } : {}),
-      ...(deliverablesLink.trim() ? { deliverablesLink: deliverablesLink.trim() } : {}),
-      ...(paymentLink.trim() ? { paymentLink: paymentLink.trim() } : {}),
-    });
+        name,
+        clientName,
+        clientEmail,
+        deliverables: filteredDeliverables.map((d) => ({
+          id: crypto.randomUUID(),
+          description: d,
+          completed: false,
+        })),
+        revisionLimit,
+        revisionsUsed: 0,
+        price: parseFloat(price) || 0,
+        status: "Active",
+        changeRequests: [],
+        createdAt: new Date().toISOString(),
+        ...(deadline ? { deadline } : {}),
+        ...(deliverablesLink.trim() ? { deliverablesLink: deliverablesLink.trim() } : {}),
+        ...(paymentLink.trim() ? { paymentLink: paymentLink.trim() } : {}),
+      });
 
-    router.push("/");
+      router.push("/");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to save project";
+      console.log("Save project error:", err);
+      setError(message);
+      setSaving(false);
+    }
   }
 
   const inputClass =
@@ -73,6 +84,18 @@ export default function NewProject() {
           Define your project scope and protect it from day one.
         </p>
       </div>
+
+      {error && (
+        <div className="bg-[#F87171]/10 border border-[#F87171]/30 rounded-xl px-5 py-4 mb-2 flex items-start gap-3">
+          <svg className="w-5 h-5 text-[#F87171] shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+          </svg>
+          <div>
+            <p className="text-[#F87171] font-medium text-sm">Failed to create project</p>
+            <p className="text-[#F87171]/70 text-sm mt-0.5">{error}</p>
+          </div>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="bg-[#1E293B] border border-[#475569] rounded-xl p-6 space-y-5">
@@ -240,9 +263,10 @@ export default function NewProject() {
 
         <button
           type="submit"
-          className="w-full bg-[#6366F1] hover:bg-[#5558E6] text-[#F1F5F9] font-semibold py-3.5 rounded-xl transition-colors text-base"
+          disabled={saving}
+          className="w-full bg-[#6366F1] hover:bg-[#5558E6] disabled:opacity-50 disabled:cursor-not-allowed text-[#F1F5F9] font-semibold py-3.5 rounded-xl transition-colors text-base"
         >
-          Create Project & Send to Client
+          {saving ? "Saving..." : "Create Project & Send to Client"}
         </button>
       </form>
     </div>
