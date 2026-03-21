@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const publicRoutes = ["/login", "/signup"];
+const publicRoutes = ["/login", "/signup", "/auth/callback"];
 
 function isPortalRoute(pathname: string) {
   return pathname.startsWith("/portal/");
