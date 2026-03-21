@@ -10,6 +10,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const isPortal = pathname.startsWith("/portal");
+  const isLanding = pathname === "/";
   const isAuthPage = pathname === "/login" || pathname === "/signup";
   const [menuOpen, setMenuOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
@@ -30,18 +31,19 @@ export default function Navbar() {
   }
 
   const navLinks = [
-    { href: "/", label: "Dashboard" },
+    { href: "/dashboard", label: "Dashboard" },
     { href: "/projects", label: "Projects" },
     { href: "/deadlines", label: "Deadlines" },
     { href: "/history", label: "History" },
   ];
 
-  const showNav = !isPortal && !isAuthPage && user;
+  const showAppNav = !isPortal && !isAuthPage && !isLanding && user;
+  const showLandingNav = isLanding && !user;
 
   return (
-    <nav className="bg-[#0F172A] border-b border-[#475569]">
+    <nav className={`bg-[#0F172A] ${isLanding ? "border-b border-[#475569]/50" : "border-b border-[#475569]"}`}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-        <Link href={user ? "/" : "/login"} className="flex items-center gap-2.5">
+        <Link href={user ? "/dashboard" : "/"} className="flex items-center gap-2.5">
           <div className="w-8 h-8 bg-[#6366F1] rounded-lg flex items-center justify-center">
             <svg
               className="w-5 h-5 text-[#F1F5F9]"
@@ -62,7 +64,26 @@ export default function Navbar() {
           </span>
         </Link>
 
-        {showNav && (
+        {/* Landing page nav — Login / Sign Up */}
+        {showLandingNav && (
+          <div className="flex items-center gap-3">
+            <Link
+              href="/login"
+              className="text-sm font-medium text-[#94A3B8] hover:text-[#F1F5F9] transition-colors px-3 py-2"
+            >
+              Log In
+            </Link>
+            <Link
+              href="/signup"
+              className="text-sm font-medium bg-[#6366F1] hover:bg-[#5558E6] text-[#F1F5F9] px-4 py-2 rounded-lg transition-colors"
+            >
+              Sign Up
+            </Link>
+          </div>
+        )}
+
+        {/* Authenticated app nav */}
+        {showAppNav && (
           <>
             {/* Desktop nav */}
             <div className="hidden md:flex items-center gap-6">
@@ -124,7 +145,7 @@ export default function Navbar() {
       </div>
 
       {/* Mobile menu dropdown */}
-      {showNav && menuOpen && (
+      {showAppNav && menuOpen && (
         <div className="md:hidden border-t border-[#475569] bg-[#0F172A] px-4 pb-4 pt-2 space-y-1">
           {navLinks.map((link) => (
             <Link

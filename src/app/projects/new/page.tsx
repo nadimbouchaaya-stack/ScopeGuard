@@ -137,7 +137,7 @@ export default function NewProject() {
 
           <div className="flex gap-3 justify-center mt-6">
             <button
-              onClick={() => router.push("/")}
+              onClick={() => router.push("/dashboard")}
               className="bg-[#6366F1] hover:bg-[#5558E6] text-[#F1F5F9] font-semibold px-6 py-3 rounded-xl transition-colors text-sm"
             >
               Back to Dashboard

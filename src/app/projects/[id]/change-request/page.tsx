@@ -37,7 +37,7 @@ export default function ChangeRequestPage() {
           This project may have been deleted.
         </p>
         <Link
-          href="/"
+          href="/dashboard"
           className="text-[#818CF8] hover:text-[#A5B4FC] font-medium"
         >
           Back to Dashboard
@@ -105,7 +105,7 @@ export default function ChangeRequestPage() {
         </p>
         <div className="flex gap-3 justify-center">
           <Link
-            href="/"
+            href="/dashboard"
             className="bg-[#334155] hover:bg-[#475569] text-[#F1F5F9] font-medium px-5 py-2.5 rounded-lg transition-colors"
           >
             Back to Dashboard
@@ -129,7 +129,7 @@ export default function ChangeRequestPage() {
     <div className="max-w-2xl mx-auto">
       <div className="mb-8">
         <Link
-          href="/"
+          href="/dashboard"
           className="text-sm text-[#94A3B8] hover:text-[#F1F5F9] transition-colors flex items-center gap-1 mb-4"
         >
           <svg
@@ -173,7 +173,7 @@ export default function ChangeRequestPage() {
             <div className="h-2 rounded-full bg-[#F87171] w-full" />
           </div>
           <Link
-            href="/"
+            href="/dashboard"
             className="bg-[#334155] hover:bg-[#475569] text-[#F1F5F9] font-medium px-5 py-2.5 rounded-lg transition-colors inline-block"
           >
             Back to Dashboard

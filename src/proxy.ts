@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const publicRoutes = ["/login", "/signup", "/auth/callback"];
+const publicRoutes = ["/", "/login", "/signup", "/auth/callback"];
 
 function isPortalRoute(pathname: string) {
   return pathname.startsWith("/portal/");
@@ -47,6 +47,13 @@ export async function proxy(request: NextRequest) {
     return supabaseResponse;
   }
 
+  // Landing page: authenticated users go to /dashboard
+  if (pathname === "/" && user) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/dashboard";
+    return NextResponse.redirect(url);
+  }
+
   // Redirect unauthenticated users to login (except public routes)
   if (!user && !publicRoutes.includes(pathname)) {
     const url = request.nextUrl.clone();
@@ -54,10 +61,10 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Redirect authenticated users away from login/signup
-  if (user && publicRoutes.includes(pathname)) {
+  // Redirect authenticated users away from login/signup to dashboard
+  if (user && (pathname === "/login" || pathname === "/signup")) {
     const url = request.nextUrl.clone();
-    url.pathname = "/";
+    url.pathname = "/dashboard";
     return NextResponse.redirect(url);
   }
 
