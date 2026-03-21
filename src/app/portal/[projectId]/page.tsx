@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { Project, ChangeRequest } from "@/lib/types";
-import { getProject, saveProject } from "@/lib/storage";
+import { getProjectPublic, saveProjectPublic } from "@/lib/storage";
 
 const statusColors: Record<string, string> = {
   Active: "bg-[#34D399]/15 text-[#34D399] border-[#34D399]/30",
@@ -25,7 +25,7 @@ export default function ClientPortal() {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    getProject(projectId).then((p) => {
+    getProjectPublic(projectId).then((p) => {
       if (p) setProject(p);
       setLoaded(true);
     });
@@ -51,7 +51,7 @@ export default function ClientPortal() {
       ),
     };
 
-    await saveProject(updatedProject);
+    await saveProjectPublic(updatedProject);
     setProject(updatedProject);
   }
 

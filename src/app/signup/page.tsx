@@ -1,0 +1,189 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
+
+export default function SignupPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters");
+      return;
+    }
+
+    setLoading(true);
+
+    const supabase = createClient();
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+
+    if (error) {
+      setError(error.message);
+      setLoading(false);
+      return;
+    }
+
+    setSuccess(true);
+    setLoading(false);
+  }
+
+  const inputClass =
+    "w-full bg-[#0F172A] border border-[#475569] rounded-lg px-4 py-3 text-[#F1F5F9] placeholder-[#94A3B8]/50 focus:outline-none focus:border-[#6366F1] focus:ring-1 focus:ring-[#6366F1] transition-colors";
+
+  if (success) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center px-4">
+        <div className="w-full max-w-md text-center">
+          <div className="bg-[#1E293B] border border-[#475569] rounded-xl p-8">
+            <div className="w-16 h-16 bg-[#34D399]/15 rounded-2xl flex items-center justify-center mx-auto mb-5">
+              <svg
+                className="w-8 h-8 text-[#34D399]"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"
+                />
+              </svg>
+            </div>
+            <h1 className="text-2xl font-bold text-[#F1F5F9] mb-2">
+              Check your email
+            </h1>
+            <p className="text-[#94A3B8] mb-6">
+              We sent a confirmation link to{" "}
+              <strong className="text-[#F1F5F9]">{email}</strong>. Click the
+              link to activate your account.
+            </p>
+            <Link
+              href="/login"
+              className="text-[#818CF8] hover:text-[#A5B4FC] font-medium text-sm"
+            >
+              Back to Sign In
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-[80vh] flex items-center justify-center px-4">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <div className="w-12 h-12 bg-[#6366F1] rounded-xl flex items-center justify-center mx-auto mb-4">
+            <svg
+              className="w-7 h-7 text-[#F1F5F9]"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2.5}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"
+              />
+            </svg>
+          </div>
+          <h1 className="text-2xl font-bold text-[#F1F5F9]">
+            Create your account
+          </h1>
+          <p className="text-[#94A3B8] text-sm mt-1">
+            Start protecting your projects from scope creep
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="bg-[#1E293B] border border-[#475569] rounded-xl p-6 space-y-4">
+            {error && (
+              <div className="bg-[#F87171]/10 border border-[#F87171]/30 rounded-lg px-4 py-3">
+                <p className="text-[#F87171] text-sm">{error}</p>
+              </div>
+            )}
+
+            <div>
+              <label className="block text-sm font-medium text-[#94A3B8] mb-2">
+                Email
+              </label>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                className={inputClass}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#94A3B8] mb-2">
+                Password
+              </label>
+              <input
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="At least 6 characters"
+                className={inputClass}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#94A3B8] mb-2">
+                Confirm Password
+              </label>
+              <input
+                type="password"
+                required
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Confirm your password"
+                className={inputClass}
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-[#6366F1] hover:bg-[#5558E6] disabled:opacity-50 disabled:cursor-not-allowed text-[#F1F5F9] font-semibold py-3 rounded-xl transition-colors"
+          >
+            {loading ? "Creating account..." : "Create Account"}
+          </button>
+        </form>
+
+        <p className="text-center text-sm text-[#94A3B8] mt-6">
+          Already have an account?{" "}
+          <Link
+            href="/login"
+            className="text-[#818CF8] hover:text-[#A5B4FC] font-medium"
+          >
+            Sign in
+          </Link>
+        </p>
+      </div>
+    </div>
+  );
+}

@@ -1,12 +1,5 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from "./supabase/client";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error(
-    `Missing Supabase env vars. NEXT_PUBLIC_SUPABASE_URL=${supabaseUrl ? "set" : "MISSING"}, NEXT_PUBLIC_SUPABASE_ANON_KEY=${supabaseAnonKey ? "set" : "MISSING"}`
-  );
-}
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Re-export a singleton browser client for use in storage.ts and other client components.
+// This maintains backward compatibility with existing imports.
+export const supabase = createClient();

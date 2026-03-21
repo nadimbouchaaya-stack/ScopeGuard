@@ -1,5 +1,9 @@
-import { supabase } from "./supabase";
+import { createClient } from "./supabase/client";
 import { Project, ChangeRequest, Deliverable } from "./types";
+
+function getSupabase() {
+  return createClient();
+}
 
 interface DbProject {
   id: string;
@@ -15,6 +19,7 @@ interface DbProject {
   payment_link: string | null;
   deliverables: Deliverable[];
   created_at: string;
+  user_id?: string;
 }
 
 interface DbChangeRequest {
@@ -25,6 +30,7 @@ interface DbChangeRequest {
   time_impact_days: number;
   status: string;
   created_at: string;
+  user_id?: string;
 }
 
 function mapProject(row: DbProject, changeRequests: DbChangeRequest[]): Project {
@@ -54,10 +60,21 @@ function mapProject(row: DbProject, changeRequests: DbChangeRequest[]): Project 
   };
 }
 
+async function getUserId(): Promise<string> {
+  const supabase = getSupabase();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not authenticated");
+  return user.id;
+}
+
 export async function getProjects(): Promise<Project[]> {
+  const supabase = getSupabase();
+  const userId = await getUserId();
+
   const { data: projects, error: pErr } = await supabase
     .from("projects")
     .select("*")
+    .eq("user_id", userId)
     .order("created_at", { ascending: false });
 
   if (pErr) {
@@ -65,10 +82,15 @@ export async function getProjects(): Promise<Project[]> {
     throw new Error(pErr.message);
   }
 
-  const { data: crs, error: crErr } = await supabase
-    .from("change_requests")
-    .select("*")
-    .order("created_at", { ascending: true });
+  const projectIds = (projects || []).map((p: DbProject) => p.id);
+
+  const { data: crs, error: crErr } = projectIds.length > 0
+    ? await supabase
+        .from("change_requests")
+        .select("*")
+        .in("project_id", projectIds)
+        .order("created_at", { ascending: true })
+    : { data: [], error: null };
 
   if (crErr) {
     console.error("Failed to fetch change requests:", crErr);
@@ -85,6 +107,8 @@ export async function getProjects(): Promise<Project[]> {
 }
 
 export async function getProject(id: string): Promise<Project | undefined> {
+  const supabase = getSupabase();
+
   const { data: project, error: pErr } = await supabase
     .from("projects")
     .select("*")
@@ -108,6 +132,8 @@ export async function getProject(id: string): Promise<Project | undefined> {
 }
 
 export async function saveProject(project: Project): Promise<void> {
+  const supabase = getSupabase();
+  const userId = await getUserId();
   const { changeRequests, ...rest } = project;
 
   const { error: projectErr } = await supabase.from("projects").upsert({
@@ -124,6 +150,7 @@ export async function saveProject(project: Project): Promise<void> {
     payment_link: rest.paymentLink || null,
     deliverables: rest.deliverables,
     created_at: rest.createdAt,
+    user_id: userId,
   });
 
   if (projectErr) {
@@ -141,6 +168,7 @@ export async function saveProject(project: Project): Promise<void> {
         time_impact_days: cr.timeImpactDays,
         status: cr.status,
         created_at: cr.createdAt,
+        user_id: userId,
       }))
     );
 
@@ -152,9 +180,71 @@ export async function saveProject(project: Project): Promise<void> {
 }
 
 export async function deleteProject(id: string): Promise<void> {
+  const supabase = getSupabase();
   const { error } = await supabase.from("projects").delete().eq("id", id);
   if (error) {
     console.error("Failed to delete project:", error);
     throw new Error(error.message);
+  }
+}
+
+/**
+ * Public project fetch for the client portal — no auth required.
+ * Uses a fresh client; RLS policy allows SELECT by project ID for anyone.
+ */
+export async function getProjectPublic(id: string): Promise<Project | undefined> {
+  const supabase = getSupabase();
+
+  const { data: project, error: pErr } = await supabase
+    .from("projects")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (pErr || !project) {
+    if (pErr) console.error("Failed to fetch public project:", pErr);
+    return undefined;
+  }
+
+  const { data: crs, error: crErr } = await supabase
+    .from("change_requests")
+    .select("*")
+    .eq("project_id", id)
+    .order("created_at", { ascending: true });
+
+  if (crErr) console.error("Failed to fetch change requests for public project:", crErr);
+
+  return mapProject(project as DbProject, ((crs || []) as DbChangeRequest[]));
+}
+
+/**
+ * Public save for portal actions (approve/decline change requests).
+ * Does not require auth — RLS policy allows UPDATE on specific conditions.
+ */
+export async function saveProjectPublic(project: Project): Promise<void> {
+  const supabase = getSupabase();
+  const { changeRequests, ...rest } = project;
+
+  const { error: projectErr } = await supabase.from("projects").update({
+    deadline: rest.deadline || null,
+  }).eq("id", rest.id);
+
+  if (projectErr) {
+    console.error("Failed to update project (public):", projectErr);
+    throw new Error(projectErr.message);
+  }
+
+  if (changeRequests.length > 0) {
+    for (const cr of changeRequests) {
+      const { error: crErr } = await supabase
+        .from("change_requests")
+        .update({ status: cr.status })
+        .eq("id", cr.id);
+
+      if (crErr) {
+        console.error("Failed to update change request (public):", crErr);
+        throw new Error(crErr.message);
+      }
+    }
   }
 }
