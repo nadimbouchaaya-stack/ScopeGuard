@@ -12,7 +12,10 @@
       "Bash(npx next:*)",
       "Bash(npm uninstall:*)",
       "Bash(taskkill //F //IM node.exe)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(grep -E \"\\\\.\\(ts|tsx|js|jsx\\)$\")",
+      "Bash(ls:*)",
+      "Bash(git show:*)"
     ]
   }
 }
