@@ -68,28 +68,34 @@ export default function NewProject() {
       });
 
       // Send email to client
+      console.log("[new-project] Project saved, sending email...");
       const portalUrl = `https://scope-guard-fawn.vercel.app/portal/${projectId}`;
+      const emailPayload = {
+        clientName,
+        clientEmail,
+        projectName: name,
+        deliverables: filteredDeliverables,
+        revisionLimit,
+        price: projectPrice,
+        deadline: deadline || undefined,
+        portalUrl,
+      };
+      console.log("[new-project] Email payload:", emailPayload);
+
       const emailRes = await fetch("/api/send-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          clientName,
-          clientEmail,
-          projectName: name,
-          deliverables: filteredDeliverables,
-          revisionLimit,
-          price: projectPrice,
-          deadline: deadline || undefined,
-          portalUrl,
-        }),
+        body: JSON.stringify(emailPayload),
       });
 
+      console.log("[new-project] Email API response status:", emailRes.status);
+      const emailData = await emailRes.json();
+      console.log("[new-project] Email API response body:", emailData);
+
       if (!emailRes.ok) {
-        const emailErr = await emailRes.json();
-        console.log("Email send error:", emailErr);
         // Project saved successfully but email failed — still show success with warning
         setSuccess(true);
-        setError(`Project created but email failed to send: ${emailErr.error || "Unknown error"}`);
+        setError(`Project created but email failed to send: ${emailData.error || "Unknown error"}`);
         setSaving(false);
         return;
       }

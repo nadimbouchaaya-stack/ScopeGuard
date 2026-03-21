@@ -1,8 +1,6 @@
 import { Resend } from "resend";
 import { NextRequest, NextResponse } from "next/server";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 interface EmailPayload {
   clientName: string;
   clientEmail: string;
@@ -15,8 +13,32 @@ interface EmailPayload {
 }
 
 export async function POST(request: NextRequest) {
+  console.log("[send-email] API route hit");
+
   try {
+    const apiKey = process.env.RESEND_API_KEY;
+    console.log("[send-email] RESEND_API_KEY present:", !!apiKey);
+    console.log("[send-email] RESEND_API_KEY length:", apiKey?.length ?? 0);
+
+    if (!apiKey) {
+      console.error("[send-email] RESEND_API_KEY is not set");
+      return NextResponse.json(
+        { error: "Server misconfiguration: missing RESEND_API_KEY" },
+        { status: 500 }
+      );
+    }
+
+    const resend = new Resend(apiKey);
+
     const body: EmailPayload = await request.json();
+    console.log("[send-email] Payload received:", {
+      clientName: body.clientName,
+      clientEmail: body.clientEmail,
+      projectName: body.projectName,
+      deliverableCount: body.deliverables?.length,
+      hasDeadline: !!body.deadline,
+      portalUrl: body.portalUrl,
+    });
 
     const {
       clientName,
@@ -131,6 +153,7 @@ export async function POST(request: NextRequest) {
 </body>
 </html>`;
 
+    console.log("[send-email] Calling resend.emails.send...");
     const { data, error } = await resend.emails.send({
       from: "ScopeGuard <onboarding@resend.dev>",
       to: clientEmail,
@@ -139,13 +162,14 @@ export async function POST(request: NextRequest) {
     });
 
     if (error) {
-      console.error("Resend error:", error);
+      console.error("[send-email] Resend API error:", JSON.stringify(error));
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    console.log("[send-email] Email sent successfully, id:", data?.id);
     return NextResponse.json({ success: true, id: data?.id });
   } catch (err) {
-    console.error("Send email error:", err);
+    console.error("[send-email] Unexpected error:", err);
     const message = err instanceof Error ? err.message : "Failed to send email";
     return NextResponse.json({ error: message }, { status: 500 });
   }
