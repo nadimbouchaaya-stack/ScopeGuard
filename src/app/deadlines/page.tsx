@@ -44,9 +44,9 @@ export default function Deadlines() {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-[#F1F5F9]">Deadlines</h1>
-        <p className="text-[#94A3B8] mt-1">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-[#F1F5F9]">Deadlines</h1>
+        <p className="text-[#94A3B8] mt-1 text-sm sm:text-base">
           Track upcoming deadlines across all active projects.
         </p>
       </div>
@@ -115,18 +115,20 @@ export default function Deadlines() {
               return (
                 <div
                   key={project.id}
-                  className="bg-[#1E293B] border border-[#475569] rounded-xl p-5 flex items-center gap-4 hover:bg-[#334155] transition-colors"
+                  className="bg-[#1E293B] border border-[#475569] rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 hover:bg-[#334155] transition-colors"
                 >
-                  <div className={`w-3 h-3 rounded-full ${color.dot} shrink-0`} />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 mb-1">
-                      <h3 className="font-semibold text-[#F1F5F9] truncate">{project.name}</h3>
-                      <span className="text-[#94A3B8] text-sm shrink-0">{project.clientName}</span>
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className={`w-3 h-3 rounded-full ${color.dot} shrink-0`} />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 sm:gap-3 mb-0.5 sm:mb-1">
+                        <h3 className="font-semibold text-[#F1F5F9] truncate text-sm sm:text-base">{project.name}</h3>
+                        <span className="text-[#94A3B8] text-xs sm:text-sm shrink-0">{project.clientName}</span>
+                      </div>
+                      <p className="text-[#94A3B8]/60 text-xs sm:text-sm">{dueDate}</p>
                     </div>
-                    <p className="text-[#94A3B8]/60 text-sm">{dueDate}</p>
                   </div>
-                  <div className="text-right shrink-0">
-                    <span className={`text-sm font-medium ${color.text} ${color.bg} px-3 py-1 rounded-full`}>
+                  <div className="text-right sm:shrink-0 ml-6 sm:ml-0">
+                    <span className={`text-xs sm:text-sm font-medium ${color.text} ${color.bg} px-3 py-1 rounded-full`}>
                       {color.label}
                     </span>
                   </div>

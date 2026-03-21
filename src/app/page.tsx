@@ -122,21 +122,21 @@ export default function Dashboard() {
 
   return (
     <div>
-      <div className="text-center mb-12 pt-4">
-        <h1 className="text-3xl font-bold text-[#F1F5F9] mb-2">Welcome to ScopeGuard</h1>
-        <p className="text-[#94A3B8]">
+      <div className="text-center mb-8 sm:mb-12 pt-2 sm:pt-4">
+        <h1 className="text-2xl sm:text-3xl font-bold text-[#F1F5F9] mb-2">Welcome to ScopeGuard</h1>
+        <p className="text-[#94A3B8] text-sm sm:text-base">
           Protect your freelance projects from scope creep.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-3xl mx-auto">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 max-w-3xl mx-auto">
         {cards.map((card) => {
           const colors = colorMap[card.color];
           return (
             <Link
               key={card.title}
               href={card.href}
-              className={`group relative bg-[#1E293B] border ${colors.border} rounded-xl p-8 transition-all hover:bg-[#334155] hover:scale-[1.02] hover:shadow-lg`}
+              className={`group relative bg-[#1E293B] border ${colors.border} rounded-xl p-5 sm:p-8 transition-all hover:bg-[#334155] hover:scale-[1.02] hover:shadow-lg`}
             >
               {card.badge && (
                 <span className={`absolute top-4 right-4 text-xs font-medium px-2.5 py-1 rounded-full ${colors.badgeBg} ${colors.badgeText}`}>

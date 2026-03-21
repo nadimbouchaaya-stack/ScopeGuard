@@ -95,10 +95,10 @@ export default function ClientPortal() {
   return (
     <div className="max-w-3xl mx-auto">
       {/* Header */}
-      <div className="bg-[#1E293B] border border-[#475569] rounded-xl p-6 mb-6">
-        <div className="flex items-start justify-between mb-4">
+      <div className="bg-[#1E293B] border border-[#475569] rounded-xl p-4 sm:p-6 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-4">
           <div>
-            <h1 className="text-2xl font-bold text-[#F1F5F9]">{project.name}</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-[#F1F5F9]">{project.name}</h1>
             <p className="text-[#94A3B8] mt-1">Client: {project.clientName}</p>
             <p className="text-[#94A3B8]/70 text-sm mt-0.5">{project.clientEmail}</p>
           </div>
@@ -109,7 +109,7 @@ export default function ClientPortal() {
           </span>
         </div>
 
-        <div className="grid grid-cols-3 gap-4 pt-4 border-t border-[#475569]">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-[#475569]">
           <div>
             <p className="text-xs text-[#94A3B8]/60 uppercase tracking-wider mb-1">
               Project Price
@@ -290,7 +290,7 @@ function ChangeRequestCard({
   return (
     <div className="bg-[#0F172A]/50 rounded-lg p-4">
       <p className="text-[#F1F5F9] font-medium mb-2">{cr.description}</p>
-      <div className="flex gap-4 text-sm text-[#94A3B8] mb-4">
+      <div className="flex flex-col sm:flex-row gap-1 sm:gap-4 text-sm text-[#94A3B8] mb-4">
         <span>
           Additional cost:{" "}
           <span className="text-[#F1F5F9] font-medium">

@@ -156,9 +156,9 @@ export default function NewProject() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-[#F1F5F9]">New Project</h1>
-        <p className="text-[#94A3B8] mt-1">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-[#F1F5F9]">New Project</h1>
+        <p className="text-[#94A3B8] mt-1 text-sm sm:text-base">
           Define your project scope and protect it from day one.
         </p>
       </div>
@@ -193,7 +193,7 @@ export default function NewProject() {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className={labelClass}>Client Name</label>
               <input
@@ -218,7 +218,7 @@ export default function NewProject() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className={labelClass}>Revision Limit</label>
               <input

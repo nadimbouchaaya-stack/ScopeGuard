@@ -27,16 +27,16 @@ export default function ActiveProjects() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-[#F1F5F9]">Active Projects</h1>
-          <p className="text-[#94A3B8] mt-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#F1F5F9]">Active Projects</h1>
+          <p className="text-[#94A3B8] mt-1 text-sm sm:text-base">
             Manage your active projects and track scope changes.
           </p>
         </div>
         <Link
           href="/projects/new"
-          className="bg-[#6366F1] hover:bg-[#5558E6] text-[#F1F5F9] font-medium px-5 py-2.5 rounded-lg transition-colors flex items-center gap-2"
+          className="bg-[#6366F1] hover:bg-[#5558E6] text-[#F1F5F9] font-medium px-5 py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2 shrink-0"
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />

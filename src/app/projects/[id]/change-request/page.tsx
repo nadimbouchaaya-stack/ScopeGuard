@@ -147,7 +147,7 @@ export default function ChangeRequestPage() {
           </svg>
           Back to Dashboard
         </Link>
-        <h1 className="text-3xl font-bold text-[#F1F5F9]">Change Request</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-[#F1F5F9]">Change Request</h1>
         <p className="text-[#94A3B8] mt-1">
           For{" "}
           <span className="text-[#F1F5F9] font-medium">{project.name}</span> —{" "}
@@ -224,7 +224,7 @@ export default function ChangeRequestPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className={labelClass}>Additional Cost ($)</label>
                   <input

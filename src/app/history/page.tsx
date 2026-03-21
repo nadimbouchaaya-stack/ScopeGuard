@@ -29,9 +29,9 @@ export default function ProjectHistory() {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-[#F1F5F9]">Project History</h1>
-        <p className="text-[#94A3B8] mt-1">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-[#F1F5F9]">Project History</h1>
+        <p className="text-[#94A3B8] mt-1 text-sm sm:text-base">
           Completed projects grouped by client.
         </p>
       </div>

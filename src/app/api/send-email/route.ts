@@ -75,9 +75,12 @@ export async function POST(request: NextRequest) {
   <div style="max-width:600px;margin:0 auto;padding:40px 20px;">
 
     <!-- Header -->
-    <div style="background-color:#0F172A;border-radius:12px 12px 0 0;padding:32px;text-align:center;">
-      <h1 style="color:#F1F5F9;font-size:24px;margin:0 0 4px;">ScopeGuard</h1>
-      <p style="color:#94A3B8;font-size:14px;margin:0;">Project Scope Agreement</p>
+    <div style="background-color:#0F172A;border-radius:12px 12px 0 0;padding:32px 32px 28px;text-align:center;">
+      <div style="margin-bottom:8px;">
+        <span style="font-size:32px;line-height:1;">&#x1F6E1;&#xFE0F;</span>
+      </div>
+      <h1 style="color:#F1F5F9;font-size:26px;font-weight:800;margin:0 0 6px;letter-spacing:-0.5px;">ScopeGuard</h1>
+      <p style="color:#94A3B8;font-size:13px;margin:0;text-transform:uppercase;letter-spacing:1.5px;">Project Scope Agreement</p>
     </div>
 
     <!-- Body -->
