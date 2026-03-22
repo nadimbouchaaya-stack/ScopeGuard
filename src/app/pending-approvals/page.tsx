@@ -71,6 +71,7 @@ interface PendingCR {
 export default function PendingApprovalsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [showCashRain, setShowCashRain] = useState(false);
   const [cashRainEmoji, setCashRainEmoji] = useState("💵");
 
@@ -90,6 +91,10 @@ export default function PendingApprovalsPage() {
       const pending = allCRs.filter((cr) => cr.status?.toLowerCase().trim() === "pending");
       console.log("[PendingApprovals] pending:", pending.length);
       setProjects(p);
+      setLoaded(true);
+    }).catch((err) => {
+      console.error("[PendingApprovals] ERROR:", err);
+      setError(err instanceof Error ? err.message : String(err));
       setLoaded(true);
     });
 
@@ -164,6 +169,12 @@ export default function PendingApprovalsPage() {
           Review and respond to incoming requests
         </p>
       </div>
+
+      {error && (
+        <div className="mb-6 bg-[#F87171]/10 border border-[#F87171]/30 rounded-xl px-5 py-4 text-sm text-[#F87171]">
+          <strong>Error loading projects:</strong> {error}
+        </div>
+      )}
 
       {/* Stats bar */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">

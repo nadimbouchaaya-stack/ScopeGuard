@@ -19,6 +19,9 @@ export default function Dashboard() {
       console.log("[Dashboard] Pending CR count:", pendingCount);
       setProjects(p);
       setLoaded(true);
+    }).catch((err) => {
+      console.error("[Dashboard] ERROR:", err);
+      setLoaded(true);
     });
 
     const supabase = createClient();
