@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { Project, ChangeRequest } from "@/lib/types";
 import { getProjects, saveProject } from "@/lib/storage";
+import { createClient } from "@/lib/supabase/client";
 import { getProfile } from "@/lib/profile";
 
 interface CashDrop {
@@ -74,16 +75,24 @@ export default function PendingApprovalsPage() {
   const [cashRainEmoji, setCashRainEmoji] = useState("💵");
 
   useEffect(() => {
-    console.log("[PendingApprovals] Fetching projects...");
+    // Step 1: Log the authenticated user (same pattern as dashboard/Navbar)
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      console.log("[PendingApprovals] user:", user?.id, user?.email);
+    });
+
+    // Step 2: Fetch projects — EXACT same pattern as projects/page.tsx
     getProjects().then((p) => {
-      console.log("[PendingApprovals] Projects loaded:", p.length);
+      console.log("[PendingApprovals] projects:", p.length);
       const allCRs = p.flatMap((proj) => proj.changeRequests);
-      console.log("[PendingApprovals] Total CRs:", allCRs.length);
-      console.log("[DEBUG] raw statuses:", JSON.stringify(allCRs.map((cr) => cr.status)));
-      console.log("[PendingApprovals] Pending CRs:", allCRs.filter((cr) => cr.status?.toLowerCase().trim() === "pending").length);
+      console.log("[PendingApprovals] all CRs:", allCRs.length);
+      console.log("[PendingApprovals] raw statuses:", JSON.stringify(allCRs.map((cr) => cr.status)));
+      const pending = allCRs.filter((cr) => cr.status?.toLowerCase().trim() === "pending");
+      console.log("[PendingApprovals] pending:", pending.length);
       setProjects(p);
       setLoaded(true);
     });
+
     getProfile()
       .then((p) => setCashRainEmoji(p.cash_rain_emoji))
       .catch(() => {});

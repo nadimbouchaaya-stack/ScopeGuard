@@ -23,6 +23,7 @@ export default function Dashboard() {
 
     const supabase = createClient();
     supabase.auth.getUser().then(({ data: { user } }) => {
+      console.log("[Dashboard] user:", user?.id, user?.email);
       if (user) {
         const fullName = user.user_metadata?.full_name;
         if (fullName) {
