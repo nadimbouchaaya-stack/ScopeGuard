@@ -83,9 +83,6 @@ export default function PendingApprovalsPage() {
       console.log("[PendingApprovals] Pending CRs:", allCRs.filter((cr) => cr.status?.toLowerCase().trim() === "pending").length);
       setProjects(p);
       setLoaded(true);
-    }).catch((err) => {
-      console.error("[PendingApprovals] ERROR loading projects:", err);
-      setLoaded(true);
     });
     getProfile()
       .then((p) => setCashRainEmoji(p.cash_rain_emoji))
