@@ -182,12 +182,32 @@ export default function ActiveProjects() {
               (cr) => cr.status === "Pending"
             ).length;
 
+            const totalCRs = project.changeRequests.length;
+            const approvedCRs = project.changeRequests.filter(
+              (cr) => cr.status === "Approved"
+            ).length;
+            const approvalRate = totalCRs > 0 ? Math.round((approvedCRs / totalCRs) * 100) : -1;
+
+            const approvalStyle =
+              approvalRate < 0
+                ? "text-[#94A3B8] bg-[#475569]/50 border-[#475569]"
+                : approvalRate < 50
+                  ? "text-[#FBBF24] bg-[#FBBF24]/20 border-[#FBBF24]/30"
+                  : approvalRate < 80
+                    ? "text-[#60A5FA] bg-[#3B82F6]/20 border-[#3B82F6]/30"
+                    : "text-[#34D399] bg-[#34D399]/20 border-[#34D399]/30";
+
             return (
               <div
                 key={project.id}
-                className="bg-[#1E293B] border border-[#475569] rounded-xl p-6 hover:bg-[#334155] transition-colors group"
+                className="bg-[#1E293B] border border-[#475569] border-t-2 border-t-[#6366F1] rounded-xl p-6 hover:bg-[#334155] transition-colors group relative"
               >
-                <div className="flex items-start justify-between mb-4">
+                {/* Sent badge */}
+                <span className="absolute top-3 right-3 text-xs font-medium px-2 py-0.5 rounded-full bg-[#6366F1]/20 text-[#818CF8]">
+                  📤 Sent
+                </span>
+
+                <div className="flex items-start justify-between mb-4 pr-16">
                   <div className="flex-1 min-w-0">
                     <Link
                       href={`/projects/${project.id}`}
@@ -198,8 +218,8 @@ export default function ActiveProjects() {
                     <p className="text-[#94A3B8] text-sm mt-0.5">
                       {project.clientName}
                     </p>
-                    <p className="text-[#94A3B8]/70 text-xs mt-0.5">
-                      {project.clientEmail}
+                    <p className="text-xs text-[#64748B] mt-0.5">
+                      Scope sent to {project.clientName}
                     </p>
                   </div>
                   <span
@@ -322,6 +342,18 @@ export default function ActiveProjects() {
                       ))}
                   </div>
                 )}
+
+                {/* Approval rate bubble */}
+                <div className="flex items-center justify-end mb-4">
+                  <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-center ${approvalStyle}`}>
+                    <span className="text-sm font-bold leading-none">
+                      {approvalRate < 0 ? "—" : `${approvalRate}%`}
+                    </span>
+                    <span className="text-[10px] leading-none opacity-70">
+                      {approvalRate < 0 ? "no requests" : "approval"}
+                    </span>
+                  </div>
+                </div>
 
                 <div className="flex gap-2 pt-4 border-t border-[#475569]">
                   {project.revisionsUsed >= project.revisionLimit ? (
