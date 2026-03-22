@@ -81,7 +81,7 @@ export default function PendingApprovalsPage() {
         const allCRs = p.flatMap((proj) => proj.changeRequests);
         console.log("[PendingApprovals] Total CRs:", allCRs.length);
         console.log("[PendingApprovals] Pending CRs:", allCRs.filter((cr) => cr.status === "Pending").length);
-        console.log("[PendingApprovals] CR statuses:", allCRs.map((cr) => ({ id: cr.id, status: cr.status, desc: cr.description })));
+        console.log("[PendingApprovals] CR statuses (raw):", allCRs.map((cr) => JSON.stringify(cr.status)));
         setProjects(p);
         setLoaded(true);
       })

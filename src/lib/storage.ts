@@ -33,6 +33,13 @@ interface DbChangeRequest {
   user_id?: string;
 }
 
+function normalizeCRStatus(raw: string): ChangeRequest["status"] {
+  const lower = raw.toLowerCase();
+  if (lower === "approved") return "Approved";
+  if (lower === "declined") return "Declined";
+  return "Pending";
+}
+
 function mapProject(row: DbProject, changeRequests: DbChangeRequest[]): Project {
   return {
     id: row.id,
@@ -54,7 +61,7 @@ function mapProject(row: DbProject, changeRequests: DbChangeRequest[]): Project 
       description: cr.description,
       additionalCost: Number(cr.additional_cost),
       timeImpactDays: cr.time_impact_days,
-      status: cr.status as ChangeRequest["status"],
+      status: normalizeCRStatus(cr.status),
       createdAt: cr.created_at,
     })),
   };
