@@ -1,9 +1,75 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { Project, ChangeRequest } from "@/lib/types";
 import { getProjects, saveProject } from "@/lib/storage";
+
+interface CashDrop {
+  id: number;
+  left: number;
+  delay: number;
+  duration: number;
+  size: number;
+  rotation: number;
+}
+
+function CashRain({ onComplete }: { onComplete: () => void }) {
+  const [drops] = useState<CashDrop[]>(() =>
+    Array.from({ length: 40 }, (_, i) => ({
+      id: i,
+      left: Math.random() * 100,
+      delay: Math.random() * 0.8,
+      duration: 1.5 + Math.random() * 1.5,
+      size: 20 + Math.random() * 24,
+      rotation: Math.random() * 360,
+    }))
+  );
+
+  useEffect(() => {
+    const timer = setTimeout(onComplete, 3000);
+    return () => clearTimeout(timer);
+  }, [onComplete]);
+
+  return (
+    <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
+      {drops.map((drop) => (
+        <div
+          key={drop.id}
+          className="absolute animate-cash-fall"
+          style={{
+            left: `${drop.left}%`,
+            top: -50,
+            fontSize: drop.size,
+            animationDelay: `${drop.delay}s`,
+            animationDuration: `${drop.duration}s`,
+            ["--rotation" as string]: `${drop.rotation}deg`,
+          }}
+        >
+          💵
+        </div>
+      ))}
+      <style jsx>{`
+        @keyframes cash-fall {
+          0% {
+            transform: translateY(0) rotate(0deg);
+            opacity: 1;
+          }
+          70% {
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(105vh) rotate(var(--rotation));
+            opacity: 0;
+          }
+        }
+        .animate-cash-fall {
+          animation: cash-fall linear forwards;
+        }
+      `}</style>
+    </div>
+  );
+}
 
 const statusColors: Record<string, string> = {
   Active: "bg-[#34D399]/15 text-[#34D399] border-[#34D399]/30",
@@ -16,6 +82,7 @@ export default function ActiveProjects() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [expandedProject, setExpandedProject] = useState<string | null>(null);
+  const [showCashRain, setShowCashRain] = useState(false);
 
   useEffect(() => {
     getProjects().then((all) => {
@@ -53,12 +120,19 @@ export default function ActiveProjects() {
     setProjects((prev) =>
       prev.map((p) => (p.id === projectId ? updatedProject : p))
     );
+
+    if (action === "Approved") {
+      setShowCashRain(true);
+    }
   }
+
+  const handleCashRainComplete = useCallback(() => setShowCashRain(false), []);
 
   if (!loaded) return null;
 
   return (
     <div>
+      {showCashRain && <CashRain onComplete={handleCashRainComplete} />}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-[#F1F5F9]">Active Projects</h1>
