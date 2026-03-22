@@ -74,10 +74,21 @@ export default function PendingApprovalsPage() {
   const [cashRainEmoji, setCashRainEmoji] = useState("💵");
 
   useEffect(() => {
-    getProjects().then((p) => {
-      setProjects(p);
-      setLoaded(true);
-    });
+    console.log("[PendingApprovals] Fetching projects...");
+    getProjects()
+      .then((p) => {
+        console.log("[PendingApprovals] Projects loaded:", p.length);
+        const allCRs = p.flatMap((proj) => proj.changeRequests);
+        console.log("[PendingApprovals] Total CRs:", allCRs.length);
+        console.log("[PendingApprovals] Pending CRs:", allCRs.filter((cr) => cr.status === "Pending").length);
+        console.log("[PendingApprovals] CR statuses:", allCRs.map((cr) => ({ id: cr.id, status: cr.status, desc: cr.description })));
+        setProjects(p);
+        setLoaded(true);
+      })
+      .catch((err) => {
+        console.error("[PendingApprovals] Failed to load projects:", err);
+        setLoaded(true);
+      });
     getProfile()
       .then((p) => setCashRainEmoji(p.cash_rain_emoji))
       .catch(() => {});
