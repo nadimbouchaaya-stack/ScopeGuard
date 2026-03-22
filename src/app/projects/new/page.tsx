@@ -231,7 +231,7 @@ export default function NewProject() {
               />
             </div>
             <div>
-              <label className={labelClass}>Project Price ($)</label>
+              <label className={labelClass}>Total Contract Value ($)</label>
               <input
                 type="number"
                 required

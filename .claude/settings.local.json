@@ -15,7 +15,8 @@
       "WebSearch",
       "Bash(grep -E \"\\\\.\\(ts|tsx|js|jsx\\)$\")",
       "Bash(ls:*)",
-      "Bash(git show:*)"
+      "Bash(git show:*)",
+      "Bash(npx tsc:*)"
     ]
   }
 }

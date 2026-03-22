@@ -112,7 +112,7 @@ export default function ClientPortal() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-[#475569]">
           <div>
             <p className="text-xs text-[#94A3B8]/60 uppercase tracking-wider mb-1">
-              Project Price
+              Total Contract Value
             </p>
             <p className="text-lg font-semibold text-[#F1F5F9]">
               ${project.price.toLocaleString()}

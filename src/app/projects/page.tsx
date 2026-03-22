@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Project } from "@/lib/types";
-import { getProjects } from "@/lib/storage";
+import { Project, ChangeRequest } from "@/lib/types";
+import { getProjects, saveProject } from "@/lib/storage";
 
 const statusColors: Record<string, string> = {
   Active: "bg-[#34D399]/15 text-[#34D399] border-[#34D399]/30",
@@ -15,6 +15,7 @@ const statusColors: Record<string, string> = {
 export default function ActiveProjects() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [expandedProject, setExpandedProject] = useState<string | null>(null);
 
   useEffect(() => {
     getProjects().then((all) => {
@@ -22,6 +23,37 @@ export default function ActiveProjects() {
       setLoaded(true);
     });
   }, []);
+
+  async function handleChangeRequest(
+    projectId: string,
+    crId: string,
+    action: "Approved" | "Declined"
+  ) {
+    const project = projects.find((p) => p.id === projectId);
+    if (!project) return;
+
+    const cr = project.changeRequests.find((c) => c.id === crId);
+    let newDeadline = project.deadline;
+
+    if (action === "Approved" && cr && cr.timeImpactDays > 0 && project.deadline) {
+      const current = new Date(project.deadline);
+      current.setDate(current.getDate() + cr.timeImpactDays);
+      newDeadline = current.toISOString().split("T")[0];
+    }
+
+    const updatedProject: Project = {
+      ...project,
+      deadline: newDeadline,
+      changeRequests: project.changeRequests.map((c) =>
+        c.id === crId ? { ...c, status: action } : c
+      ),
+    };
+
+    await saveProject(updatedProject);
+    setProjects((prev) =>
+      prev.map((p) => (p.id === projectId ? updatedProject : p))
+    );
+  }
 
   if (!loaded) return null;
 
@@ -131,14 +163,83 @@ export default function ActiveProjects() {
                     <span className="font-medium text-[#F1F5F9]">${project.price.toLocaleString()}</span>
                   </div>
                   {pendingRequests > 0 && (
-                    <div className="flex items-center gap-1.5 text-[#FBBF24] text-sm">
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                    <button
+                      onClick={() =>
+                        setExpandedProject(
+                          expandedProject === project.id ? null : project.id
+                        )
+                      }
+                      className="flex items-center justify-between w-full text-[#FBBF24] text-sm hover:text-[#FCD34D] transition-colors"
+                    >
+                      <span className="flex items-center gap-1.5">
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                        </svg>
+                        {pendingRequests} pending change request{pendingRequests > 1 ? "s" : ""}
+                      </span>
+                      <svg
+                        className={`w-4 h-4 transition-transform ${expandedProject === project.id ? "rotate-180" : ""}`}
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                       </svg>
-                      {pendingRequests} pending change request{pendingRequests > 1 ? "s" : ""}
-                    </div>
+                    </button>
                   )}
                 </div>
+
+                {/* Expandable pending change requests */}
+                {expandedProject === project.id && pendingRequests > 0 && (
+                  <div className="space-y-3 mb-4">
+                    {project.changeRequests
+                      .filter((cr) => cr.status === "Pending")
+                      .map((cr) => (
+                        <div
+                          key={cr.id}
+                          className="bg-[#0F172A]/50 border border-[#475569]/50 rounded-lg p-3"
+                        >
+                          <p className="text-[#F1F5F9] text-sm font-medium mb-1.5">
+                            {cr.description}
+                          </p>
+                          <div className="flex flex-wrap gap-3 text-xs text-[#94A3B8] mb-3">
+                            <span>
+                              Cost:{" "}
+                              <span className="text-[#F1F5F9] font-medium">
+                                +${cr.additionalCost.toLocaleString()}
+                              </span>
+                            </span>
+                            <span>
+                              Deadline:{" "}
+                              <span className="text-[#F1F5F9] font-medium">
+                                +{cr.timeImpactDays} day
+                                {cr.timeImpactDays === 1 ? "" : "s"}
+                              </span>
+                            </span>
+                          </div>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() =>
+                                handleChangeRequest(project.id, cr.id, "Approved")
+                              }
+                              className="bg-[#34D399] hover:bg-[#2BC48E] text-[#0F172A] font-medium px-3.5 py-1.5 rounded-lg text-xs transition-colors"
+                            >
+                              Approve
+                            </button>
+                            <button
+                              onClick={() =>
+                                handleChangeRequest(project.id, cr.id, "Declined")
+                              }
+                              className="bg-[#334155] hover:bg-[#475569] text-[#94A3B8] hover:text-[#F1F5F9] font-medium px-3.5 py-1.5 rounded-lg text-xs transition-colors"
+                            >
+                              Decline
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                )}
 
                 <div className="flex gap-2 pt-4 border-t border-[#475569]">
                   {project.revisionsUsed >= project.revisionLimit ? (

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import PasswordInput from "@/components/PasswordInput";
 
 function GoogleIcon() {
   return (
@@ -138,8 +139,7 @@ export default function LoginPage() {
                 <label className="block text-sm font-medium text-[#94A3B8] mb-2">
                   Password
                 </label>
-                <input
-                  type="password"
+                <PasswordInput
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
