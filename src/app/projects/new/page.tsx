@@ -183,7 +183,7 @@ export default function NewProject() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6 pb-24">
         <div className="bg-[#1E293B] border border-[#475569] rounded-xl p-6 space-y-5">
           <h2 className="text-lg font-semibold text-[#F1F5F9] border-b border-[#475569] pb-3">
             Project Details

@@ -202,31 +202,18 @@ export default function ProfilePage() {
               <label className={labelClass} style={{ color: "var(--text-secondary, #94A3B8)" }}>
                 Full Name
               </label>
-              <div className="flex gap-3">
-                <input
-                  type="text"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Your full name"
-                  className={inputClass}
-                  style={{
-                    backgroundColor: "var(--bg-input, #0F172A)",
-                    borderColor: "var(--border, #475569)",
-                    color: "var(--text-primary, #F1F5F9)",
-                  }}
-                />
-                <button
-                  onClick={() => handleSave("name", { full_name: fullName })}
-                  disabled={saving === "name"}
-                  className="shrink-0 text-sm font-medium px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
-                  style={{
-                    backgroundColor: saved === "name" ? "var(--success, #34D399)" : "var(--accent, #6366F1)",
-                    color: saved === "name" ? "#0F172A" : "var(--text-primary, #F1F5F9)",
-                  }}
-                >
-                  {saving === "name" ? "..." : saved === "name" ? "Saved!" : "Save"}
-                </button>
-              </div>
+              <input
+                type="text"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                placeholder="Your full name"
+                className={inputClass}
+                style={{
+                  backgroundColor: "var(--bg-input, #0F172A)",
+                  borderColor: "var(--border, #475569)",
+                  color: "var(--text-primary, #F1F5F9)",
+                }}
+              />
             </div>
 
             <div>
@@ -247,6 +234,20 @@ export default function ProfilePage() {
               <p className="text-xs mt-1" style={{ color: "var(--text-secondary, #94A3B8)" }}>
                 Email is managed through your authentication provider
               </p>
+            </div>
+
+            <div className="flex justify-end pt-2">
+              <button
+                onClick={() => handleSave("name", { full_name: fullName })}
+                disabled={saving === "name"}
+                className="text-sm font-medium px-6 py-2.5 rounded-lg transition-colors disabled:opacity-50"
+                style={{
+                  backgroundColor: saved === "name" ? "var(--success, #34D399)" : "var(--accent, #6366F1)",
+                  color: saved === "name" ? "#0F172A" : "var(--text-primary, #F1F5F9)",
+                }}
+              >
+                {saving === "name" ? "Saving..." : saved === "name" ? "Saved!" : "Save"}
+              </button>
             </div>
           </div>
         </div>

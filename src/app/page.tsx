@@ -144,7 +144,7 @@ export default function LandingPage() {
       </section>
 
       {/* ===== HOW IT WORKS ===== */}
-      <section id="how-it-works" className="py-16 sm:py-24 scroll-mt-20">
+      <section id="how-it-works" className="pt-16 sm:pt-24 pb-8 sm:pb-12 scroll-mt-20">
         <div className="max-w-5xl mx-auto px-4">
           <div className="text-center mb-12 sm:mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-[#F1F5F9] mb-4">How it works</h2>

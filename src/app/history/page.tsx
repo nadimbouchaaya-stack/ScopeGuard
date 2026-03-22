@@ -37,7 +37,7 @@ export default function ProjectHistory() {
       </div>
 
       {clientNames.length === 0 ? (
-        <div className="text-center py-20 border border-dashed border-[#475569] rounded-2xl">
+        <div className="text-center py-20 border border-indigo-500/20 bg-indigo-500/5 rounded-2xl">
           <div className="w-16 h-16 bg-[#334155] rounded-2xl flex items-center justify-center mx-auto mb-4">
             <svg className="w-8 h-8 text-[#94A3B8]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />

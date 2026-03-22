@@ -4,15 +4,27 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Project } from "@/lib/types";
 import { getProjects } from "@/lib/storage";
+import { createClient } from "@/lib/supabase/client";
 
 export default function Dashboard() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [firstName, setFirstName] = useState<string | null>(null);
 
   useEffect(() => {
     getProjects().then((p) => {
       setProjects(p);
       setLoaded(true);
+    });
+
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        const fullName = user.user_metadata?.full_name;
+        if (fullName) {
+          setFirstName(fullName.split(" ")[0]);
+        }
+      }
     });
   }, []);
 
@@ -123,7 +135,9 @@ export default function Dashboard() {
   return (
     <div>
       <div className="text-center mb-8 sm:mb-12 pt-2 sm:pt-4">
-        <h1 className="text-2xl sm:text-3xl font-bold text-[#F1F5F9] mb-2">Welcome to ScopeGuard</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-[#F1F5F9] mb-2">
+          {firstName ? `Welcome back, ${firstName}!` : "Welcome back!"} 👋
+        </h1>
         <p className="text-[#94A3B8] text-sm sm:text-base">
           Protect your freelance projects from scope creep.
         </p>

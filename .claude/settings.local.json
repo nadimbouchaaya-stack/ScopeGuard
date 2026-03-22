@@ -16,7 +16,9 @@
       "Bash(grep -E \"\\\\.\\(ts|tsx|js|jsx\\)$\")",
       "Bash(ls:*)",
       "Bash(git show:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(find /c/Users/nadim/Desktop/scopeguard/app -type f \\\\\\(-name *.tsx -o -name *.ts -o -name *.json \\\\\\))",
+      "Bash(find /c/Users/nadim/Desktop/scopeguard/src/app -name *not-found* -o -name *error*)"
     ]
   }
 }
