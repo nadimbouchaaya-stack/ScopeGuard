@@ -158,7 +158,7 @@ export async function POST(request: NextRequest) {
 
     console.log("[send-email] Calling resend.emails.send...");
     const { data, error } = await resend.emails.send({
-      from: "ScopeGuard <onboarding@resend.dev>",
+      from: "ScopeGuard <noreply@tryscopeguard.com>",
       to: clientEmail,
       subject: `Your project scope is ready for review - ${projectName}`,
       html,
