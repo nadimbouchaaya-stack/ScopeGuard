@@ -118,7 +118,6 @@ export default function PendingApprovalsPage() {
 
   if (!loaded) return null;
 
-  // Derive stats from all projects
   const allCRs = projects.flatMap((p) =>
     p.changeRequests.map((cr) => ({ cr, project: p }))
   );
@@ -128,20 +127,17 @@ export default function PendingApprovalsPage() {
   const decidedCount = approvedCount + declinedCount;
   const approvalRate = decidedCount > 0 ? Math.round((approvedCount / decidedCount) * 100) : -1;
 
-  // Donut color
   const rateColor =
     approvalRate < 0
-      ? { stroke: "#94A3B8", text: "text-[#94A3B8]", bg: "bg-[#94A3B8]/10" }
+      ? { stroke: "#94A3B8", text: "text-[#94A3B8]" }
       : approvalRate < 50
-        ? { stroke: "#F87171", text: "text-[#F87171]", bg: "bg-[#F87171]/10" }
+        ? { stroke: "#F87171", text: "text-[#F87171]" }
         : approvalRate < 80
-          ? { stroke: "#FBBF24", text: "text-[#FBBF24]", bg: "bg-[#FBBF24]/10" }
-          : { stroke: "#34D399", text: "text-[#34D399]", bg: "bg-[#34D399]/10" };
+          ? { stroke: "#FBBF24", text: "text-[#FBBF24]" }
+          : { stroke: "#34D399", text: "text-[#34D399]" };
 
   const circumference = 2 * Math.PI * 28;
   const donutOffset = approvalRate >= 0 ? circumference * (1 - approvalRate / 100) : circumference;
-
-  const nothingPending = pendingCRs.length === 0;
 
   return (
     <div>
@@ -173,14 +169,9 @@ export default function PendingApprovalsPage() {
             <svg className="w-12 h-12 -rotate-90" viewBox="0 0 64 64">
               <circle cx="32" cy="32" r="28" fill="none" stroke="#334155" strokeWidth="5" />
               <circle
-                cx="32"
-                cy="32"
-                r="28"
-                fill="none"
-                stroke={rateColor.stroke}
-                strokeWidth="5"
-                strokeDasharray={circumference}
-                strokeDashoffset={donutOffset}
+                cx="32" cy="32" r="28" fill="none"
+                stroke={rateColor.stroke} strokeWidth="5"
+                strokeDasharray={circumference} strokeDashoffset={donutOffset}
                 strokeLinecap="round"
               />
             </svg>
@@ -209,7 +200,7 @@ export default function PendingApprovalsPage() {
         </div>
       </div>
 
-      {/* Section A — Change Requests */}
+      {/* Section A — Pending Change Requests */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-8 h-8 bg-[#FBBF24]/15 rounded-lg flex items-center justify-center shrink-0">
@@ -227,73 +218,83 @@ export default function PendingApprovalsPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <p className="text-[#F1F5F9] font-semibold text-lg mb-1">You're all caught up!</p>
+            <p className="text-[#F1F5F9] font-semibold text-lg mb-1">You&apos;re all caught up!</p>
             <p className="text-[#94A3B8] text-sm">No pending approvals 🎉</p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {pendingCRs.map(({ cr, project }) => (
               <div
                 key={cr.id}
-                className="bg-[#1E293B] border border-[#475569] rounded-xl p-5 hover:bg-[#334155] transition-colors"
+                className="bg-[#1E293B] border border-[#475569] rounded-xl p-6 hover:bg-[#334155]/50 transition-colors"
               >
-                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-3">
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Link
-                        href={`/projects/${project.id}`}
-                        className="text-sm font-semibold text-[#818CF8] hover:text-[#A5B4FC] transition-colors truncate"
-                      >
-                        {project.name}
-                      </Link>
-                      <span className="text-[#94A3B8]/60 text-xs shrink-0">&middot;</span>
-                      <span className="text-[#94A3B8] text-xs shrink-0">{project.clientName}</span>
-                    </div>
-                    <p className="text-[#F1F5F9] text-sm">{cr.description}</p>
+                {/* Header row: project info + date */}
+                <div className="flex items-start justify-between gap-3 mb-3">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <Link
+                      href={`/projects/${project.id}`}
+                      className="text-sm font-semibold text-[#818CF8] hover:text-[#A5B4FC] transition-colors truncate"
+                    >
+                      {project.name}
+                    </Link>
+                    <span className="text-[#94A3B8]/40 text-xs shrink-0">&middot;</span>
+                    <span className="text-[#94A3B8] text-xs shrink-0">{project.clientName}</span>
                   </div>
                   <span className="text-xs text-[#94A3B8]/50 shrink-0">
                     {new Date(cr.createdAt).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
+                      month: "short", day: "numeric", year: "numeric",
                     })}
                   </span>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-4 text-xs text-[#94A3B8]">
-                  <span>
-                    Cost:{" "}
-                    <span className="text-[#F1F5F9] font-medium">
-                      +${cr.additionalCost.toLocaleString()}
-                    </span>
-                  </span>
-                  <span>
-                    Time:{" "}
-                    <span className="text-[#F1F5F9] font-medium">
-                      +{cr.timeImpactDays} day{cr.timeImpactDays === 1 ? "" : "s"}
-                    </span>
-                  </span>
+                {/* Description */}
+                <p className="text-[#F1F5F9] text-sm mb-4">{cr.description}</p>
 
-                  <div className="flex gap-2 ml-auto">
-                    <button
-                      onClick={() => handleAction(project.id, cr.id, "Approved")}
-                      className="bg-[#34D399] hover:bg-[#2BC48E] text-[#0F172A] font-medium px-4 py-1.5 rounded-lg text-xs transition-colors flex items-center gap-1"
-                    >
-                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                      </svg>
-                      Approve
-                    </button>
-                    <button
-                      onClick={() => handleAction(project.id, cr.id, "Declined")}
-                      className="bg-[#F87171]/15 hover:bg-[#F87171]/25 text-[#F87171] font-medium px-4 py-1.5 rounded-lg text-xs transition-colors flex items-center gap-1"
-                    >
-                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                      Decline
-                    </button>
-                  </div>
+                {/* Impact badges */}
+                <div className="flex flex-wrap gap-2 mb-4">
+                  <span className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-[#FBBF24]/10 text-[#FBBF24] border border-[#FBBF24]/20">
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    +${cr.additionalCost.toLocaleString()}
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-[#FBBF24]/10 text-[#FBBF24] border border-[#FBBF24]/20">
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    +{cr.timeImpactDays} day{cr.timeImpactDays === 1 ? "" : "s"}
+                  </span>
+                </div>
+
+                {/* Actions */}
+                <div className="flex flex-wrap items-center gap-2 pt-4 border-t border-[#475569]">
+                  <button
+                    onClick={() => handleAction(project.id, cr.id, "Approved")}
+                    className="bg-[#34D399] hover:bg-[#2BC48E] text-[#0F172A] font-medium px-4 py-2 rounded-lg text-xs transition-colors flex items-center gap-1.5"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                    </svg>
+                    Approve
+                  </button>
+                  <button
+                    onClick={() => handleAction(project.id, cr.id, "Declined")}
+                    className="bg-[#F87171]/15 hover:bg-[#F87171]/25 text-[#F87171] font-medium px-4 py-2 rounded-lg text-xs transition-colors flex items-center gap-1.5"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    Decline
+                  </button>
+                  <Link
+                    href={`/projects/${project.id}/pending/${cr.id}`}
+                    className="ml-auto bg-[#334155] hover:bg-[#475569] text-[#94A3B8] hover:text-[#F1F5F9] font-medium px-4 py-2 rounded-lg text-xs transition-colors flex items-center gap-1.5"
+                  >
+                    View Details
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                    </svg>
+                  </Link>
                 </div>
               </div>
             ))}

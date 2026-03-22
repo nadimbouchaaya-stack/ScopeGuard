@@ -51,7 +51,16 @@ export default function Dashboard() {
     0
   );
 
-  const cards = [
+  const cards: Array<{
+    title: string;
+    description: string;
+    href: string;
+    icon: React.ReactNode;
+    color: string;
+    badge: string | null;
+    enabled: boolean;
+    notificationCount?: number;
+  }> = [
     {
       title: "New Project",
       description: "Create a new project and define your scope",
@@ -114,8 +123,9 @@ export default function Dashboard() {
         </svg>
       ),
       color: "indigo",
-      badge: pendingCRCount > 0 ? `${pendingCRCount} awaiting review` : null,
+      badge: null,
       enabled: true,
+      notificationCount: pendingCRCount,
     },
     {
       title: "Subscription & Billing",
@@ -208,6 +218,11 @@ export default function Dashboard() {
               {card.badge && (
                 <span className={`absolute top-4 right-4 text-xs font-medium px-2.5 py-1 rounded-full ${colors.badgeBg} ${colors.badgeText}`}>
                   {card.badge}
+                </span>
+              )}
+              {card.notificationCount != null && card.notificationCount > 0 && (
+                <span className="absolute -top-2 -right-2 min-w-[20px] h-5 flex items-center justify-center bg-red-500 text-white text-xs font-bold rounded-full px-1.5 animate-pulse">
+                  {card.notificationCount}
                 </span>
               )}
               <div className={`w-14 h-14 ${colors.bg} rounded-xl flex items-center justify-center mb-5 ${colors.icon}`}>
