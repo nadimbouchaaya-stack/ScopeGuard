@@ -1,0 +1,281 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { getProfile, saveProfile } from "@/lib/profile";
+import { useTheme } from "@/components/ThemeProvider";
+
+const EMOJI_OPTIONS = [
+  "💵", "💰", "💎", "🤑", "💸", "🪙",
+  "🎉", "🎊", "🥳", "🔥", "⭐", "✨",
+  "🚀", "💜", "❤️", "💚", "🌟", "🏆",
+  "👏", "🙌", "💪", "🎯", "🍾", "🎁",
+];
+
+const THEMES = [
+  {
+    id: "dark" as const,
+    label: "Dark",
+    description: "Default dark theme",
+    preview: { bg: "#0F172A", card: "#1E293B", accent: "#6366F1" },
+  },
+  {
+    id: "light" as const,
+    label: "Light",
+    description: "Clean light theme",
+    preview: { bg: "#F8FAFC", card: "#FFFFFF", accent: "#6366F1" },
+  },
+  {
+    id: "colorblind" as const,
+    label: "Colorblind",
+    description: "Optimized for color vision deficiency",
+    preview: { bg: "#0F172A", card: "#1E293B", accent: "#2563EB" },
+  },
+  {
+    id: "neon" as const,
+    label: "Neon",
+    description: "Vibrant cyberpunk aesthetic",
+    preview: { bg: "#0A0A0F", card: "#12121A", accent: "#A855F7" },
+  },
+];
+
+const LANGUAGES = [
+  { id: "en" as const, label: "English", flag: "🇬🇧" },
+  { id: "fr" as const, label: "Français", flag: "🇫🇷" },
+  { id: "es" as const, label: "Español", flag: "🇪🇸" },
+  { id: "ar" as const, label: "العربية", flag: "🇸🇦" },
+  { id: "it" as const, label: "Italiano", flag: "🇮🇹" },
+  { id: "de" as const, label: "Deutsch", flag: "🇩🇪" },
+];
+
+export default function SettingsPage() {
+  const { theme: currentTheme, setTheme: applyTheme } = useTheme();
+  const [emoji, setEmoji] = useState("💵");
+  const [selectedTheme, setSelectedTheme] = useState(currentTheme);
+  const [language, setLanguage] = useState<"en" | "fr" | "es" | "ar" | "it" | "de">("en");
+  const [loaded, setLoaded] = useState(false);
+  const [saving, setSaving] = useState<string | null>(null);
+  const [saved, setSaved] = useState<string | null>(null);
+
+  useEffect(() => {
+    getProfile().then((p) => {
+      setEmoji(p.cash_rain_emoji);
+      setSelectedTheme(p.theme);
+      setLanguage(p.language);
+      setLoaded(true);
+    }).catch(() => setLoaded(true));
+  }, []);
+
+  async function handleSave(field: string, updates: Parameters<typeof saveProfile>[0]) {
+    setSaving(field);
+    setSaved(null);
+    try {
+      await saveProfile(updates);
+      setSaved(field);
+      setTimeout(() => setSaved(null), 2000);
+    } catch {
+      // error handled silently
+    }
+    setSaving(null);
+  }
+
+  if (!loaded) return null;
+
+  const cardClass = "bg-[var(--bg-card,#1E293B)] border border-[var(--border,#475569)] rounded-xl p-6";
+
+  return (
+    <div className="max-w-2xl mx-auto">
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: "var(--text-primary, #F1F5F9)" }}>
+            Settings
+          </h1>
+          <p className="mt-1 text-sm sm:text-base" style={{ color: "var(--text-secondary, #94A3B8)" }}>
+            Customize your ScopeGuard experience
+          </p>
+        </div>
+        <Link
+          href="/profile"
+          className="text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+          style={{
+            backgroundColor: "var(--accent, #6366F1)",
+            color: "var(--text-primary, #F1F5F9)",
+          }}
+        >
+          Edit Profile
+        </Link>
+      </div>
+
+      <div className="space-y-6">
+        {/* Cash Rain Emoji Picker */}
+        <div className={cardClass}>
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-lg font-semibold" style={{ color: "var(--text-primary, #F1F5F9)" }}>
+                Cash Rain Emoji
+              </h2>
+              <p className="text-sm mt-0.5" style={{ color: "var(--text-secondary, #94A3B8)" }}>
+                Choose the emoji that rains when you approve a change request
+              </p>
+            </div>
+            <div className="text-4xl">{emoji}</div>
+          </div>
+
+          <div className="grid grid-cols-6 sm:grid-cols-8 gap-2 mb-4">
+            {EMOJI_OPTIONS.map((e) => (
+              <button
+                key={e}
+                onClick={() => setEmoji(e)}
+                className={`text-2xl p-2 rounded-lg transition-all ${
+                  emoji === e
+                    ? "ring-2 scale-110"
+                    : "hover:scale-105"
+                }`}
+                style={{
+                  backgroundColor: emoji === e ? "var(--accent, #6366F1)" + "26" : "var(--bg-input, #0F172A)" + "80",
+                  borderColor: emoji === e ? "var(--accent, #6366F1)" : "transparent",
+                  borderWidth: "1px",
+                  borderStyle: "solid",
+                }}
+              >
+                {e}
+              </button>
+            ))}
+          </div>
+
+          <button
+            onClick={() => handleSave("emoji", { cash_rain_emoji: emoji })}
+            disabled={saving === "emoji"}
+            className="text-sm font-medium px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
+            style={{
+              backgroundColor: saved === "emoji" ? "var(--success, #34D399)" : "var(--accent, #6366F1)",
+              color: saved === "emoji" ? "#0F172A" : "var(--text-primary, #F1F5F9)",
+            }}
+          >
+            {saving === "emoji" ? "Saving..." : saved === "emoji" ? "Saved!" : "Save Emoji"}
+          </button>
+        </div>
+
+        {/* Theme Switcher */}
+        <div className={cardClass}>
+          <h2 className="text-lg font-semibold mb-1" style={{ color: "var(--text-primary, #F1F5F9)" }}>
+            Theme
+          </h2>
+          <p className="text-sm mb-4" style={{ color: "var(--text-secondary, #94A3B8)" }}>
+            Choose your preferred visual style
+          </p>
+
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            {THEMES.map((t) => (
+              <button
+                key={t.id}
+                onClick={() => {
+                  setSelectedTheme(t.id);
+                  applyTheme(t.id);
+                }}
+                className={`relative rounded-xl p-4 text-left transition-all border ${
+                  selectedTheme === t.id
+                    ? "ring-2"
+                    : "hover:brightness-110"
+                }`}
+                style={{
+                  backgroundColor: t.preview.card,
+                  borderColor: selectedTheme === t.id ? t.preview.accent : "#475569" + "60",
+                }}
+              >
+                {/* Theme preview bar */}
+                <div className="flex gap-1.5 mb-3">
+                  <div className="w-8 h-2 rounded-full" style={{ backgroundColor: t.preview.accent }} />
+                  <div className="w-5 h-2 rounded-full" style={{ backgroundColor: t.preview.bg, border: "1px solid #475569" }} />
+                  <div className="w-6 h-2 rounded-full" style={{ backgroundColor: t.preview.accent + "40" }} />
+                </div>
+                <p className="font-semibold text-sm" style={{ color: t.id === "light" ? "#0F172A" : "#F1F5F9" }}>
+                  {t.label}
+                </p>
+                <p className="text-xs mt-0.5" style={{ color: t.id === "light" ? "#475569" : "#94A3B8" }}>
+                  {t.description}
+                </p>
+                {selectedTheme === t.id && (
+                  <div
+                    className="absolute top-2.5 right-2.5 w-5 h-5 rounded-full flex items-center justify-center"
+                    style={{ backgroundColor: t.preview.accent }}
+                  >
+                    <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                    </svg>
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
+
+          <button
+            onClick={() => handleSave("theme", { theme: selectedTheme })}
+            disabled={saving === "theme"}
+            className="text-sm font-medium px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
+            style={{
+              backgroundColor: saved === "theme" ? "var(--success, #34D399)" : "var(--accent, #6366F1)",
+              color: saved === "theme" ? "#0F172A" : "var(--text-primary, #F1F5F9)",
+            }}
+          >
+            {saving === "theme" ? "Saving..." : saved === "theme" ? "Saved!" : "Save Theme"}
+          </button>
+        </div>
+
+        {/* Language Selector */}
+        <div className={cardClass}>
+          <h2 className="text-lg font-semibold mb-1" style={{ color: "var(--text-primary, #F1F5F9)" }}>
+            Language
+          </h2>
+          <p className="text-sm mb-4" style={{ color: "var(--text-secondary, #94A3B8)" }}>
+            Select your preferred language (translations coming soon)
+          </p>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
+            {LANGUAGES.map((lang) => (
+              <button
+                key={lang.id}
+                onClick={() => setLanguage(lang.id)}
+                className={`flex items-center gap-2.5 px-4 py-3 rounded-lg transition-all border text-left ${
+                  language === lang.id ? "ring-1" : ""
+                }`}
+                style={{
+                  backgroundColor: language === lang.id
+                    ? "var(--accent, #6366F1)" + "1A"
+                    : "var(--bg-input, #0F172A)" + "80",
+                  borderColor: language === lang.id
+                    ? "var(--accent, #6366F1)"
+                    : "var(--border, #475569)" + "60",
+                }}
+              >
+                <span className="text-xl">{lang.flag}</span>
+                <span
+                  className="text-sm font-medium"
+                  style={{
+                    color: language === lang.id
+                      ? "var(--text-primary, #F1F5F9)"
+                      : "var(--text-secondary, #94A3B8)",
+                  }}
+                >
+                  {lang.label}
+                </span>
+              </button>
+            ))}
+          </div>
+
+          <button
+            onClick={() => handleSave("language", { language })}
+            disabled={saving === "language"}
+            className="text-sm font-medium px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
+            style={{
+              backgroundColor: saved === "language" ? "var(--success, #34D399)" : "var(--accent, #6366F1)",
+              color: saved === "language" ? "#0F172A" : "var(--text-primary, #F1F5F9)",
+            }}
+          >
+            {saving === "language" ? "Saving..." : saved === "language" ? "Saved!" : "Save Language"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

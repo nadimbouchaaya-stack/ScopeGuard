@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { Project, ChangeRequest } from "@/lib/types";
 import { getProjects, saveProject } from "@/lib/storage";
+import { getProfile } from "@/lib/profile";
 
 interface CashDrop {
   id: number;
@@ -83,12 +84,16 @@ export default function ActiveProjects() {
   const [loaded, setLoaded] = useState(false);
   const [expandedProject, setExpandedProject] = useState<string | null>(null);
   const [showCashRain, setShowCashRain] = useState(false);
+  const [cashRainEmoji, setCashRainEmoji] = useState("💵");
 
   useEffect(() => {
     getProjects().then((all) => {
       setProjects(all.filter((p) => p.status !== "Completed"));
       setLoaded(true);
     });
+    getProfile()
+      .then((p) => setCashRainEmoji(p.cash_rain_emoji))
+      .catch(() => {});
   }, []);
 
   async function handleChangeRequest(
@@ -132,7 +137,7 @@ export default function ActiveProjects() {
 
   return (
     <div>
-      {showCashRain && <CashRain onComplete={handleCashRainComplete} />}
+      {showCashRain && <CashRain onComplete={handleCashRainComplete} emoji={cashRainEmoji} />}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-[#F1F5F9]">Active Projects</h1>
