@@ -33,13 +33,6 @@ interface DbChangeRequest {
   user_id?: string;
 }
 
-function normalizeCRStatus(raw: string): ChangeRequest["status"] {
-  const normalized = raw.toLowerCase().trim();
-  if (normalized === "approved") return "Approved";
-  if (normalized === "declined") return "Declined";
-  return "Pending";
-}
-
 function mapProject(row: DbProject, changeRequests: DbChangeRequest[]): Project {
   return {
     id: row.id,
@@ -61,7 +54,7 @@ function mapProject(row: DbProject, changeRequests: DbChangeRequest[]): Project 
       description: cr.description,
       additionalCost: Number(cr.additional_cost),
       timeImpactDays: cr.time_impact_days,
-      status: normalizeCRStatus(cr.status),
+      status: (cr.status || "Pending") as ChangeRequest["status"],
       createdAt: cr.created_at,
     })),
   };
@@ -245,6 +238,7 @@ export async function saveProjectPublic(project: Project): Promise<void> {
 
   const { error: projectErr } = await supabase.from("projects").update({
     deadline: rest.deadline || null,
+    status: rest.status,
   }).eq("id", rest.id);
 
   if (projectErr) {

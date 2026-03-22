@@ -130,15 +130,21 @@ export async function POST(request: NextRequest) {
         Any work outside the deliverables listed above will be handled through a formal change request process, ensuring full transparency on cost and timeline adjustments.
       </p>
 
-      <!-- CTA Button -->
+      <!-- CTA Buttons -->
+      <div style="text-align:center;margin:0 0 16px;">
+        <a href="${portalUrl}/approve" style="display:inline-block;background-color:#34D399;color:#0F172A;font-size:16px;font-weight:600;text-decoration:none;padding:14px 32px;border-radius:8px;">
+          Confirm Your Scope
+        </a>
+      </div>
+
       <div style="text-align:center;margin:0 0 24px;">
-        <a href="${portalUrl}" style="display:inline-block;background-color:#6366F1;color:#FFFFFF;font-size:16px;font-weight:600;text-decoration:none;padding:14px 32px;border-radius:8px;">
-          Review &amp; Approve Scope
+        <a href="${portalUrl}" style="display:inline-block;background-color:#6366F1;color:#FFFFFF;font-size:14px;font-weight:600;text-decoration:none;padding:10px 24px;border-radius:8px;">
+          View Full Portal
         </a>
       </div>
 
       <p style="color:#94A3B8;font-size:13px;text-align:center;margin:0;">
-        Or copy this link: <a href="${portalUrl}" style="color:#6366F1;text-decoration:underline;">${portalUrl}</a>
+        Or copy this link: <a href="${portalUrl}/approve" style="color:#6366F1;text-decoration:underline;">${portalUrl}/approve</a>
       </p>
     </div>
 

@@ -13,18 +13,16 @@ export default function Dashboard() {
 
   useEffect(() => {
     console.log("[Dashboard] Fetching projects...");
-    getProjects()
-      .then((p) => {
-        console.log("[Dashboard] Projects loaded:", p.length);
-        const pendingCount = p.reduce((sum, proj) => sum + proj.changeRequests.filter((cr) => cr.status?.toLowerCase().trim() === "pending").length, 0);
-        console.log("[Dashboard] Pending CR count:", pendingCount);
-        setProjects(p);
-        setLoaded(true);
-      })
-      .catch((err) => {
-        console.error("[Dashboard] Failed to load projects:", err);
-        setLoaded(true);
-      });
+    getProjects().then((p) => {
+      console.log("[Dashboard] Projects loaded:", p.length);
+      const pendingCount = p.reduce((sum, proj) => sum + proj.changeRequests.filter((cr) => cr.status?.toLowerCase().trim() === "pending").length, 0);
+      console.log("[Dashboard] Pending CR count:", pendingCount);
+      setProjects(p);
+      setLoaded(true);
+    }).catch((err) => {
+      console.error("[Dashboard] ERROR loading projects:", err);
+      setLoaded(true);
+    });
 
     const supabase = createClient();
     supabase.auth.getUser().then(({ data: { user } }) => {
