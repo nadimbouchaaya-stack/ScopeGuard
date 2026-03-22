@@ -11,6 +11,9 @@ export const metadata: Metadata = {
   title: "ScopeGuard — Scope Creep Protection for Freelancers",
   description:
     "Protect your projects from scope creep. Track deliverables, manage revisions, and handle change requests professionally.",
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 export default function RootLayout({

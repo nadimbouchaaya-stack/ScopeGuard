@@ -11,7 +11,7 @@ export default function NewProject() {
   const [clientName, setClientName] = useState("");
   const [clientEmail, setClientEmail] = useState("");
   const [deliverables, setDeliverables] = useState<string[]>([""]);
-  const [revisionLimit, setRevisionLimit] = useState(3);
+  const [revisionLimit, setRevisionLimit] = useState("3");
   const [price, setPrice] = useState("");
   const [deadline, setDeadline] = useState("");
   const [deliverablesLink, setDeliverablesLink] = useState("");
@@ -53,6 +53,7 @@ export default function NewProject() {
     const projectId = crypto.randomUUID();
     try {
       const projectPrice = parseFloat(price) || 0;
+      const parsedRevisionLimit = Math.max(1, parseInt(revisionLimit) || 1);
 
       await saveProject({
         id: projectId,
@@ -64,7 +65,7 @@ export default function NewProject() {
           description: d,
           completed: false,
         })),
-        revisionLimit,
+        revisionLimit: parsedRevisionLimit,
         revisionsUsed: 0,
         price: projectPrice,
         status: "Active",
@@ -83,7 +84,7 @@ export default function NewProject() {
         clientEmail,
         projectName: name,
         deliverables: filteredDeliverables,
-        revisionLimit,
+        revisionLimit: parsedRevisionLimit,
         price: projectPrice,
         deadline: deadline || undefined,
         portalUrl,
@@ -230,11 +231,18 @@ export default function NewProject() {
             <div>
               <label className={labelClass}>Revision Limit</label>
               <input
-                type="number"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 required
-                min={1}
                 value={revisionLimit}
-                onChange={(e) => setRevisionLimit(parseInt(e.target.value) || 1)}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === "" || /^\d+$/.test(val)) {
+                    setRevisionLimit(val);
+                  }
+                }}
+                placeholder="3"
                 className={inputClass}
               />
             </div>
