@@ -46,8 +46,9 @@ export default function Dashboard() {
     return diff <= 7;
   }).length;
 
-  const pendingProjects = projects.filter(
-    (p) => p.status === "Pending Approval"
+  const pendingCRCount = projects.reduce(
+    (sum, p) => sum + p.changeRequests.filter((cr) => cr.status === "Pending").length,
+    0
   );
 
   const cards = [
@@ -62,6 +63,7 @@ export default function Dashboard() {
       ),
       color: "indigo",
       badge: null,
+      enabled: true,
     },
     {
       title: "Active Projects",
@@ -74,6 +76,7 @@ export default function Dashboard() {
       ),
       color: "green",
       badge: activeCount > 0 ? `${activeCount} active` : null,
+      enabled: true,
     },
     {
       title: "Project History",
@@ -86,6 +89,7 @@ export default function Dashboard() {
       ),
       color: "slate",
       badge: completedCount > 0 ? `${completedCount} completed` : null,
+      enabled: true,
     },
     {
       title: "Deadlines",
@@ -98,6 +102,33 @@ export default function Dashboard() {
       ),
       color: "amber",
       badge: upcomingDeadlines > 0 ? `${upcomingDeadlines} due soon` : null,
+      enabled: true,
+    },
+    {
+      title: "Pending Approvals",
+      description: "Review and respond to incoming requests",
+      href: "/pending-approvals",
+      icon: (
+        <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      ),
+      color: "indigo",
+      badge: pendingCRCount > 0 ? `${pendingCRCount} awaiting review` : null,
+      enabled: true,
+    },
+    {
+      title: "Subscription & Billing",
+      description: "Coming soon",
+      href: "#",
+      icon: (
+        <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+        </svg>
+      ),
+      color: "slate",
+      badge: null,
+      enabled: false,
     },
   ];
 
@@ -147,71 +178,27 @@ export default function Dashboard() {
         </p>
       </div>
 
-      {/* Widgets Row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 max-w-3xl mx-auto mb-6">
-        {/* Widget A — Pending Approvals */}
-        <div className="bg-[#1E293B] border border-[#475569] rounded-xl overflow-hidden border-l-[3px] border-l-[#6366F1]">
-          <div className="px-5 py-4 flex items-center gap-3 border-b border-[#475569]">
-            <div className="w-8 h-8 bg-[#6366F1]/15 rounded-lg flex items-center justify-center shrink-0">
-              <svg className="w-[18px] h-[18px] text-[#6366F1]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <div>
-              <h3 className="text-sm font-semibold text-[#F1F5F9]">Pending Approvals</h3>
-              <p className="text-xs text-[#94A3B8]">
-                {pendingProjects.length > 0
-                  ? `${pendingProjects.length} project${pendingProjects.length === 1 ? "" : "s"} awaiting client approval`
-                  : "All scopes approved ✅"}
-              </p>
-            </div>
-          </div>
-          {pendingProjects.length > 0 ? (
-            <div className="divide-y divide-[#475569]/50">
-              {pendingProjects.map((p) => (
-                <Link
-                  key={p.id}
-                  href={`/projects/${p.id}`}
-                  className="flex items-center justify-between px-5 py-3 hover:bg-[#334155] transition-colors"
-                >
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-[#F1F5F9] truncate">{p.name}</p>
-                    <p className="text-xs text-[#94A3B8]">{p.clientName}</p>
-                  </div>
-                  <span className="text-xs text-[#94A3B8]/60 shrink-0 ml-3">
-                    {new Date(p.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                  </span>
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <div className="px-5 py-6 text-center">
-              <p className="text-sm text-[#94A3B8]">No projects pending approval right now.</p>
-            </div>
-          )}
-        </div>
-
-        {/* Widget B — Coming Soon */}
-        <div className="bg-[#1E293B] border border-[#475569] rounded-xl overflow-hidden border-l-[3px] border-l-[#6366F1]/50 border-l-dashed opacity-70">
-          <div className="px-5 py-4 flex items-center gap-3 border-b border-[#475569]">
-            <div className="w-8 h-8 bg-[#94A3B8]/10 rounded-lg flex items-center justify-center shrink-0">
-              <svg className="w-[18px] h-[18px] text-[#94A3B8]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-              </svg>
-            </div>
-            <h3 className="text-sm font-semibold text-[#F1F5F9]">Subscription &amp; Billing</h3>
-          </div>
-          <div className="px-5 py-6 text-center">
-            <p className="text-sm text-[#94A3B8]">
-              Upgrade options and billing management — coming soon 🚀
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 max-w-3xl mx-auto">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 max-w-4xl mx-auto">
         {cards.map((card) => {
           const colors = colorMap[card.color];
+
+          if (!card.enabled) {
+            return (
+              <div
+                key={card.title}
+                className={`relative bg-[#1E293B] border ${colors.border.split(" ")[0]} rounded-xl p-5 sm:p-8 opacity-60 cursor-default`}
+              >
+                <div className={`w-14 h-14 ${colors.bg} rounded-xl flex items-center justify-center mb-5 ${colors.icon}`}>
+                  {card.icon}
+                </div>
+                <h2 className="text-xl font-semibold text-[#F1F5F9] mb-2">
+                  {card.title}
+                </h2>
+                <p className="text-[#94A3B8] text-sm">{card.description}</p>
+              </div>
+            );
+          }
+
           return (
             <Link
               key={card.title}
