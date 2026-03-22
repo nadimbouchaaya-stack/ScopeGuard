@@ -189,9 +189,12 @@ export default function ActiveProjects() {
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-lg font-semibold text-[#F1F5F9] truncate group-hover:text-[#818CF8] transition-colors">
+                    <Link
+                      href={`/projects/${project.id}`}
+                      className="text-lg font-semibold text-[#F1F5F9] truncate group-hover:text-[#818CF8] transition-colors hover:underline block"
+                    >
                       {project.name}
-                    </h3>
+                    </Link>
                     <p className="text-[#94A3B8] text-sm mt-0.5">
                       {project.clientName}
                     </p>

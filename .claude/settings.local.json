@@ -18,7 +18,8 @@
       "Bash(git show:*)",
       "Bash(npx tsc:*)",
       "Bash(find /c/Users/nadim/Desktop/scopeguard/app -type f \\\\\\(-name *.tsx -o -name *.ts -o -name *.json \\\\\\))",
-      "Bash(find /c/Users/nadim/Desktop/scopeguard/src/app -name *not-found* -o -name *error*)"
+      "Bash(find /c/Users/nadim/Desktop/scopeguard/src/app -name *not-found* -o -name *error*)",
+      "Bash(node -e \"try{require.resolve\\(''lucide-react''\\);console.log\\(''installed''\\)}catch{console.log\\(''not installed''\\)}\")"
     ]
   }
 }
