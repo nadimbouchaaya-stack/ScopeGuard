@@ -69,7 +69,7 @@ export default function NewProject() {
 
       // Send email to client
       console.log("[new-project] Project saved, sending email...");
-      const portalUrl = `https://scope-guard-fawn.vercel.app/portal/${projectId}`;
+      const portalUrl = `https://tryscopeguard.com/portal/${projectId}`;
       const emailPayload = {
         clientName,
         clientEmail,
