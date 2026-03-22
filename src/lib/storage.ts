@@ -34,9 +34,9 @@ interface DbChangeRequest {
 }
 
 function normalizeCRStatus(raw: string): ChangeRequest["status"] {
-  const lower = raw.toLowerCase();
-  if (lower === "approved") return "Approved";
-  if (lower === "declined") return "Declined";
+  const normalized = raw.toLowerCase().trim();
+  if (normalized === "approved") return "Approved";
+  if (normalized === "declined") return "Declined";
   return "Pending";
 }
 
@@ -188,6 +188,17 @@ export async function saveProject(project: Project): Promise<void> {
 
 export async function deleteProject(id: string): Promise<void> {
   const supabase = getSupabase();
+
+  const { error: crErr } = await supabase
+    .from("change_requests")
+    .delete()
+    .eq("project_id", id);
+
+  if (crErr) {
+    console.error("Failed to delete change requests:", crErr);
+    throw new Error(crErr.message);
+  }
+
   const { error } = await supabase.from("projects").delete().eq("id", id);
   if (error) {
     console.error("Failed to delete project:", error);

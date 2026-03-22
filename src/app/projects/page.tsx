@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { Project, ChangeRequest } from "@/lib/types";
-import { getProjects, saveProject } from "@/lib/storage";
+import { getProjects, saveProject, deleteProject } from "@/lib/storage";
 import { getProfile } from "@/lib/profile";
 
 interface CashDrop {
@@ -85,6 +85,8 @@ export default function ActiveProjects() {
   const [expandedProject, setExpandedProject] = useState<string | null>(null);
   const [showCashRain, setShowCashRain] = useState(false);
   const [cashRainEmoji, setCashRainEmoji] = useState("💵");
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     getProjects().then((all) => {
@@ -133,6 +135,19 @@ export default function ActiveProjects() {
 
   const handleCashRainComplete = useCallback(() => setShowCashRain(false), []);
 
+  async function handleDeleteProject(id: string) {
+    if (deleting) return;
+    setDeleting(true);
+    try {
+      await deleteProject(id);
+      setProjects((prev) => prev.filter((p) => p.id !== id));
+    } catch (err) {
+      console.error("Failed to delete project:", err);
+    }
+    setDeleting(false);
+    setDeleteConfirmId(null);
+  }
+
   if (!loaded) return null;
 
   return (
@@ -179,12 +194,12 @@ export default function ActiveProjects() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {projects.map((project) => {
             const pendingRequests = project.changeRequests.filter(
-              (cr) => cr.status === "Pending"
+              (cr) => cr.status?.toLowerCase().trim() === "pending"
             ).length;
 
             const totalCRs = project.changeRequests.length;
             const approvedCRs = project.changeRequests.filter(
-              (cr) => cr.status === "Approved"
+              (cr) => cr.status?.toLowerCase().trim() === "approved"
             ).length;
             const approvalRate = totalCRs > 0 ? Math.round((approvedCRs / totalCRs) * 100) : -1;
 
@@ -202,10 +217,21 @@ export default function ActiveProjects() {
                 key={project.id}
                 className="bg-[#1E293B] border border-[#475569] border-t-2 border-t-[#6366F1] rounded-xl p-6 hover:bg-[#334155] transition-colors group relative"
               >
-                {/* Sent badge */}
-                <span className="absolute top-3 right-3 text-xs font-medium px-2 py-0.5 rounded-full bg-[#6366F1]/20 text-[#818CF8]">
-                  📤 Sent
-                </span>
+                {/* Sent badge + delete */}
+                <div className="absolute top-3 right-3 flex items-center gap-2">
+                  <button
+                    onClick={(e) => { e.preventDefault(); setDeleteConfirmId(project.id); }}
+                    className="text-[#94A3B8]/40 hover:text-[#F87171] transition-colors p-1 rounded-lg hover:bg-[#F87171]/10 opacity-0 group-hover:opacity-100"
+                    title="Delete project"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                    </svg>
+                  </button>
+                  <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-[#6366F1]/20 text-[#818CF8]">
+                    📤 Sent
+                  </span>
+                </div>
 
                 <div className="flex items-start justify-between mb-4 pr-16">
                   <div className="flex-1 min-w-0">
@@ -296,7 +322,7 @@ export default function ActiveProjects() {
                 {expandedProject === project.id && pendingRequests > 0 && (
                   <div className="space-y-3 mb-4">
                     {project.changeRequests
-                      .filter((cr) => cr.status === "Pending")
+                      .filter((cr) => cr.status?.toLowerCase().trim() === "pending")
                       .map((cr) => (
                         <div
                           key={cr.id}
@@ -378,6 +404,38 @@ export default function ActiveProjects() {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Delete confirmation modal */}
+      {deleteConfirmId && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={() => setDeleteConfirmId(null)}>
+          <div className="bg-[#1E293B] border border-[#475569] rounded-xl p-6 max-w-sm w-full shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="w-12 h-12 bg-[#F87171]/15 rounded-xl flex items-center justify-center mx-auto mb-4">
+              <svg className="w-6 h-6 text-[#F87171]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-[#F1F5F9] text-center mb-2">Delete Project</h3>
+            <p className="text-sm text-[#94A3B8] text-center mb-6">
+              Are you sure you want to delete this project? This cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDeleteConfirmId(null)}
+                className="flex-1 bg-[#334155] hover:bg-[#475569] text-[#F1F5F9] font-medium py-2.5 rounded-lg transition-colors text-sm"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDeleteProject(deleteConfirmId)}
+                disabled={deleting}
+                className="flex-1 bg-[#F87171] hover:bg-[#EF4444] disabled:opacity-50 text-white font-medium py-2.5 rounded-lg transition-colors text-sm"
+              >
+                {deleting ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

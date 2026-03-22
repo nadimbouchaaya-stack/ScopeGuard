@@ -80,8 +80,8 @@ export default function PendingApprovalsPage() {
         console.log("[PendingApprovals] Projects loaded:", p.length);
         const allCRs = p.flatMap((proj) => proj.changeRequests);
         console.log("[PendingApprovals] Total CRs:", allCRs.length);
-        console.log("[PendingApprovals] Pending CRs:", allCRs.filter((cr) => cr.status === "Pending").length);
-        console.log("[PendingApprovals] CR statuses (raw):", allCRs.map((cr) => JSON.stringify(cr.status)));
+        console.log("[PendingApprovals] CR statuses raw:", JSON.stringify(allCRs.map((cr) => ({ id: cr.id, status: cr.status, raw: JSON.stringify(cr.status) }))));
+        console.log("[PendingApprovals] Pending CRs:", allCRs.filter((cr) => cr.status?.toLowerCase().trim() === "pending").length);
         setProjects(p);
         setLoaded(true);
       })
@@ -132,9 +132,9 @@ export default function PendingApprovalsPage() {
   const allCRs = projects.flatMap((p) =>
     p.changeRequests.map((cr) => ({ cr, project: p }))
   );
-  const pendingCRs: PendingCR[] = allCRs.filter((x) => x.cr.status === "Pending");
-  const approvedCount = allCRs.filter((x) => x.cr.status === "Approved").length;
-  const declinedCount = allCRs.filter((x) => x.cr.status === "Declined").length;
+  const pendingCRs: PendingCR[] = allCRs.filter((x) => x.cr.status?.toLowerCase().trim() === "pending");
+  const approvedCount = allCRs.filter((x) => x.cr.status?.toLowerCase().trim() === "approved").length;
+  const declinedCount = allCRs.filter((x) => x.cr.status?.toLowerCase().trim() === "declined").length;
   const decidedCount = approvedCount + declinedCount;
   const approvalRate = decidedCount > 0 ? Math.round((approvedCount / decidedCount) * 100) : -1;
 

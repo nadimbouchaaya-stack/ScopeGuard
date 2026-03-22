@@ -16,7 +16,7 @@ export default function Dashboard() {
     getProjects()
       .then((p) => {
         console.log("[Dashboard] Projects loaded:", p.length);
-        const pendingCount = p.reduce((sum, proj) => sum + proj.changeRequests.filter((cr) => cr.status === "Pending").length, 0);
+        const pendingCount = p.reduce((sum, proj) => sum + proj.changeRequests.filter((cr) => cr.status?.toLowerCase().trim() === "pending").length, 0);
         console.log("[Dashboard] Pending CR count:", pendingCount);
         setProjects(p);
         setLoaded(true);
@@ -56,7 +56,7 @@ export default function Dashboard() {
   }).length;
 
   const pendingCRCount = projects.reduce(
-    (sum, p) => sum + p.changeRequests.filter((cr) => cr.status === "Pending").length,
+    (sum, p) => sum + p.changeRequests.filter((cr) => cr.status?.toLowerCase().trim() === "pending").length,
     0
   );
 

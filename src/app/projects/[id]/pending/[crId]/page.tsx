@@ -148,7 +148,7 @@ export default function ChangeRequestDetailPage() {
     );
   }
 
-  const isPending = cr.status === "Pending";
+  const isPending = cr.status?.toLowerCase().trim() === "pending";
 
   return (
     <div className="max-w-2xl mx-auto">
