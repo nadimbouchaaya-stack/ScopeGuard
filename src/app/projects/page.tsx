@@ -16,12 +16,12 @@ interface CashDrop {
 
 function CashRain({ onComplete, emoji = "💵" }: { onComplete: () => void; emoji?: string }) {
   const [drops] = useState<CashDrop[]>(() =>
-    Array.from({ length: 40 }, (_, i) => ({
+    Array.from({ length: 200 }, (_, i) => ({
       id: i,
       left: Math.random() * 100,
       delay: Math.random() * 0.8,
       duration: 1.5 + Math.random() * 1.5,
-      size: 100 + Math.random() * 120,
+      size: 20 + Math.random() * 24,
       rotation: Math.random() * 360,
     }))
   );
