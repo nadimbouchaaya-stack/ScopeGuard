@@ -19,6 +19,10 @@ export default function ClientPortal() {
   const [project, setProject] = useState<Project | null>(null);
   const [loaded, setLoaded] = useState(false);
 
+  // Scope approval state
+  const [scopeApproving, setScopeApproving] = useState(false);
+  const [scopeApproved, setScopeApproved] = useState(false);
+
   // CR submission form state
   const [showCRForm, setShowCRForm] = useState(false);
   const [crDescription, setCrDescription] = useState("");
@@ -37,6 +41,38 @@ export default function ClientPortal() {
       if (p) setProject(p);
       setLoaded(true);
     });
+  }
+
+  async function handleApproveScope() {
+    if (!project || scopeApproving) return;
+    setScopeApproving(true);
+
+    const supabase = createClient();
+    const { error } = await supabase
+      .from("projects")
+      .update({ status: "Active" })
+      .eq("id", projectId);
+
+    setScopeApproving(false);
+
+    if (error) {
+      console.error("[Portal] Scope approve error:", error);
+      return;
+    }
+
+    setScopeApproved(true);
+    setProject({ ...project, status: "Active" });
+
+    // Notify freelancer via email (fire and forget)
+    fetch("/api/scope-approved", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        projectId,
+        projectName: project.name,
+        clientName: project.clientName,
+      }),
+    }).catch(() => {});
   }
 
   async function handleSubmitCR(e: React.FormEvent) {
@@ -234,6 +270,54 @@ export default function ClientPortal() {
             </svg>
             Pay Now
           </a>
+        </div>
+      )}
+
+      {/* Approve Scope Section */}
+      {project.status === "Active" && !scopeApproved && (
+        <div className="bg-[#1E293B] border border-[#34D399]/30 rounded-xl overflow-hidden mb-6">
+          <div className="border-l-4 border-[#34D399] p-5 sm:p-6">
+            <h2 className="text-lg font-semibold text-[#F1F5F9] mb-1">Ready to get started?</h2>
+            <p className="text-sm text-[#94A3B8] mb-5">
+              Approve the scope below to confirm you&apos;ve reviewed the deliverables and agree to the terms.
+            </p>
+            <button
+              onClick={handleApproveScope}
+              disabled={scopeApproving}
+              className="w-full sm:w-auto bg-[#34D399] hover:bg-[#2BC48E] disabled:opacity-50 text-[#0F172A] font-semibold py-3 px-8 rounded-xl transition-colors text-base flex items-center justify-center gap-2"
+            >
+              {scopeApproving ? (
+                <>
+                  <svg className="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" className="opacity-25" />
+                    <path d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" fill="currentColor" className="opacity-75" />
+                  </svg>
+                  Approving...
+                </>
+              ) : (
+                <>
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                  </svg>
+                  Approve Scope
+                </>
+              )}
+            </button>
+            <p className="text-xs text-[#94A3B8]/60 mt-3">or scroll down to request changes</p>
+          </div>
+        </div>
+      )}
+
+      {/* Scope Approved Banner */}
+      {scopeApproved && (
+        <div className="bg-[#34D399]/10 border border-[#34D399]/30 rounded-xl px-5 py-4 mb-6 flex items-start gap-3">
+          <svg className="w-5 h-5 text-[#34D399] mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div>
+            <p className="text-sm font-medium text-[#34D399]">Scope approved!</p>
+            <p className="text-xs text-[#94A3B8] mt-1">Your freelancer has been notified and work will begin shortly.</p>
+          </div>
         </div>
       )}
 

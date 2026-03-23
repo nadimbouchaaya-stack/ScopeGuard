@@ -236,6 +236,22 @@ export default function PendingApprovalsPage() {
     if (action === "Approved") {
       setShowCashRain(true);
     }
+
+    // Send email notification to the client (fire and forget)
+    fetch("/api/cr-action", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        projectId,
+        projectName: item.project.name,
+        clientName: item.project.client_name,
+        clientEmail: item.project.client_email,
+        action,
+        description: item.cr.description,
+        additionalCost: item.cr.additionalCost,
+        timeImpactDays: item.cr.timeImpactDays,
+      }),
+    }).catch(() => {});
   }
 
   const handleCashRainComplete = useCallback(() => setShowCashRain(false), []);
