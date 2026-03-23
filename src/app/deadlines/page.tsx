@@ -15,7 +15,9 @@ function getDaysUntil(deadline: string): number {
 
 function getDeadlineColor(days: number) {
   if (days < 0) return { dot: "bg-[#F87171]", text: "text-[#F87171]", bg: "bg-[#F87171]/10", label: "Overdue" };
-  if (days <= 7) return { dot: "bg-[#FBBF24]", text: "text-[#FBBF24]", bg: "bg-[#FBBF24]/10", label: days === 0 ? "Due today" : `${days} day${days === 1 ? "" : "s"} left` };
+  if (days <= 1) return { dot: "bg-[#F87171]", text: "text-[#F87171]", bg: "bg-[#F87171]/10", label: days === 0 ? "Due today" : "1 day left" };
+  if (days <= 3) return { dot: "bg-[#FB923C]", text: "text-[#FB923C]", bg: "bg-[#FB923C]/10", label: `${days} days left` };
+  if (days <= 7) return { dot: "bg-[#FBBF24]", text: "text-[#FBBF24]", bg: "bg-[#FBBF24]/10", label: `${days} days left` };
   return { dot: "bg-[#34D399]", text: "text-[#34D399]", bg: "bg-[#34D399]/10", label: `${days} days left` };
 }
 

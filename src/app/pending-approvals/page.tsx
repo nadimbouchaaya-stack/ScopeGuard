@@ -243,8 +243,10 @@ export default function PendingApprovalsPage() {
   if (!loaded) return null;
 
   const pendingCRs = allCRItems.filter((x) => x.cr.status?.toLowerCase().trim() === "pending");
-  const approvedCount = allCRItems.filter((x) => x.cr.status?.toLowerCase().trim() === "approved").length;
+  const approvedItems = allCRItems.filter((x) => x.cr.status?.toLowerCase().trim() === "approved");
+  const approvedCount = approvedItems.length;
   const declinedCount = allCRItems.filter((x) => x.cr.status?.toLowerCase().trim() === "declined").length;
+  const revenueRecovered = approvedItems.reduce((sum, x) => sum + x.cr.additionalCost, 0);
   const decidedCount = approvedCount + declinedCount;
   const approvalRate = decidedCount > 0 ? Math.round((approvedCount / decidedCount) * 100) : -1;
 
@@ -278,7 +280,7 @@ export default function PendingApprovalsPage() {
       )}
 
       {/* Stats bar */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
         <div className="bg-[#1E293B] border border-[#475569] rounded-xl p-5 flex items-center gap-4">
           <div className="w-12 h-12 bg-[#FBBF24]/10 rounded-xl flex items-center justify-center shrink-0">
             <svg className="w-6 h-6 text-[#FBBF24]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -287,7 +289,7 @@ export default function PendingApprovalsPage() {
           </div>
           <div>
             <p className="text-2xl font-bold text-[#F1F5F9]">{pendingCRs.length}</p>
-            <p className="text-xs text-[#94A3B8]">Total Pending</p>
+            <p className="text-xs text-[#94A3B8]">Pending</p>
           </div>
         </div>
 
@@ -322,7 +324,19 @@ export default function PendingApprovalsPage() {
           </div>
           <div>
             <p className="text-2xl font-bold text-[#F1F5F9]">{approvedCount}</p>
-            <p className="text-xs text-[#94A3B8]">Total Approved</p>
+            <p className="text-xs text-[#94A3B8]">Approved</p>
+          </div>
+        </div>
+
+        <div className="bg-[#1E293B] border border-[#34D399]/30 rounded-xl p-5 flex items-center gap-4">
+          <div className="w-12 h-12 bg-[#34D399]/10 rounded-xl flex items-center justify-center shrink-0">
+            <svg className="w-6 h-6 text-[#34D399]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div>
+            <p className="text-2xl font-bold text-[#34D399]">${revenueRecovered.toLocaleString()}</p>
+            <p className="text-xs text-[#94A3B8]">Revenue Recovered</p>
           </div>
         </div>
       </div>

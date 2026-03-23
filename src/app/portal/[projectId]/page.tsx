@@ -108,12 +108,14 @@ export default function ClientPortal() {
   return (
     <div className="max-w-3xl mx-auto">
       {/* Header */}
-      <div className="bg-[#1E293B] border border-[#475569] rounded-xl p-4 sm:p-6 mb-6">
+      <div className="relative bg-[#1E293B] border border-[#475569] rounded-xl overflow-hidden mb-6">
+        {/* Gradient accent bar */}
+        <div className="h-1.5 bg-gradient-to-r from-[#6366F1] via-[#A855F7] to-[#6366F1]" />
+        <div className="p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-4">
           <div>
             <h1 className="text-xl sm:text-2xl font-bold text-[#F1F5F9]">{project.name}</h1>
-            <p className="text-[#94A3B8] mt-1">Client: {project.clientName}</p>
-            <p className="text-[#94A3B8]/70 text-sm mt-0.5">{project.clientEmail}</p>
+            <p className="text-[#94A3B8] mt-1">{project.clientName}</p>
           </div>
           <span
             className={`text-xs font-medium px-3 py-1.5 rounded-full border ${statusColors[project.status]}`}
@@ -161,6 +163,7 @@ export default function ClientPortal() {
               {project.deliverables.length} items
             </p>
           </div>
+        </div>
         </div>
       </div>
 
@@ -388,10 +391,13 @@ export default function ClientPortal() {
         </div>
       )}
 
-      {/* Footer note */}
-      <div className="mt-8 text-center">
+      {/* Footer */}
+      <div className="mt-10 text-center space-y-2 pb-4">
         <p className="text-xs text-[#94A3B8]/50">
           Have another project? Ask your freelancer for the portal link.
+        </p>
+        <p className="text-xs text-[#94A3B8]/30">
+          Powered by <span className="font-semibold text-[#6366F1]/50">ScopeGuard</span>
         </p>
       </div>
     </div>

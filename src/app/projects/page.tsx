@@ -87,6 +87,7 @@ export default function ActiveProjects() {
   const [cashRainEmoji, setCashRainEmoji] = useState("💵");
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     getProjects().then((all) => {
@@ -172,6 +173,24 @@ export default function ActiveProjects() {
         </Link>
       </div>
 
+      {/* Search */}
+      {projects.length > 0 && (
+        <div className="mb-6">
+          <div className="relative">
+            <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+            </svg>
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search projects or clients..."
+              className="w-full bg-[#1E293B] border border-[#475569] rounded-lg pl-10 pr-4 py-2.5 text-sm text-[#F1F5F9] placeholder-[#94A3B8]/50 focus:outline-none focus:border-[#6366F1] transition-colors"
+            />
+          </div>
+        </div>
+      )}
+
       {projects.length === 0 ? (
         <div className="text-center py-20 border border-indigo-500/20 bg-indigo-500/5 rounded-2xl">
           <div className="w-16 h-16 bg-[#334155] rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -194,7 +213,11 @@ export default function ActiveProjects() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {projects.map((project) => {
+          {projects.filter((p) => {
+            if (!search.trim()) return true;
+            const q = search.toLowerCase();
+            return p.name.toLowerCase().includes(q) || p.clientName.toLowerCase().includes(q);
+          }).map((project) => {
             const isOverdue = project.deadline && new Date(project.deadline) < new Date(new Date().toDateString());
             const pendingRequests = project.changeRequests.filter(
               (cr) => cr.status?.toLowerCase().trim() === "pending"

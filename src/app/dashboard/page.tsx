@@ -85,9 +85,10 @@ export default function Dashboard() {
 
   if (!loaded) return null;
 
-  const activeCount = projects.filter(
+  const activeProjects = projects.filter(
     (p) => p.status === "Active" || p.status === "Pending Approval"
-  ).length;
+  );
+  const activeCount = activeProjects.length;
   const completedCount = projects.filter(
     (p) => p.status === "Completed"
   ).length;
@@ -100,6 +101,22 @@ export default function Dashboard() {
     );
     return diff <= 7;
   }).length;
+
+  // Revenue stats
+  const activeRevenue = activeProjects.reduce((sum, p) => sum + p.price, 0);
+  const pendingCRValue = activeProjects.reduce((sum, p) => {
+    return sum + p.changeRequests
+      .filter((cr) => cr.status?.toLowerCase().trim() === "pending")
+      .reduce((s, cr) => s + cr.additionalCost, 0);
+  }, 0);
+  const totalEarned = projects
+    .filter((p) => p.status === "Completed")
+    .reduce((sum, p) => {
+      const crRevenue = p.changeRequests
+        .filter((cr) => cr.status?.toLowerCase().trim() === "approved")
+        .reduce((s, cr) => s + cr.additionalCost, 0);
+      return sum + p.price + crRevenue;
+    }, 0);
 
   const cards: Array<{
     title: string;
@@ -237,6 +254,69 @@ export default function Dashboard() {
           Protect your freelance projects from scope creep.
         </p>
       </div>
+
+      {/* Revenue Stats */}
+      {projects.length > 0 && (
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-4xl mx-auto mb-8">
+          <div className="bg-[#1E293B] border border-[#475569] rounded-xl px-5 py-4 flex items-center gap-3">
+            <div className="w-10 h-10 bg-[#34D399]/10 rounded-lg flex items-center justify-center shrink-0">
+              <svg className="w-5 h-5 text-[#34D399]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-lg font-bold text-[#F1F5F9]">${activeRevenue.toLocaleString()}</p>
+              <p className="text-xs text-[#94A3B8]">Active Revenue</p>
+            </div>
+          </div>
+          <div className="bg-[#1E293B] border border-[#475569] rounded-xl px-5 py-4 flex items-center gap-3">
+            <div className="w-10 h-10 bg-[#FBBF24]/10 rounded-lg flex items-center justify-center shrink-0">
+              <svg className="w-5 h-5 text-[#FBBF24]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-lg font-bold text-[#F1F5F9]">${pendingCRValue.toLocaleString()}</p>
+              <p className="text-xs text-[#94A3B8]">Pending CR Value</p>
+            </div>
+          </div>
+          <div className="bg-[#1E293B] border border-[#475569] rounded-xl px-5 py-4 flex items-center gap-3">
+            <div className="w-10 h-10 bg-[#6366F1]/10 rounded-lg flex items-center justify-center shrink-0">
+              <svg className="w-5 h-5 text-[#6366F1]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-lg font-bold text-[#F1F5F9]">${totalEarned.toLocaleString()}</p>
+              <p className="text-xs text-[#94A3B8]">Total Earned</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Onboarding state for new users */}
+      {projects.length === 0 && (
+        <div className="max-w-lg mx-auto text-center py-8 mb-8">
+          <div className="w-20 h-20 bg-[#6366F1]/10 rounded-2xl flex items-center justify-center mx-auto mb-5">
+            <svg className="w-10 h-10 text-[#6366F1]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
+            </svg>
+          </div>
+          <h2 className="text-xl font-bold text-[#F1F5F9] mb-2">Get started with ScopeGuard</h2>
+          <p className="text-[#94A3B8] text-sm mb-6">
+            Create your first project to start protecting your freelance work from scope creep.
+          </p>
+          <Link
+            href="/projects/new"
+            className="inline-flex items-center gap-2 bg-[#6366F1] hover:bg-[#5558E6] text-[#F1F5F9] font-semibold px-6 py-3 rounded-xl transition-colors"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            Create Your First Project
+          </Link>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 max-w-4xl mx-auto">
         {cards.map((card) => {
