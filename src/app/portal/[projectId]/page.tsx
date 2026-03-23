@@ -2,20 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { Project, ChangeRequest } from "@/lib/types";
-import { getProjectPublic, saveProjectPublic } from "@/lib/storage";
+import { Project } from "@/lib/types";
+import { getProjectPublic } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/client";
 
 const statusColors: Record<string, string> = {
   Active: "bg-[#34D399]/15 text-[#34D399] border-[#34D399]/30",
   "Pending Approval": "bg-[#FBBF24]/15 text-[#FBBF24] border-[#FBBF24]/30",
   Completed: "bg-[#94A3B8]/15 text-[#94A3B8] border-[#94A3B8]/30",
-};
-
-const crStatusColors: Record<string, string> = {
-  Pending: "bg-[#FBBF24]/15 text-[#FBBF24]",
-  Approved: "bg-[#34D399]/15 text-[#34D399]",
-  Declined: "bg-[#F87171]/15 text-[#F87171]",
 };
 
 export default function ClientPortal() {
@@ -81,30 +75,6 @@ export default function ClientPortal() {
     loadProject();
   }
 
-  async function handleChangeRequest(crId: string, action: "Approved" | "Declined") {
-    if (!project) return;
-
-    const cr = project.changeRequests.find((c) => c.id === crId);
-    let newDeadline = project.deadline;
-
-    if (action === "Approved" && cr && cr.timeImpactDays > 0 && project.deadline) {
-      const current = new Date(project.deadline);
-      current.setDate(current.getDate() + cr.timeImpactDays);
-      newDeadline = current.toISOString().split("T")[0];
-    }
-
-    const updatedProject: Project = {
-      ...project,
-      deadline: newDeadline,
-      changeRequests: project.changeRequests.map((c) =>
-        c.id === crId ? { ...c, status: action } : c
-      ),
-    };
-
-    await saveProjectPublic(updatedProject);
-    setProject(updatedProject);
-  }
-
   if (!loaded) return null;
 
   if (!project) {
@@ -134,13 +104,6 @@ export default function ClientPortal() {
       </div>
     );
   }
-
-  const pendingRequests = project.changeRequests.filter(
-    (cr) => cr.status === "Pending"
-  );
-  const resolvedRequests = project.changeRequests.filter(
-    (cr) => cr.status !== "Pending"
-  );
 
   return (
     <div className="max-w-3xl mx-auto">
@@ -363,116 +326,49 @@ export default function ClientPortal() {
         )}
       </div>
 
-      {/* Pending Change Requests */}
-      {pendingRequests.length > 0 && (
-        <div className="bg-[#1E293B] border border-[#FBBF24]/30 rounded-xl p-6 mb-6">
-          <div className="flex items-center gap-2 mb-4">
-            <svg
-              className="w-5 h-5 text-[#FBBF24]"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"
-              />
-            </svg>
-            <h2 className="text-lg font-semibold text-[#FBBF24]">
-              Pending Change Requests
-            </h2>
-          </div>
-
-          <div className="space-y-4">
-            {pendingRequests.map((cr) => (
-              <ChangeRequestCard
-                key={cr.id}
-                cr={cr}
-                onAction={handleChangeRequest}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Resolved Change Requests */}
-      {resolvedRequests.length > 0 && (
+      {/* Change Requests */}
+      {project.changeRequests.length > 0 ? (
         <div className="bg-[#1E293B] border border-[#475569] rounded-xl p-6">
-          <h2 className="text-lg font-semibold text-[#F1F5F9] mb-4">
-            Past Change Requests
-          </h2>
+          <h2 className="text-lg font-semibold text-[#F1F5F9] mb-4">Your Change Requests</h2>
           <div className="space-y-3">
-            {resolvedRequests.map((cr) => (
+            {project.changeRequests.map((cr) => (
               <div
                 key={cr.id}
-                className="py-3 px-4 rounded-lg bg-[#0F172A]/50 flex items-start justify-between"
+                className="bg-[#0F172A]/50 rounded-lg p-4"
               >
-                <div>
-                  <p className="text-[#F1F5F9] text-sm">{cr.description}</p>
-                  <p className="text-[#94A3B8]/60 text-xs mt-1">
-                    +${cr.additionalCost.toLocaleString()} · +{cr.timeImpactDays} day{cr.timeImpactDays === 1 ? "" : "s"}
-                  </p>
+                <div className="flex items-start justify-between gap-3 mb-3">
+                  <p className="text-[#F1F5F9] text-sm font-medium">{cr.description}</p>
+                  <span
+                    className={`text-xs font-medium px-2.5 py-1 rounded-full shrink-0 ${
+                      cr.status?.toLowerCase().trim() === "pending"
+                        ? "bg-[#FBBF24]/15 text-[#FBBF24]"
+                        : cr.status?.toLowerCase().trim() === "approved"
+                          ? "bg-[#34D399]/15 text-[#34D399]"
+                          : "bg-[#F87171]/15 text-[#F87171]"
+                    }`}
+                  >
+                    {cr.status?.toLowerCase().trim() === "pending" ? "Pending Review" : cr.status}
+                  </span>
                 </div>
-                <span
-                  className={`text-xs font-medium px-2.5 py-1 rounded-full ${crStatusColors[cr.status]}`}
-                >
-                  {cr.status}
-                </span>
+                <div className="flex flex-wrap gap-2">
+                  <span className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-[#FBBF24]/10 text-[#FBBF24] border border-[#FBBF24]/20">
+                    +${cr.additionalCost.toLocaleString()}
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-[#FBBF24]/10 text-[#FBBF24] border border-[#FBBF24]/20">
+                    +{cr.timeImpactDays} day{cr.timeImpactDays === 1 ? "" : "s"}
+                  </span>
+                </div>
               </div>
             ))}
           </div>
         </div>
-      )}
-
-      {project.changeRequests.length === 0 && (
+      ) : (
         <div className="bg-[#1E293B] border border-[#475569] rounded-xl p-6 text-center">
           <p className="text-[#94A3B8]">
             No change requests have been submitted for this project.
           </p>
         </div>
       )}
-    </div>
-  );
-}
-
-function ChangeRequestCard({
-  cr,
-  onAction,
-}: {
-  cr: ChangeRequest;
-  onAction: (id: string, action: "Approved" | "Declined") => void;
-}) {
-  return (
-    <div className="bg-[#0F172A]/50 rounded-lg p-4">
-      <p className="text-[#F1F5F9] font-medium mb-2">{cr.description}</p>
-      <div className="flex flex-col sm:flex-row gap-1 sm:gap-4 text-sm text-[#94A3B8] mb-4">
-        <span>
-          Additional cost:{" "}
-          <span className="text-[#F1F5F9] font-medium">
-            +${cr.additionalCost.toLocaleString()}
-          </span>
-        </span>
-        <span>
-          Deadline extension:{" "}
-          <span className="text-[#F1F5F9] font-medium">+{cr.timeImpactDays} day{cr.timeImpactDays === 1 ? "" : "s"}</span>
-        </span>
-      </div>
-      <div className="flex gap-3">
-        <button
-          onClick={() => onAction(cr.id, "Approved")}
-          className="bg-[#34D399] hover:bg-[#2BC48E] text-[#0F172A] font-medium px-5 py-2 rounded-lg text-sm transition-colors"
-        >
-          Approve
-        </button>
-        <button
-          onClick={() => onAction(cr.id, "Declined")}
-          className="bg-[#334155] hover:bg-[#475569] text-[#94A3B8] hover:text-[#F1F5F9] font-medium px-5 py-2 rounded-lg text-sm transition-colors"
-        >
-          Decline
-        </button>
-      </div>
     </div>
   );
 }

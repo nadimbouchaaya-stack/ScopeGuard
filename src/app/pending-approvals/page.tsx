@@ -94,6 +94,9 @@ export default function PendingApprovalsPage() {
   const [showCashRain, setShowCashRain] = useState(false);
   const [cashRainEmoji, setCashRainEmoji] = useState("💵");
 
+  const [userProjectIds, setUserProjectIds] = useState<string[]>([]);
+  const [userProjects, setUserProjects] = useState<DbProject[]>([]);
+
   const fetchData = useCallback(async () => {
     const supabase = createClient();
 
@@ -104,9 +107,6 @@ export default function PendingApprovalsPage() {
       return;
     }
 
-    console.log("[PendingApprovals] user:", user.id, user.email);
-
-    // Get user's projects
     const { data: projects, error: pErr } = await supabase
       .from("projects")
       .select("id, name, client_name, client_email, price, deadline, revision_limit")
@@ -119,20 +119,20 @@ export default function PendingApprovalsPage() {
       return;
     }
 
-    console.log("[PendingApprovals] projects:", projects?.length);
+    const pIds = projects?.map((p: DbProject) => p.id) ?? [];
+    setUserProjectIds(pIds);
+    setUserProjects(projects ?? []);
 
-    const projectIds = projects?.map((p: DbProject) => p.id) ?? [];
-    if (projectIds.length === 0) {
+    if (pIds.length === 0) {
       setAllCRItems([]);
       setLoaded(true);
       return;
     }
 
-    // Get ALL change requests for those projects
     const { data: allCRs, error: crErr } = await supabase
       .from("change_requests")
       .select("id, description, additional_cost, time_impact_days, status, created_at, project_id")
-      .in("project_id", projectIds)
+      .in("project_id", pIds)
       .order("created_at", { ascending: false });
 
     if (crErr) {
@@ -142,10 +142,6 @@ export default function PendingApprovalsPage() {
       return;
     }
 
-    console.log("[PendingApprovals] all CRs:", allCRs?.length);
-    console.log("[PendingApprovals] raw statuses:", JSON.stringify(allCRs?.map((c: DbCR) => c.status)));
-
-    // Map to CRWithProject
     const items: CRWithProject[] = (allCRs ?? []).map((dbCr: DbCR) => ({
       cr: {
         id: dbCr.id,
@@ -159,9 +155,6 @@ export default function PendingApprovalsPage() {
       project: projects!.find((p: DbProject) => p.id === dbCr.project_id)!,
     }));
 
-    const pending = items.filter((x) => x.cr.status?.toLowerCase().trim() === "pending");
-    console.log("[PendingApprovals] pending:", pending.length);
-
     setAllCRItems(items);
     setLoaded(true);
   }, []);
@@ -172,6 +165,21 @@ export default function PendingApprovalsPage() {
       .then((p) => setCashRainEmoji(p.cash_rain_emoji))
       .catch(() => {});
   }, [fetchData]);
+
+  // Real-time subscription for CR changes
+  useEffect(() => {
+    if (userProjectIds.length === 0) return;
+    const supabase = createClient();
+    const channel = supabase
+      .channel("pending-approvals-cr-changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "change_requests" },
+        () => fetchData()
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [userProjectIds, fetchData]);
 
   async function handleAction(projectId: string, crId: string, action: "Approved" | "Declined") {
     const item = allCRItems.find((x) => x.cr.id === crId);

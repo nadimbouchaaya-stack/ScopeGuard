@@ -179,7 +179,8 @@ export default function ActiveProjects() {
             </svg>
           </div>
           <h3 className="text-lg font-semibold text-[#F1F5F9] mb-1">No active projects</h3>
-          <p className="text-[#94A3B8] mb-6">Create a new project to get started.</p>
+          <p className="text-[#94A3B8] mb-2">Create a new project to get started.</p>
+          <p className="text-[#94A3B8]/60 text-xs mb-6">Looking for a project shared with you? Use the portal link sent to your email.</p>
           <Link
             href="/projects/new"
             className="bg-[#6366F1] hover:bg-[#5558E6] text-[#F1F5F9] font-medium px-5 py-2.5 rounded-lg transition-colors inline-flex items-center gap-2"

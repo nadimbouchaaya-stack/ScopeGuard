@@ -11,9 +11,21 @@ export default function Dashboard() {
   const [loaded, setLoaded] = useState(false);
   const [firstName, setFirstName] = useState<string | null>(null);
   const [pendingCRCount, setPendingCRCount] = useState(0);
+  const [projectIds, setProjectIds] = useState<string[]>([]);
+
+  async function fetchPendingCount(supabase: ReturnType<typeof createClient>, pIds: string[]) {
+    if (pIds.length === 0) return;
+    const { data: crs } = await supabase
+      .from("change_requests")
+      .select("id, status")
+      .in("project_id", pIds);
+    const count = crs?.filter(
+      (cr: { id: string; status: string }) => cr.status?.toLowerCase().trim() === "pending"
+    ).length ?? 0;
+    setPendingCRCount(count);
+  }
 
   useEffect(() => {
-    // Fetch projects for dashboard stats
     getProjects().then((p) => {
       setProjects(p);
       setLoaded(true);
@@ -23,33 +35,48 @@ export default function Dashboard() {
     supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (!user) return;
 
-      // Set first name
-      const fullName = user.user_metadata?.full_name;
-      if (fullName) {
-        setFirstName(fullName.split(" ")[0]);
+      // Resolve first name: user_metadata → user_profiles → email
+      const metaName = user.user_metadata?.full_name;
+      if (metaName) {
+        setFirstName(metaName.split(" ")[0]);
+      } else {
+        const { data: profile } = await supabase
+          .from("user_profiles")
+          .select("full_name")
+          .eq("user_id", user.id)
+          .single();
+        if (profile?.full_name) {
+          setFirstName(profile.full_name.split(" ")[0]);
+        } else if (user.email) {
+          setFirstName(user.email.split("@")[0]);
+        }
       }
 
-      // Fetch pending CR count directly from DB
+      // Fetch project IDs + pending CR count
       const { data: userProjects } = await supabase
         .from("projects")
         .select("id")
         .eq("user_id", user.id);
-
-      const projectIds = userProjects?.map((p: { id: string }) => p.id) ?? [];
-      if (projectIds.length === 0) return;
-
-      const { data: crs } = await supabase
-        .from("change_requests")
-        .select("id, status")
-        .in("project_id", projectIds);
-
-      const count = crs?.filter(
-        (cr: { id: string; status: string }) => cr.status?.toLowerCase().trim() === "pending"
-      ).length ?? 0;
-
-      setPendingCRCount(count);
+      const pIds = userProjects?.map((p: { id: string }) => p.id) ?? [];
+      setProjectIds(pIds);
+      await fetchPendingCount(supabase, pIds);
     });
   }, []);
+
+  // Real-time subscription for new CRs
+  useEffect(() => {
+    if (projectIds.length === 0) return;
+    const supabase = createClient();
+    const channel = supabase
+      .channel("dashboard-cr-changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "change_requests" },
+        () => fetchPendingCount(supabase, projectIds)
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [projectIds]);
 
   if (!loaded) return null;
 
