@@ -2,8 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
-import { Project, ChangeRequest } from "@/lib/types";
-import { getProjects, saveProject } from "@/lib/storage";
+import { ChangeRequest } from "@/lib/types";
 import { createClient } from "@/lib/supabase/client";
 import { getProfile } from "@/lib/profile";
 
@@ -63,70 +62,151 @@ function CashRain({ onComplete, emoji = "💵" }: { onComplete: () => void; emoj
   );
 }
 
-interface PendingCR {
+interface DbCR {
+  id: string;
+  project_id: string;
+  description: string;
+  additional_cost: number;
+  time_impact_days: number;
+  status: string;
+  created_at: string;
+}
+
+interface DbProject {
+  id: string;
+  name: string;
+  client_name: string;
+  client_email: string;
+  price: number;
+  deadline: string | null;
+  revision_limit: number;
+}
+
+interface CRWithProject {
   cr: ChangeRequest;
-  project: Project;
+  project: DbProject;
 }
 
 export default function PendingApprovalsPage() {
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [allCRItems, setAllCRItems] = useState<CRWithProject[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showCashRain, setShowCashRain] = useState(false);
   const [cashRainEmoji, setCashRainEmoji] = useState("💵");
 
-  useEffect(() => {
-    // Step 1: Log the authenticated user (same pattern as dashboard/Navbar)
+  const fetchData = useCallback(async () => {
     const supabase = createClient();
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      console.log("[PendingApprovals] user:", user?.id, user?.email);
-    });
 
-    // Step 2: Fetch projects — EXACT same pattern as projects/page.tsx
-    getProjects().then((p) => {
-      console.log("[PendingApprovals] projects:", p.length);
-      const allCRs = p.flatMap((proj) => proj.changeRequests);
-      console.log("[PendingApprovals] all CRs:", allCRs.length);
-      console.log("[PendingApprovals] raw statuses:", JSON.stringify(allCRs.map((cr) => cr.status)));
-      const pending = allCRs.filter((cr) => cr.status?.toLowerCase().trim() === "pending");
-      console.log("[PendingApprovals] pending:", pending.length);
-      setProjects(p);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      setError("Not authenticated");
       setLoaded(true);
-    }).catch((err) => {
-      console.error("[PendingApprovals] ERROR:", err);
-      setError(err instanceof Error ? err.message : String(err));
-      setLoaded(true);
-    });
+      return;
+    }
 
+    console.log("[PendingApprovals] user:", user.id, user.email);
+
+    // Get user's projects
+    const { data: projects, error: pErr } = await supabase
+      .from("projects")
+      .select("id, name, client_name, client_email, price, deadline, revision_limit")
+      .eq("user_id", user.id);
+
+    if (pErr) {
+      console.error("[PendingApprovals] projects error:", pErr);
+      setError(pErr.message);
+      setLoaded(true);
+      return;
+    }
+
+    console.log("[PendingApprovals] projects:", projects?.length);
+
+    const projectIds = projects?.map((p: DbProject) => p.id) ?? [];
+    if (projectIds.length === 0) {
+      setAllCRItems([]);
+      setLoaded(true);
+      return;
+    }
+
+    // Get ALL change requests for those projects
+    const { data: allCRs, error: crErr } = await supabase
+      .from("change_requests")
+      .select("id, description, additional_cost, time_impact_days, status, created_at, project_id")
+      .in("project_id", projectIds)
+      .order("created_at", { ascending: false });
+
+    if (crErr) {
+      console.error("[PendingApprovals] CRs error:", crErr);
+      setError(crErr.message);
+      setLoaded(true);
+      return;
+    }
+
+    console.log("[PendingApprovals] all CRs:", allCRs?.length);
+    console.log("[PendingApprovals] raw statuses:", JSON.stringify(allCRs?.map((c: DbCR) => c.status)));
+
+    // Map to CRWithProject
+    const items: CRWithProject[] = (allCRs ?? []).map((dbCr: DbCR) => ({
+      cr: {
+        id: dbCr.id,
+        projectId: dbCr.project_id,
+        description: dbCr.description,
+        additionalCost: Number(dbCr.additional_cost),
+        timeImpactDays: dbCr.time_impact_days,
+        status: (dbCr.status || "Pending") as ChangeRequest["status"],
+        createdAt: dbCr.created_at,
+      },
+      project: projects!.find((p: DbProject) => p.id === dbCr.project_id)!,
+    }));
+
+    const pending = items.filter((x) => x.cr.status?.toLowerCase().trim() === "pending");
+    console.log("[PendingApprovals] pending:", pending.length);
+
+    setAllCRItems(items);
+    setLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    fetchData();
     getProfile()
       .then((p) => setCashRainEmoji(p.cash_rain_emoji))
       .catch(() => {});
-  }, []);
+  }, [fetchData]);
 
   async function handleAction(projectId: string, crId: string, action: "Approved" | "Declined") {
-    const project = projects.find((p) => p.id === projectId);
-    if (!project) return;
+    const item = allCRItems.find((x) => x.cr.id === crId);
+    if (!item) return;
 
-    const cr = project.changeRequests.find((c) => c.id === crId);
-    let newDeadline = project.deadline;
+    const supabase = createClient();
 
-    if (action === "Approved" && cr && cr.timeImpactDays > 0 && project.deadline) {
-      const current = new Date(project.deadline);
-      current.setDate(current.getDate() + cr.timeImpactDays);
-      newDeadline = current.toISOString().split("T")[0];
+    // Update the CR status directly
+    const { error: crErr } = await supabase
+      .from("change_requests")
+      .update({ status: action })
+      .eq("id", crId);
+
+    if (crErr) {
+      console.error("[PendingApprovals] update CR error:", crErr);
+      return;
     }
 
-    const updatedProject: Project = {
-      ...project,
-      deadline: newDeadline,
-      changeRequests: project.changeRequests.map((c) =>
-        c.id === crId ? { ...c, status: action } : c
-      ),
-    };
+    // If approved and has time impact, extend the project deadline
+    if (action === "Approved" && item.cr.timeImpactDays > 0 && item.project.deadline) {
+      const current = new Date(item.project.deadline);
+      current.setDate(current.getDate() + item.cr.timeImpactDays);
+      const newDeadline = current.toISOString().split("T")[0];
 
-    await saveProject(updatedProject);
-    setProjects((prev) =>
-      prev.map((p) => (p.id === projectId ? updatedProject : p))
+      await supabase
+        .from("projects")
+        .update({ deadline: newDeadline })
+        .eq("id", projectId);
+    }
+
+    // Update local state
+    setAllCRItems((prev) =>
+      prev.map((x) =>
+        x.cr.id === crId ? { ...x, cr: { ...x.cr, status: action } } : x
+      )
     );
 
     if (action === "Approved") {
@@ -138,12 +218,9 @@ export default function PendingApprovalsPage() {
 
   if (!loaded) return null;
 
-  const allCRs = projects.flatMap((p) =>
-    p.changeRequests.map((cr) => ({ cr, project: p }))
-  );
-  const pendingCRs: PendingCR[] = allCRs.filter((x) => x.cr.status?.toLowerCase().trim() === "pending");
-  const approvedCount = allCRs.filter((x) => x.cr.status?.toLowerCase().trim() === "approved").length;
-  const declinedCount = allCRs.filter((x) => x.cr.status?.toLowerCase().trim() === "declined").length;
+  const pendingCRs = allCRItems.filter((x) => x.cr.status?.toLowerCase().trim() === "pending");
+  const approvedCount = allCRItems.filter((x) => x.cr.status?.toLowerCase().trim() === "approved").length;
+  const declinedCount = allCRItems.filter((x) => x.cr.status?.toLowerCase().trim() === "declined").length;
   const decidedCount = approvedCount + declinedCount;
   const approvalRate = decidedCount > 0 ? Math.round((approvedCount / decidedCount) * 100) : -1;
 
@@ -264,7 +341,7 @@ export default function PendingApprovalsPage() {
                       {project.name}
                     </Link>
                     <span className="text-[#94A3B8]/40 text-xs shrink-0">&middot;</span>
-                    <span className="text-[#94A3B8] text-xs shrink-0">{project.clientName}</span>
+                    <span className="text-[#94A3B8] text-xs shrink-0">{project.client_name}</span>
                   </div>
                   <span className="text-xs text-[#94A3B8]/50 shrink-0">
                     {new Date(cr.createdAt).toLocaleDateString("en-US", {

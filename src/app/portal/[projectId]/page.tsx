@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { Project, ChangeRequest } from "@/lib/types";
 import { getProjectPublic, saveProjectPublic } from "@/lib/storage";
+import { createClient } from "@/lib/supabase/client";
 
 const statusColors: Record<string, string> = {
   Active: "bg-[#34D399]/15 text-[#34D399] border-[#34D399]/30",
@@ -24,12 +25,61 @@ export default function ClientPortal() {
   const [project, setProject] = useState<Project | null>(null);
   const [loaded, setLoaded] = useState(false);
 
+  // CR submission form state
+  const [showCRForm, setShowCRForm] = useState(false);
+  const [crDescription, setCrDescription] = useState("");
+  const [crCost, setCrCost] = useState("");
+  const [crDays, setCrDays] = useState("");
+  const [crSubmitting, setCrSubmitting] = useState(false);
+  const [crError, setCrError] = useState<string | null>(null);
+  const [crSuccess, setCrSuccess] = useState(false);
+
   useEffect(() => {
+    loadProject();
+  }, [projectId]);
+
+  function loadProject() {
     getProjectPublic(projectId).then((p) => {
       if (p) setProject(p);
       setLoaded(true);
     });
-  }, [projectId]);
+  }
+
+  async function handleSubmitCR(e: React.FormEvent) {
+    e.preventDefault();
+    if (!crDescription.trim()) return;
+
+    setCrSubmitting(true);
+    setCrError(null);
+
+    const supabase = createClient();
+    const { error } = await supabase
+      .from("change_requests")
+      .insert({
+        project_id: projectId,
+        description: crDescription.trim(),
+        additional_cost: Number(crCost) || 0,
+        time_impact_days: Number(crDays) || 0,
+        status: "Pending",
+      });
+
+    setCrSubmitting(false);
+
+    if (error) {
+      console.error("[Portal] CR insert error:", error);
+      setCrError("Failed to submit request. Please try again.");
+      return;
+    }
+
+    setCrSuccess(true);
+    setCrDescription("");
+    setCrCost("");
+    setCrDays("");
+    setShowCRForm(false);
+
+    // Reload project to show the new CR
+    loadProject();
+  }
 
   async function handleChangeRequest(crId: string, action: "Approved" | "Declined") {
     if (!project) return;
@@ -205,6 +255,113 @@ export default function ClientPortal() {
           </a>
         </div>
       )}
+
+      {/* CR Success Banner */}
+      {crSuccess && (
+        <div className="bg-[#34D399]/10 border border-[#34D399]/30 rounded-xl px-5 py-4 mb-6 flex items-start gap-3">
+          <svg className="w-5 h-5 text-[#34D399] mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div>
+            <p className="text-sm font-medium text-[#34D399]">Change request submitted!</p>
+            <p className="text-xs text-[#94A3B8] mt-1">The freelancer will review it shortly.</p>
+          </div>
+          <button onClick={() => setCrSuccess(false)} className="ml-auto text-[#94A3B8] hover:text-[#F1F5F9]">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      )}
+
+      {/* Submit Change Request */}
+      <div className="bg-[#1E293B] border border-[#475569] rounded-xl p-6 mb-6">
+        {!showCRForm ? (
+          <button
+            onClick={() => setShowCRForm(true)}
+            className="w-full flex items-center justify-center gap-2 bg-[#6366F1] hover:bg-[#5558E6] text-[#F1F5F9] font-semibold py-3 rounded-xl transition-colors text-base"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            Request a Change
+          </button>
+        ) : (
+          <form onSubmit={handleSubmitCR}>
+            <h2 className="text-lg font-semibold text-[#F1F5F9] mb-4">Submit Change Request</h2>
+
+            {crError && (
+              <div className="mb-4 bg-[#F87171]/10 border border-[#F87171]/30 rounded-lg px-4 py-3 text-sm text-[#F87171]">
+                {crError}
+              </div>
+            )}
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-[#94A3B8] mb-1.5">
+                  What do you need changed?
+                </label>
+                <textarea
+                  value={crDescription}
+                  onChange={(e) => setCrDescription(e.target.value)}
+                  placeholder="Describe the change you'd like..."
+                  rows={3}
+                  required
+                  className="w-full bg-[#0F172A] border border-[#475569] rounded-lg px-4 py-3 text-[#F1F5F9] placeholder-[#94A3B8]/50 focus:outline-none focus:border-[#6366F1] transition-colors text-sm"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-[#94A3B8] mb-1.5">
+                    Estimated cost impact ($)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={crCost}
+                    onChange={(e) => setCrCost(e.target.value)}
+                    placeholder="0"
+                    className="w-full bg-[#0F172A] border border-[#475569] rounded-lg px-4 py-3 text-[#F1F5F9] placeholder-[#94A3B8]/50 focus:outline-none focus:border-[#6366F1] transition-colors text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[#94A3B8] mb-1.5">
+                    Estimated time impact (days)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={crDays}
+                    onChange={(e) => setCrDays(e.target.value)}
+                    placeholder="0"
+                    className="w-full bg-[#0F172A] border border-[#475569] rounded-lg px-4 py-3 text-[#F1F5F9] placeholder-[#94A3B8]/50 focus:outline-none focus:border-[#6366F1] transition-colors text-sm"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-5">
+              <button
+                type="submit"
+                disabled={crSubmitting || !crDescription.trim()}
+                className="flex-1 bg-[#6366F1] hover:bg-[#5558E6] disabled:opacity-50 text-[#F1F5F9] font-semibold py-3 rounded-xl transition-colors text-sm"
+              >
+                {crSubmitting ? "Submitting..." : "Submit Request"}
+              </button>
+              <button
+                type="button"
+                onClick={() => { setShowCRForm(false); setCrError(null); }}
+                className="bg-[#334155] hover:bg-[#475569] text-[#94A3B8] hover:text-[#F1F5F9] font-medium px-5 py-3 rounded-xl transition-colors text-sm"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
 
       {/* Pending Change Requests */}
       {pendingRequests.length > 0 && (

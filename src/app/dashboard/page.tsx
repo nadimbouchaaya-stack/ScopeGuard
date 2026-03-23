@@ -10,29 +10,44 @@ export default function Dashboard() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [firstName, setFirstName] = useState<string | null>(null);
+  const [pendingCRCount, setPendingCRCount] = useState(0);
 
   useEffect(() => {
-    console.log("[Dashboard] Fetching projects...");
+    // Fetch projects for dashboard stats
     getProjects().then((p) => {
-      console.log("[Dashboard] Projects loaded:", p.length);
-      const pendingCount = p.reduce((sum, proj) => sum + proj.changeRequests.filter((cr) => cr.status?.toLowerCase().trim() === "pending").length, 0);
-      console.log("[Dashboard] Pending CR count:", pendingCount);
       setProjects(p);
-      setLoaded(true);
-    }).catch((err) => {
-      console.error("[Dashboard] ERROR:", err);
       setLoaded(true);
     });
 
     const supabase = createClient();
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      console.log("[Dashboard] user:", user?.id, user?.email);
-      if (user) {
-        const fullName = user.user_metadata?.full_name;
-        if (fullName) {
-          setFirstName(fullName.split(" ")[0]);
-        }
+    supabase.auth.getUser().then(async ({ data: { user } }) => {
+      if (!user) return;
+
+      // Set first name
+      const fullName = user.user_metadata?.full_name;
+      if (fullName) {
+        setFirstName(fullName.split(" ")[0]);
       }
+
+      // Fetch pending CR count directly from DB
+      const { data: userProjects } = await supabase
+        .from("projects")
+        .select("id")
+        .eq("user_id", user.id);
+
+      const projectIds = userProjects?.map((p: { id: string }) => p.id) ?? [];
+      if (projectIds.length === 0) return;
+
+      const { data: crs } = await supabase
+        .from("change_requests")
+        .select("id, status")
+        .in("project_id", projectIds);
+
+      const count = crs?.filter(
+        (cr: { id: string; status: string }) => cr.status?.toLowerCase().trim() === "pending"
+      ).length ?? 0;
+
+      setPendingCRCount(count);
     });
   }, []);
 
@@ -53,11 +68,6 @@ export default function Dashboard() {
     );
     return diff <= 7;
   }).length;
-
-  const pendingCRCount = projects.reduce(
-    (sum, p) => sum + p.changeRequests.filter((cr) => cr.status?.toLowerCase().trim() === "pending").length,
-    0
-  );
 
   const cards: Array<{
     title: string;
