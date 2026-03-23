@@ -20,6 +20,7 @@ export default function ProfilePage() {
   const [loaded, setLoaded] = useState(false);
   const [saving, setSaving] = useState<string | null>(null);
   const [saved, setSaved] = useState<string | null>(null);
+  const [successToast, setSuccessToast] = useState(false);
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
@@ -42,10 +43,12 @@ export default function ProfilePage() {
   async function handleSave(field: string, updates: Parameters<typeof saveProfile>[0]) {
     setSaving(field);
     setSaved(null);
+    setSuccessToast(false);
     try {
       await saveProfile(updates);
       setSaved(field);
-      setTimeout(() => setSaved(null), 2000);
+      setSuccessToast(true);
+      setTimeout(() => { setSaved(null); setSuccessToast(false); }, 3000);
     } catch {}
     setSaving(null);
   }
@@ -101,6 +104,15 @@ export default function ProfilePage() {
           Settings
         </Link>
       </div>
+
+      {successToast && (
+        <div className="mb-6 bg-[#34D399]/10 border border-[#34D399]/30 rounded-xl px-5 py-3 flex items-center gap-3 animate-in fade-in">
+          <svg className="w-5 h-5 text-[#34D399] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span className="text-sm font-medium text-[#34D399]">Profile updated successfully</span>
+        </div>
+      )}
 
       <div className="space-y-6">
         {/* Avatar Section */}

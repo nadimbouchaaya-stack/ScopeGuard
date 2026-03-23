@@ -35,20 +35,18 @@ export default function Dashboard() {
     supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (!user) return;
 
-      // Resolve first name: user_metadata → user_profiles → email
+      // Resolve first name: user_metadata → user_profiles (never email)
       const metaName = user.user_metadata?.full_name;
-      if (metaName) {
-        setFirstName(metaName.split(" ")[0]);
+      if (metaName?.trim()) {
+        setFirstName(metaName.trim().split(" ")[0]);
       } else {
         const { data: profile } = await supabase
           .from("user_profiles")
           .select("full_name")
           .eq("user_id", user.id)
           .single();
-        if (profile?.full_name) {
-          setFirstName(profile.full_name.split(" ")[0]);
-        } else if (user.email) {
-          setFirstName(user.email.split("@")[0]);
+        if (profile?.full_name?.trim()) {
+          setFirstName(profile.full_name.trim().split(" ")[0]);
         }
       }
 

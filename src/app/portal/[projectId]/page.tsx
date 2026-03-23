@@ -391,7 +391,7 @@ export default function ClientPortal() {
       {/* Footer note */}
       <div className="mt-8 text-center">
         <p className="text-xs text-[#94A3B8]/50">
-          Looking for another project? Check the email with your portal link.
+          Have another project? Ask your freelancer for the portal link.
         </p>
       </div>
     </div>

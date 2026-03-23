@@ -391,8 +391,9 @@ export default function ActiveProjects() {
                     <Link
                       href={`/projects/${project.id}/change-request`}
                       className="flex-1 text-center text-sm font-medium py-2 rounded-lg bg-[#334155] hover:bg-[#475569] text-[#94A3B8] hover:text-[#F1F5F9] transition-colors"
+                      title="Record a change request that came in outside the portal"
                     >
-                      Change Request
+                      Log Change
                     </Link>
                   )}
                   <Link

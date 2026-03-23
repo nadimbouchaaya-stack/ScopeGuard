@@ -17,6 +17,7 @@ export default function NewProject() {
   const [deliverablesLink, setDeliverablesLink] = useState("");
   const [paymentLink, setPaymentLink] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [defaultPaymentLink, setDefaultPaymentLink] = useState("");
@@ -45,6 +46,14 @@ export default function NewProject() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+
+    const errors: Record<string, string> = {};
+    if (!name.trim()) errors.name = "Project name is required";
+    if (!clientName.trim()) errors.clientName = "Client name is required";
+    if (!clientEmail.trim()) errors.clientEmail = "Client email is required";
+    if (!price.trim()) errors.price = "Contract value is required";
+    setFieldErrors(errors);
+    if (Object.keys(errors).length > 0) return;
 
     const filteredDeliverables = deliverables.filter((d) => d.trim() !== "");
     if (filteredDeliverables.length === 0) return;
@@ -196,10 +205,11 @@ export default function NewProject() {
               type="text"
               required
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => { setName(e.target.value); setFieldErrors((p) => { const { name: _, ...rest } = p; return rest; }); }}
               placeholder="e.g. Brand Identity Redesign"
               className={inputClass}
             />
+            {fieldErrors.name && <p className="text-red-400 text-sm mt-1">{fieldErrors.name}</p>}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -209,10 +219,11 @@ export default function NewProject() {
                 type="text"
                 required
                 value={clientName}
-                onChange={(e) => setClientName(e.target.value)}
+                onChange={(e) => { setClientName(e.target.value); setFieldErrors((p) => { const { clientName: _, ...rest } = p; return rest; }); }}
                 placeholder="e.g. Acme Corp"
                 className={inputClass}
               />
+              {fieldErrors.clientName && <p className="text-red-400 text-sm mt-1">{fieldErrors.clientName}</p>}
             </div>
             <div>
               <label className={labelClass}>Client Email</label>
@@ -220,10 +231,11 @@ export default function NewProject() {
                 type="email"
                 required
                 value={clientEmail}
-                onChange={(e) => setClientEmail(e.target.value)}
+                onChange={(e) => { setClientEmail(e.target.value); setFieldErrors((p) => { const { clientEmail: _, ...rest } = p; return rest; }); }}
                 placeholder="client@example.com"
                 className={inputClass}
               />
+              {fieldErrors.clientEmail && <p className="text-red-400 text-sm mt-1">{fieldErrors.clientEmail}</p>}
             </div>
           </div>
 
@@ -254,10 +266,11 @@ export default function NewProject() {
                 min={0}
                 step="0.01"
                 value={price}
-                onChange={(e) => setPrice(e.target.value)}
+                onChange={(e) => { setPrice(e.target.value); setFieldErrors((p) => { const { price: _, ...rest } = p; return rest; }); }}
                 placeholder="5000"
                 className={inputClass}
               />
+              {fieldErrors.price && <p className="text-red-400 text-sm mt-1">{fieldErrors.price}</p>}
             </div>
           </div>
 

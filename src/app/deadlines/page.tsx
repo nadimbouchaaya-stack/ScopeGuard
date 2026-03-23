@@ -113,9 +113,10 @@ export default function Deadlines() {
               });
 
               return (
-                <div
+                <Link
+                  href={`/projects/${project.id}`}
                   key={project.id}
-                  className="bg-[#1E293B] border border-[#475569] rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 hover:bg-[#334155] transition-colors"
+                  className="block bg-[#1E293B] border border-[#475569] rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 hover:bg-[#334155] transition-colors"
                 >
                   <div className="flex items-center gap-3 flex-1 min-w-0">
                     <div className={`w-3 h-3 rounded-full ${color.dot} shrink-0`} />
@@ -132,7 +133,7 @@ export default function Deadlines() {
                       {color.label}
                     </span>
                   </div>
-                </div>
+                </Link>
               );
             })}
           </div>
