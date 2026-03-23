@@ -198,15 +198,30 @@ export default function PendingApprovalsPage() {
       return;
     }
 
-    // If approved and has time impact, extend the project deadline
-    if (action === "Approved" && item.cr.timeImpactDays > 0 && item.project.deadline) {
-      const current = new Date(item.project.deadline);
-      current.setDate(current.getDate() + item.cr.timeImpactDays);
-      const newDeadline = current.toISOString().split("T")[0];
+    // If approved, increment revisions_used and extend deadline if needed
+    if (action === "Approved") {
+      // Fetch current revisions_used to increment
+      const { data: proj } = await supabase
+        .from("projects")
+        .select("revisions_used, deadline")
+        .eq("id", projectId)
+        .single();
+
+      const currentUsed = proj?.revisions_used ?? 0;
+      const updateFields: Record<string, unknown> = {
+        revisions_used: currentUsed + 1,
+      };
+
+      const deadline = proj?.deadline ?? item.project.deadline;
+      if (item.cr.timeImpactDays > 0 && deadline) {
+        const current = new Date(deadline);
+        current.setDate(current.getDate() + item.cr.timeImpactDays);
+        updateFields.deadline = current.toISOString().split("T")[0];
+      }
 
       await supabase
         .from("projects")
-        .update({ deadline: newDeadline })
+        .update(updateFields)
         .eq("id", projectId);
     }
 

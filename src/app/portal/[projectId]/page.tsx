@@ -140,7 +140,9 @@ export default function ClientPortal() {
                 className={
                   project.revisionLimit - project.revisionsUsed <= 0
                     ? "text-[#F87171]"
-                    : "text-[#34D399]"
+                    : project.revisionLimit - project.revisionsUsed <= project.revisionLimit / 2
+                      ? "text-[#FBBF24]"
+                      : "text-[#34D399]"
                 }
               >
                 {Math.max(0, project.revisionLimit - project.revisionsUsed)}
@@ -239,7 +241,22 @@ export default function ClientPortal() {
 
       {/* Submit Change Request */}
       <div className="bg-[#1E293B] border border-[#475569] rounded-xl p-6 mb-6">
-        {!showCRForm ? (
+        {project.revisionsUsed >= project.revisionLimit ? (
+          <div className="text-center py-2">
+            <button
+              disabled
+              className="w-full flex items-center justify-center gap-2 bg-[#475569] text-[#94A3B8] font-semibold py-3 rounded-xl cursor-not-allowed text-base opacity-60"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+              Request a Change
+            </button>
+            <p className="text-xs text-[#F87171] mt-3">
+              You&apos;ve used all {project.revisionLimit} revision{project.revisionLimit === 1 ? "" : "s"} included in this project. Please contact the freelancer directly for additional changes.
+            </p>
+          </div>
+        ) : !showCRForm ? (
           <button
             onClick={() => setShowCRForm(true)}
             className="w-full flex items-center justify-center gap-2 bg-[#6366F1] hover:bg-[#5558E6] text-[#F1F5F9] font-semibold py-3 rounded-xl transition-colors text-base"
@@ -329,7 +346,8 @@ export default function ClientPortal() {
       {/* Change Requests */}
       {project.changeRequests.length > 0 ? (
         <div className="bg-[#1E293B] border border-[#475569] rounded-xl p-6">
-          <h2 className="text-lg font-semibold text-[#F1F5F9] mb-4">Your Change Requests</h2>
+          <h2 className="text-lg font-semibold text-[#F1F5F9] mb-1">Your Change Requests</h2>
+          <p className="text-xs text-[#94A3B8] mb-4">Requests you&apos;ve submitted for this project</p>
           <div className="space-y-3">
             {project.changeRequests.map((cr) => (
               <div
@@ -369,6 +387,13 @@ export default function ClientPortal() {
           </p>
         </div>
       )}
+
+      {/* Footer note */}
+      <div className="mt-8 text-center">
+        <p className="text-xs text-[#94A3B8]/50">
+          Looking for another project? Check the email with your portal link.
+        </p>
+      </div>
     </div>
   );
 }

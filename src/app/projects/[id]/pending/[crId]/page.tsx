@@ -106,6 +106,7 @@ export default function ChangeRequestDetailPage() {
     const updatedProject: Project = {
       ...project,
       deadline: newDeadline,
+      revisionsUsed: action === "Approved" ? project.revisionsUsed + 1 : project.revisionsUsed,
       changeRequests: project.changeRequests.map((c) =>
         c.id === crId ? { ...c, status: action } : c
       ),
