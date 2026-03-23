@@ -89,6 +89,7 @@ export default function ProjectDetailPage() {
   const [editDeadline, setEditDeadline] = useState("");
   const [editDeliverables, setEditDeliverables] = useState<string[]>([]);
   const [editSaving, setEditSaving] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -119,6 +120,7 @@ export default function ProjectDetailPage() {
     const updatedProject: Project = {
       ...project,
       deadline: newDeadline,
+      revisionsUsed: action === "Approved" ? project.revisionsUsed + 1 : project.revisionsUsed,
       changeRequests: project.changeRequests.map((c) =>
         c.id === crId ? { ...c, status: action } : c
       ),
@@ -251,7 +253,10 @@ export default function ProjectDetailPage() {
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-[#F1F5F9]">{project.name}</h1>
             <p className="text-[#94A3B8] mt-1 text-sm sm:text-base">
-              {project.clientName} &middot; {project.clientEmail}
+              {project.clientName}
+            </p>
+            <p className="text-[#94A3B8]/50 text-xs mt-0.5">
+              {project.clientEmail}
             </p>
           </div>
           <div className="flex gap-2 shrink-0 flex-wrap justify-end">
@@ -277,6 +282,19 @@ export default function ProjectDetailPage() {
                 Mark Complete
               </button>
             )}
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(`https://tryscopeguard.com/portal/${project.id}`);
+                setCopiedLink(true);
+                setTimeout(() => setCopiedLink(false), 2000);
+              }}
+              className="bg-[#334155] hover:bg-[#475569] text-[#94A3B8] hover:text-[#F1F5F9] font-medium px-4 py-2 rounded-lg transition-colors text-sm flex items-center gap-1.5"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m9.86-3.124a4.5 4.5 0 00-1.242-7.244l-4.5-4.5a4.5 4.5 0 00-6.364 6.364L4.757 8.25" />
+              </svg>
+              {copiedLink ? "Copied!" : "Copy Link"}
+            </button>
             <Link
               href={`/portal/${project.id}`}
               className="bg-[#6366F1]/10 hover:bg-[#6366F1]/20 text-[#818CF8] font-medium px-4 py-2 rounded-lg transition-colors text-sm"

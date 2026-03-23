@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { saveProject } from "@/lib/storage";
 import { getProfile } from "@/lib/profile";
+import { createClient } from "@/lib/supabase/client";
 
 export default function NewProject() {
   const router = useRouter();
@@ -20,6 +21,7 @@ export default function NewProject() {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [duplicateWarning, setDuplicateWarning] = useState(false);
   const [defaultPaymentLink, setDefaultPaymentLink] = useState("");
 
   useEffect(() => {
@@ -57,6 +59,24 @@ export default function NewProject() {
 
     const filteredDeliverables = deliverables.filter((d) => d.trim() !== "");
     if (filteredDeliverables.length === 0) return;
+
+    // Check for duplicate project name (skip if user already confirmed)
+    if (!duplicateWarning) {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: existing } = await supabase
+          .from("projects")
+          .select("id")
+          .eq("user_id", user.id)
+          .ilike("name", name.trim());
+        if (existing && existing.length > 0) {
+          setDuplicateWarning(true);
+          return;
+        }
+      }
+    }
+    setDuplicateWarning(false);
 
     setSaving(true);
     const projectId = crypto.randomUUID();
@@ -128,8 +148,10 @@ export default function NewProject() {
     }
   }
 
-  const inputClass =
-    "w-full bg-[#0F172A] border border-[#475569] rounded-lg px-4 py-3 text-[#F1F5F9] placeholder-[#94A3B8]/50 focus:outline-none focus:border-[#6366F1] focus:ring-1 focus:ring-[#6366F1] transition-colors";
+  const inputBase =
+    "w-full bg-[#0F172A] rounded-lg px-4 py-3 text-[#F1F5F9] placeholder-[#94A3B8]/50 focus:outline-none focus:ring-1 transition-colors";
+  const inputClass = (field?: string) =>
+    `${inputBase} border ${field && fieldErrors[field] ? "border-red-500 focus:border-red-500 focus:ring-red-500" : "border-[#475569] focus:border-[#6366F1] focus:ring-[#6366F1]"}`;
   const labelClass = "block text-sm font-medium text-[#94A3B8] mb-2";
 
   if (success) {
@@ -193,7 +215,21 @@ export default function NewProject() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6 pb-24">
+      {duplicateWarning && (
+        <div className="bg-[#FBBF24]/10 border border-[#FBBF24]/30 rounded-xl px-5 py-4 mb-2">
+          <div className="flex items-start gap-3">
+            <svg className="w-5 h-5 text-[#FBBF24] shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z" />
+            </svg>
+            <div>
+              <p className="text-[#FBBF24] font-medium text-sm">You already have a project named &ldquo;{name.trim()}&rdquo;</p>
+              <p className="text-[#FBBF24]/70 text-sm mt-0.5">Click &ldquo;Create Project&rdquo; again to confirm.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} noValidate className="space-y-6 pb-24">
         <div className="bg-[#1E293B] border border-[#475569] rounded-xl p-6 space-y-5">
           <h2 className="text-lg font-semibold text-[#F1F5F9] border-b border-[#475569] pb-3">
             Project Details
@@ -203,13 +239,12 @@ export default function NewProject() {
             <label className={labelClass}>Project Name</label>
             <input
               type="text"
-              required
               value={name}
               onChange={(e) => { setName(e.target.value); setFieldErrors((p) => { const { name: _, ...rest } = p; return rest; }); }}
               placeholder="e.g. Brand Identity Redesign"
-              className={inputClass}
+              className={inputClass("name")}
             />
-            {fieldErrors.name && <p className="text-red-400 text-sm mt-1">{fieldErrors.name}</p>}
+            {fieldErrors.name && <p className="text-red-400 text-xs mt-1">{fieldErrors.name}</p>}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -217,25 +252,23 @@ export default function NewProject() {
               <label className={labelClass}>Client Name</label>
               <input
                 type="text"
-                required
                 value={clientName}
                 onChange={(e) => { setClientName(e.target.value); setFieldErrors((p) => { const { clientName: _, ...rest } = p; return rest; }); }}
                 placeholder="e.g. Acme Corp"
-                className={inputClass}
+                className={inputClass("clientName")}
               />
-              {fieldErrors.clientName && <p className="text-red-400 text-sm mt-1">{fieldErrors.clientName}</p>}
+              {fieldErrors.clientName && <p className="text-red-400 text-xs mt-1">{fieldErrors.clientName}</p>}
             </div>
             <div>
               <label className={labelClass}>Client Email</label>
               <input
                 type="email"
-                required
                 value={clientEmail}
                 onChange={(e) => { setClientEmail(e.target.value); setFieldErrors((p) => { const { clientEmail: _, ...rest } = p; return rest; }); }}
                 placeholder="client@example.com"
-                className={inputClass}
+                className={inputClass("clientEmail")}
               />
-              {fieldErrors.clientEmail && <p className="text-red-400 text-sm mt-1">{fieldErrors.clientEmail}</p>}
+              {fieldErrors.clientEmail && <p className="text-red-400 text-xs mt-1">{fieldErrors.clientEmail}</p>}
             </div>
           </div>
 
@@ -246,7 +279,6 @@ export default function NewProject() {
                 type="text"
                 inputMode="numeric"
                 pattern="[0-9]*"
-                required
                 value={revisionLimit}
                 onChange={(e) => {
                   const val = e.target.value;
@@ -255,22 +287,21 @@ export default function NewProject() {
                   }
                 }}
                 placeholder="3"
-                className={inputClass}
+                className={inputClass()}
               />
             </div>
             <div>
               <label className={labelClass}>Total Contract Value ($)</label>
               <input
                 type="number"
-                required
                 min={0}
                 step="0.01"
                 value={price}
                 onChange={(e) => { setPrice(e.target.value); setFieldErrors((p) => { const { price: _, ...rest } = p; return rest; }); }}
                 placeholder="5000"
-                className={inputClass}
+                className={inputClass("price")}
               />
-              {fieldErrors.price && <p className="text-red-400 text-sm mt-1">{fieldErrors.price}</p>}
+              {fieldErrors.price && <p className="text-red-400 text-xs mt-1">{fieldErrors.price}</p>}
             </div>
           </div>
 
@@ -281,7 +312,7 @@ export default function NewProject() {
               value={deadline}
               onChange={(e) => setDeadline(e.target.value)}
               min={new Date().toISOString().split("T")[0]}
-              className={inputClass}
+              className={inputClass()}
             />
           </div>
 
@@ -292,7 +323,7 @@ export default function NewProject() {
               value={deliverablesLink}
               onChange={(e) => setDeliverablesLink(e.target.value)}
               placeholder="e.g. Google Drive, Dropbox, or WeTransfer link"
-              className={inputClass}
+              className={inputClass()}
             />
           </div>
 
@@ -303,7 +334,7 @@ export default function NewProject() {
               value={paymentLink}
               onChange={(e) => setPaymentLink(e.target.value)}
               placeholder="e.g. PayPal, Revolut, or Stripe link"
-              className={inputClass}
+              className={inputClass()}
             />
             {defaultPaymentLink && !paymentLink && (
               <button
@@ -355,7 +386,7 @@ export default function NewProject() {
                 value={d}
                 onChange={(e) => updateDeliverable(index, e.target.value)}
                 placeholder="Describe the deliverable..."
-                className={`${inputClass} flex-1`}
+                className={`${inputClass()} flex-1`}
               />
               <button
                 type="button"
@@ -386,7 +417,15 @@ export default function NewProject() {
           disabled={saving}
           className="w-full bg-[#6366F1] hover:bg-[#5558E6] disabled:opacity-50 disabled:cursor-not-allowed text-[#F1F5F9] font-semibold py-3.5 rounded-xl transition-colors text-base"
         >
-          {saving ? "Creating & Sending Email..." : "Create Project & Send to Client"}
+          {saving ? (
+            <span className="flex items-center justify-center gap-2">
+              <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              </svg>
+              Creating & Sending Email...
+            </span>
+          ) : "Create Project & Send to Client"}
         </button>
       </form>
     </div>

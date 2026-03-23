@@ -118,6 +118,7 @@ export default function ActiveProjects() {
     const updatedProject: Project = {
       ...project,
       deadline: newDeadline,
+      revisionsUsed: action === "Approved" ? project.revisionsUsed + 1 : project.revisionsUsed,
       changeRequests: project.changeRequests.map((c) =>
         c.id === crId ? { ...c, status: action } : c
       ),
@@ -194,6 +195,7 @@ export default function ActiveProjects() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {projects.map((project) => {
+            const isOverdue = project.deadline && new Date(project.deadline) < new Date(new Date().toDateString());
             const pendingRequests = project.changeRequests.filter(
               (cr) => cr.status?.toLowerCase().trim() === "pending"
             ).length;
@@ -291,6 +293,15 @@ export default function ActiveProjects() {
                     <span className="text-[#94A3B8]">Price</span>
                     <span className="font-medium text-[#F1F5F9]">${project.price.toLocaleString()}</span>
                   </div>
+                  {project.deadline && (
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-[#94A3B8]">Deadline</span>
+                      <span className={`font-medium ${isOverdue ? "text-[#F87171]" : "text-[#F1F5F9]"}`}>
+                        {new Date(project.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                        {isOverdue && <span className="ml-1.5 text-xs bg-[#F87171]/15 text-[#F87171] px-1.5 py-0.5 rounded-full">OVERDUE</span>}
+                      </span>
+                    </div>
+                  )}
                   {pendingRequests > 0 && (
                     <button
                       onClick={() =>

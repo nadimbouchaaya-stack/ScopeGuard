@@ -27,7 +27,14 @@ export default function Deadlines() {
     getProjects().then((all) => {
       const active = all
         .filter((p) => p.status !== "Completed" && p.deadline)
-        .sort((a, b) => new Date(a.deadline!).getTime() - new Date(b.deadline!).getTime());
+        .sort((a, b) => {
+          const daysA = getDaysUntil(a.deadline!);
+          const daysB = getDaysUntil(b.deadline!);
+          // Overdue items first, then by date ascending
+          if (daysA < 0 && daysB >= 0) return -1;
+          if (daysA >= 0 && daysB < 0) return 1;
+          return new Date(a.deadline!).getTime() - new Date(b.deadline!).getTime();
+        });
       setProjects(active);
       setLoaded(true);
     });
@@ -116,7 +123,7 @@ export default function Deadlines() {
                 <Link
                   href={`/projects/${project.id}`}
                   key={project.id}
-                  className="block bg-[#1E293B] border border-[#475569] rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 hover:bg-[#334155] transition-colors"
+                  className={`bg-[#1E293B] border border-[#475569] rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 hover:bg-[#334155] cursor-pointer transition-colors ${days < 0 ? "border-l-[3px] border-l-[#F87171]" : ""}`}
                 >
                   <div className="flex items-center gap-3 flex-1 min-w-0">
                     <div className={`w-3 h-3 rounded-full ${color.dot} shrink-0`} />

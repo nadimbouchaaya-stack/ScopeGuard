@@ -96,6 +96,7 @@ export default function PendingApprovalsPage() {
 
   const [userProjectIds, setUserProjectIds] = useState<string[]>([]);
   const [userProjects, setUserProjects] = useState<DbProject[]>([]);
+  const [expandedCRs, setExpandedCRs] = useState<Set<string>>(new Set());
 
   const fetchData = useCallback(async () => {
     const supabase = createClient();
@@ -374,7 +375,24 @@ export default function PendingApprovalsPage() {
                 </div>
 
                 {/* Description */}
-                <p className="text-[#F1F5F9] text-sm mb-4">{cr.description}</p>
+                <div className="mb-4">
+                  <p className={`text-[#F1F5F9] text-sm ${cr.description.length > 100 && !expandedCRs.has(cr.id) ? "line-clamp-2" : ""}`}>
+                    {cr.description}
+                  </p>
+                  {cr.description.length > 100 && (
+                    <button
+                      onClick={() => setExpandedCRs((prev) => {
+                        const next = new Set(prev);
+                        if (next.has(cr.id)) next.delete(cr.id);
+                        else next.add(cr.id);
+                        return next;
+                      })}
+                      className="text-xs text-[#818CF8] hover:text-[#A5B4FC] mt-1 transition-colors"
+                    >
+                      {expandedCRs.has(cr.id) ? "Show less" : "Show more"}
+                    </button>
+                  )}
+                </div>
 
                 {/* Impact badges */}
                 <div className="flex flex-wrap gap-2 mb-4">
