@@ -10,9 +10,14 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "ScopeGuard — Scope Creep Protection for Freelancers",
   description:
-    "Protect your projects from scope creep. Track deliverables, manage revisions, and handle change requests professionally.",
+    "Stop scope creep before it kills your profits. ScopeGuard helps freelancers track projects, manage change requests, and protect their revenue.",
   icons: {
     icon: "/icon.svg",
+  },
+  openGraph: {
+    title: "ScopeGuard — Scope Creep Protection for Freelancers",
+    description:
+      "Stop scope creep before it kills your profits. ScopeGuard helps freelancers track projects, manage change requests, and protect their revenue.",
   },
 };
 
