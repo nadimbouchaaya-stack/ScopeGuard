@@ -74,9 +74,11 @@ export default function SettingsPage() {
     try {
       await saveProfile(updates);
       setSaved(field);
-      const msg = field === "language"
-        ? "Language preference saved. Full translations coming soon!"
-        : "Settings saved";
+      const msg = field === "emoji"
+        ? "Celebration emoji saved"
+        : field === "theme"
+          ? "Theme updated"
+          : "Language preference saved. Translations coming soon!";
       setSuccessToast(msg);
       setTimeout(() => { setSaved(null); setSuccessToast(false); }, 2000);
     } catch {

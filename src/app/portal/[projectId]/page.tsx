@@ -71,6 +71,19 @@ export default function ClientPortal() {
     setCrDays("");
     setShowCRForm(false);
 
+    // Notify freelancer via email (fire and forget)
+    fetch("/api/notify-cr", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        projectId,
+        projectName: project?.name || "Unknown Project",
+        description: crDescription.trim(),
+        additionalCost: Number(crCost) || 0,
+        timeImpactDays: Number(crDays) || 0,
+      }),
+    }).catch(() => {}); // Don't block on notification failure
+
     // Reload project to show the new CR
     loadProject();
   }
