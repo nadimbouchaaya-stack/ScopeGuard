@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import { getProfile, saveProfile } from "@/lib/profile";
 import { useTheme } from "@/components/ThemeProvider";
+import AppTopBar from "@/components/AppTopBar";
 
 const EMOJI_OPTIONS = [
   "💵", "💰", "💎", "🤑", "💸", "🪙",
@@ -89,30 +89,12 @@ export default function SettingsPage() {
 
   if (!loaded) return null;
 
-  const cardClass = "bg-[var(--bg-card,#1E293B)] border border-[var(--border,#475569)] rounded-xl p-6";
+  const cardClass = "bg-[#0F1322] border border-[rgba(255,255,255,0.06)] rounded-[14px] p-6";
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: "var(--text-primary, #F1F5F9)" }}>
-            Settings
-          </h1>
-          <p className="mt-1 text-sm sm:text-base" style={{ color: "var(--text-secondary, #94A3B8)" }}>
-            Customize your ScopeGuard experience
-          </p>
-        </div>
-        <Link
-          href="/profile"
-          className="text-sm font-medium px-4 py-2 rounded-lg transition-colors"
-          style={{
-            backgroundColor: "var(--accent, #6366F1)",
-            color: "var(--text-primary, #F1F5F9)",
-          }}
-        >
-          Edit Profile
-        </Link>
-      </div>
+    <div className="min-h-screen bg-[#07090F]">
+      <AppTopBar title="Settings" />
+      <div className="p-5">
 
       {successToast && (
         <div className="mb-6 bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 px-4 py-3 rounded-lg flex items-center gap-3 text-sm">
@@ -128,10 +110,10 @@ export default function SettingsPage() {
         <div className={cardClass}>
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-lg font-semibold" style={{ color: "var(--text-primary, #F1F5F9)" }}>
+              <h2 className="text-lg font-semibold" style={{ color: "#F1F5F9" }}>
                 Cash Rain Emoji
               </h2>
-              <p className="text-sm mt-0.5" style={{ color: "var(--text-secondary, #94A3B8)" }}>
+              <p className="text-sm mt-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>
                 Choose the emoji that rains when you approve a change request
               </p>
             </div>
@@ -149,8 +131,8 @@ export default function SettingsPage() {
                     : "hover:scale-105"
                 }`}
                 style={{
-                  backgroundColor: emoji === e ? "var(--accent, #6366F1)" + "26" : "var(--bg-input, #0F172A)" + "80",
-                  borderColor: emoji === e ? "var(--accent, #6366F1)" : "transparent",
+                  backgroundColor: emoji === e ? "#6366F126" : "rgba(255,255,255,0.04)",
+                  borderColor: emoji === e ? "#6366F1" : "transparent",
                   borderWidth: "1px",
                   borderStyle: "solid",
                 }}
@@ -165,8 +147,8 @@ export default function SettingsPage() {
             disabled={saving === "emoji"}
             className="text-sm font-medium px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
             style={{
-              backgroundColor: saved === "emoji" ? "var(--success, #34D399)" : "var(--accent, #6366F1)",
-              color: saved === "emoji" ? "#0F172A" : "var(--text-primary, #F1F5F9)",
+              backgroundColor: saved === "emoji" ? "#34D399" : "#6366F1",
+              color: saved === "emoji" ? "#0F172A" : "#F1F5F9",
             }}
           >
             {saving === "emoji" ? "Saving..." : saved === "emoji" ? "Saved!" : "Save Emoji"}
@@ -175,10 +157,10 @@ export default function SettingsPage() {
 
         {/* Theme Switcher */}
         <div className={cardClass}>
-          <h2 className="text-lg font-semibold mb-1" style={{ color: "var(--text-primary, #F1F5F9)" }}>
+          <h2 className="text-lg font-semibold mb-1" style={{ color: "#F1F5F9" }}>
             Theme
           </h2>
-          <p className="text-sm mb-4" style={{ color: "var(--text-secondary, #94A3B8)" }}>
+          <p className="text-sm mb-4" style={{ color: "rgba(255,255,255,0.35)" }}>
             Choose your preferred visual style
           </p>
 
@@ -197,7 +179,7 @@ export default function SettingsPage() {
                 }`}
                 style={{
                   backgroundColor: t.preview.card,
-                  borderColor: selectedTheme === t.id ? t.preview.accent : "#475569" + "60",
+                  borderColor: selectedTheme === t.id ? t.preview.accent : "rgba(255,255,255,0.06)",
                 }}
               >
                 {/* Theme preview bar */}
@@ -231,8 +213,8 @@ export default function SettingsPage() {
             disabled={saving === "theme"}
             className="text-sm font-medium px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
             style={{
-              backgroundColor: saved === "theme" ? "var(--success, #34D399)" : "var(--accent, #6366F1)",
-              color: saved === "theme" ? "#0F172A" : "var(--text-primary, #F1F5F9)",
+              backgroundColor: saved === "theme" ? "#34D399" : "#6366F1",
+              color: saved === "theme" ? "#0F172A" : "#F1F5F9",
             }}
           >
             {saving === "theme" ? "Saving..." : saved === "theme" ? "Saved!" : "Save Theme"}
@@ -241,10 +223,10 @@ export default function SettingsPage() {
 
         {/* Language Selector */}
         <div className={cardClass}>
-          <h2 className="text-lg font-semibold mb-1" style={{ color: "var(--text-primary, #F1F5F9)" }}>
+          <h2 className="text-lg font-semibold mb-1" style={{ color: "#F1F5F9" }}>
             Language
           </h2>
-          <p className="text-sm mb-4" style={{ color: "var(--text-secondary, #94A3B8)" }}>
+          <p className="text-sm mb-4" style={{ color: "rgba(255,255,255,0.35)" }}>
             Select your preferred language (translations coming soon)
           </p>
 
@@ -258,11 +240,11 @@ export default function SettingsPage() {
                 }`}
                 style={{
                   backgroundColor: language === lang.id
-                    ? "var(--accent, #6366F1)" + "1A"
-                    : "var(--bg-input, #0F172A)" + "80",
+                    ? "#6366F11A"
+                    : "rgba(255,255,255,0.04)",
                   borderColor: language === lang.id
-                    ? "var(--accent, #6366F1)"
-                    : "var(--border, #475569)" + "60",
+                    ? "#6366F1"
+                    : "rgba(255,255,255,0.06)",
                 }}
               >
                 <span className="text-xl">{lang.flag}</span>
@@ -270,8 +252,8 @@ export default function SettingsPage() {
                   className="text-sm font-medium"
                   style={{
                     color: language === lang.id
-                      ? "var(--text-primary, #F1F5F9)"
-                      : "var(--text-secondary, #94A3B8)",
+                      ? "#F1F5F9"
+                      : "rgba(255,255,255,0.35)",
                   }}
                 >
                   {lang.label}
@@ -285,13 +267,14 @@ export default function SettingsPage() {
             disabled={saving === "language"}
             className="text-sm font-medium px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
             style={{
-              backgroundColor: saved === "language" ? "var(--success, #34D399)" : "var(--accent, #6366F1)",
-              color: saved === "language" ? "#0F172A" : "var(--text-primary, #F1F5F9)",
+              backgroundColor: saved === "language" ? "#34D399" : "#6366F1",
+              color: saved === "language" ? "#0F172A" : "#F1F5F9",
             }}
           >
             {saving === "language" ? "Saving..." : saved === "language" ? "Saved!" : "Save Language"}
           </button>
         </div>
+      </div>
       </div>
     </div>
   );

@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { getProfile, saveProfile, uploadAvatar } from "@/lib/profile";
+import AppTopBar from "@/components/AppTopBar";
 
 const PRESET_AVATARS = [
   "🧑‍💻", "👩‍💼", "👨‍💼", "🧑‍🎨", "👩‍🎨", "🧑‍🔧",
@@ -74,36 +74,18 @@ export default function ProfilePage() {
 
   if (!loaded) return null;
 
-  const cardClass = "bg-[var(--bg-card,#1E293B)] border border-[var(--border,#475569)] rounded-xl p-6";
+  const cardClass = "bg-[#0F1322] border border-[rgba(255,255,255,0.06)] rounded-[14px] p-6";
   const inputClass =
-    "w-full rounded-lg px-4 py-3 focus:outline-none focus:ring-1 transition-colors border";
+    "w-full bg-[rgba(255,255,255,0.04)] border-[rgba(255,255,255,0.08)] text-white rounded-[10px] px-4 py-3 focus:outline-none focus:ring-1 transition-colors border";
   const labelClass = "block text-sm font-medium mb-2";
 
   // Check if avatar is a preset emoji (single character / emoji) or a URL
   const isEmojiAvatar = avatarUrl && !avatarUrl.startsWith("http");
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: "var(--text-primary, #F1F5F9)" }}>
-            Profile
-          </h1>
-          <p className="mt-1 text-sm sm:text-base" style={{ color: "var(--text-secondary, #94A3B8)" }}>
-            Manage your personal information
-          </p>
-        </div>
-        <Link
-          href="/settings"
-          className="text-sm font-medium px-4 py-2 rounded-lg transition-colors"
-          style={{
-            backgroundColor: "var(--bg-hover, #334155)",
-            color: "var(--text-primary, #F1F5F9)",
-          }}
-        >
-          Settings
-        </Link>
-      </div>
+    <div className="min-h-screen bg-[#07090F]">
+      <AppTopBar title="Profile" />
+      <div className="p-5">
 
       {successToast && (
         <div className="mb-6 bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 px-4 py-3 rounded-lg flex items-center gap-3 text-sm">
@@ -117,7 +99,7 @@ export default function ProfilePage() {
       <div className="space-y-6">
         {/* Avatar Section */}
         <div className={cardClass}>
-          <h2 className="text-lg font-semibold mb-4" style={{ color: "var(--text-primary, #F1F5F9)" }}>
+          <h2 className="text-lg font-semibold mb-4" style={{ color: "#F1F5F9" }}>
             Avatar
           </h2>
 
@@ -126,8 +108,8 @@ export default function ProfilePage() {
             <div
               className="w-20 h-20 rounded-2xl flex items-center justify-center shrink-0 border overflow-hidden"
               style={{
-                backgroundColor: "var(--bg-input, #0F172A)",
-                borderColor: "var(--border, #475569)",
+                backgroundColor: "rgba(255,255,255,0.04)",
+                borderColor: "rgba(255,255,255,0.08)",
               }}
             >
               {isEmojiAvatar ? (
@@ -137,7 +119,7 @@ export default function ProfilePage() {
               ) : (
                 <svg
                   className="w-10 h-10"
-                  style={{ color: "var(--text-secondary, #94A3B8)" }}
+                  style={{ color: "rgba(255,255,255,0.35)" }}
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -161,19 +143,19 @@ export default function ProfilePage() {
                 disabled={uploading}
                 className="text-sm font-medium px-4 py-2 rounded-lg transition-colors border disabled:opacity-50"
                 style={{
-                  backgroundColor: "var(--bg-hover, #334155)",
-                  borderColor: "var(--border, #475569)",
-                  color: "var(--text-primary, #F1F5F9)",
+                  backgroundColor: "rgba(255,255,255,0.06)",
+                  borderColor: "rgba(255,255,255,0.08)",
+                  color: "#F1F5F9",
                 }}
               >
                 {uploading ? "Uploading..." : "Upload Photo"}
               </button>
               {saved === "avatar" && (
-                <span className="ml-2 text-xs font-medium" style={{ color: "var(--success, #34D399)" }}>
+                <span className="ml-2 text-xs font-medium" style={{ color: "#34D399" }}>
                   Saved!
                 </span>
               )}
-              <p className="text-xs mt-1.5" style={{ color: "var(--text-secondary, #94A3B8)" }}>
+              <p className="text-xs mt-1.5" style={{ color: "rgba(255,255,255,0.35)" }}>
                 Or pick a preset below
               </p>
             </div>
@@ -190,10 +172,10 @@ export default function ProfilePage() {
                 }`}
                 style={{
                   backgroundColor: avatarUrl === preset
-                    ? "var(--accent, #6366F1)" + "26"
-                    : "var(--bg-input, #0F172A)" + "80",
+                    ? "#6366F126"
+                    : "rgba(255,255,255,0.04)",
                   borderColor: avatarUrl === preset
-                    ? "var(--accent, #6366F1)"
+                    ? "#6366F1"
                     : "transparent",
                 }}
               >
@@ -205,13 +187,13 @@ export default function ProfilePage() {
 
         {/* Personal Info */}
         <div className={cardClass}>
-          <h2 className="text-lg font-semibold mb-4" style={{ color: "var(--text-primary, #F1F5F9)" }}>
+          <h2 className="text-lg font-semibold mb-4" style={{ color: "#F1F5F9" }}>
             Personal Information
           </h2>
 
           <div className="space-y-4">
             <div>
-              <label className={labelClass} style={{ color: "var(--text-secondary, #94A3B8)" }}>
+              <label className={labelClass} style={{ color: "rgba(255,255,255,0.35)" }}>
                 Full Name
               </label>
               <input
@@ -221,15 +203,15 @@ export default function ProfilePage() {
                 placeholder="Your full name"
                 className={inputClass}
                 style={{
-                  backgroundColor: "var(--bg-input, #0F172A)",
-                  borderColor: "var(--border, #475569)",
-                  color: "var(--text-primary, #F1F5F9)",
+                  backgroundColor: "rgba(255,255,255,0.04)",
+                  borderColor: "rgba(255,255,255,0.08)",
+                  color: "#F1F5F9",
                 }}
               />
             </div>
 
             <div>
-              <label className={labelClass} style={{ color: "var(--text-secondary, #94A3B8)" }}>
+              <label className={labelClass} style={{ color: "rgba(255,255,255,0.35)" }}>
                 Email
               </label>
               <input
@@ -238,12 +220,12 @@ export default function ProfilePage() {
                 readOnly
                 className={`${inputClass} cursor-not-allowed opacity-60`}
                 style={{
-                  backgroundColor: "var(--bg-input, #0F172A)",
-                  borderColor: "var(--border, #475569)",
-                  color: "var(--text-secondary, #94A3B8)",
+                  backgroundColor: "rgba(255,255,255,0.04)",
+                  borderColor: "rgba(255,255,255,0.08)",
+                  color: "rgba(255,255,255,0.35)",
                 }}
               />
-              <p className="text-xs mt-1" style={{ color: "var(--text-secondary, #94A3B8)" }}>
+              <p className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.35)" }}>
                 Email is managed through your authentication provider
               </p>
             </div>
@@ -254,8 +236,8 @@ export default function ProfilePage() {
                 disabled={saving === "name"}
                 className="text-sm font-medium px-6 py-2.5 rounded-lg transition-colors disabled:opacity-50"
                 style={{
-                  backgroundColor: saved === "name" ? "var(--success, #34D399)" : "var(--accent, #6366F1)",
-                  color: saved === "name" ? "#0F172A" : "var(--text-primary, #F1F5F9)",
+                  backgroundColor: saved === "name" ? "#34D399" : "#6366F1",
+                  color: saved === "name" ? "#0F172A" : "#F1F5F9",
                 }}
               >
                 {saving === "name" ? "Saving..." : saved === "name" ? "Saved!" : "Save"}
@@ -266,10 +248,10 @@ export default function ProfilePage() {
 
         {/* Payment Link */}
         <div className={cardClass}>
-          <h2 className="text-lg font-semibold mb-1" style={{ color: "var(--text-primary, #F1F5F9)" }}>
+          <h2 className="text-lg font-semibold mb-1" style={{ color: "#F1F5F9" }}>
             Default Payment Link
           </h2>
-          <p className="text-sm mb-4" style={{ color: "var(--text-secondary, #94A3B8)" }}>
+          <p className="text-sm mb-4" style={{ color: "rgba(255,255,255,0.35)" }}>
             Set a default payment link to quickly add to new projects
           </p>
 
@@ -281,9 +263,9 @@ export default function ProfilePage() {
               placeholder="e.g. https://paypal.me/yourname"
               className={inputClass}
               style={{
-                backgroundColor: "var(--bg-input, #0F172A)",
-                borderColor: "var(--border, #475569)",
-                color: "var(--text-primary, #F1F5F9)",
+                backgroundColor: "rgba(255,255,255,0.04)",
+                borderColor: "rgba(255,255,255,0.08)",
+                color: "#F1F5F9",
               }}
             />
             <button
@@ -291,8 +273,8 @@ export default function ProfilePage() {
               disabled={saving === "payment"}
               className="shrink-0 text-sm font-medium px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
               style={{
-                backgroundColor: saved === "payment" ? "var(--success, #34D399)" : "var(--accent, #6366F1)",
-                color: saved === "payment" ? "#0F172A" : "var(--text-primary, #F1F5F9)",
+                backgroundColor: saved === "payment" ? "#34D399" : "#6366F1",
+                color: saved === "payment" ? "#0F172A" : "#F1F5F9",
               }}
             >
               {saving === "payment" ? "..." : saved === "payment" ? "Saved!" : "Save"}
@@ -305,8 +287,8 @@ export default function ProfilePage() {
                 key={provider}
                 className="text-xs px-2.5 py-1 rounded-full"
                 style={{
-                  backgroundColor: "var(--bg-input, #0F172A)" + "80",
-                  color: "var(--text-secondary, #94A3B8)",
+                  backgroundColor: "rgba(255,255,255,0.04)",
+                  color: "rgba(255,255,255,0.35)",
                 }}
               >
                 {provider}
@@ -314,6 +296,7 @@ export default function ProfilePage() {
             ))}
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

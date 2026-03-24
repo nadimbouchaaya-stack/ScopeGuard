@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
 import { LayoutContent } from "@/components/LayoutContent";
 import { ThemeProvider } from "@/components/ThemeProvider";
 
@@ -29,10 +28,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body
-        className={`${inter.className} bg-[#0F172A] text-[#F1F5F9] min-h-screen antialiased`}
+        className={`${inter.className} bg-[#07090F] text-white min-h-screen antialiased`}
       >
         <ThemeProvider>
-          <Navbar />
           <LayoutContent>{children}</LayoutContent>
         </ThemeProvider>
       </body>

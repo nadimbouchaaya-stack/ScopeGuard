@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Project } from "@/lib/types";
 import { getProjects } from "@/lib/storage";
+import AppTopBar from "@/components/AppTopBar";
 
 export default function ProjectHistory() {
   const [grouped, setGrouped] = useState<Record<string, Project[]>>({});
@@ -28,16 +29,12 @@ export default function ProjectHistory() {
   const clientNames = Object.keys(grouped).sort();
 
   return (
-    <div>
-      <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-[#F1F5F9]">Project History</h1>
-        <p className="text-[#94A3B8] mt-1 text-sm sm:text-base">
-          Completed projects grouped by client.
-        </p>
-      </div>
+    <div className="min-h-screen bg-[#07090F]">
+      <AppTopBar title="History" />
+      <div className="p-5">
 
       {clientNames.length === 0 ? (
-        <div className="text-center py-20 border border-indigo-500/20 bg-indigo-500/5 rounded-2xl">
+        <div className="text-center py-20 bg-[#0F1322] border border-[rgba(255,255,255,0.06)] rounded-[14px]">
           <div className="w-16 h-16 bg-[#334155] rounded-2xl flex items-center justify-center mx-auto mb-4">
             <svg className="w-8 h-8 text-[#94A3B8]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -62,12 +59,12 @@ export default function ProjectHistory() {
             const clientEmail = projects[0].clientEmail;
 
             return (
-              <div key={clientName} className="bg-[#1E293B] border border-[#475569] rounded-xl overflow-hidden">
-                <div className="px-6 py-4 border-b border-[#475569]">
+              <div key={clientName} className="bg-[#0F1322] border border-[rgba(255,255,255,0.06)] rounded-[14px] overflow-hidden">
+                <div className="px-6 py-4 border-b border-[rgba(255,255,255,0.06)]">
                   <h2 className="text-lg font-semibold text-[#F1F5F9]">{clientName}</h2>
                   <p className="text-[#94A3B8] text-sm mt-0.5">{clientEmail}</p>
                 </div>
-                <div className="divide-y divide-[#475569]">
+                <div className="divide-y divide-[rgba(255,255,255,0.06)]">
                   {projects.map((project) => {
                     const totalCost =
                       project.price +
@@ -100,6 +97,7 @@ export default function ProjectHistory() {
           })}
         </div>
       )}
+      </div>
     </div>
   );
 }
