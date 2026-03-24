@@ -21,9 +21,9 @@ export async function POST(request: NextRequest) {
     }
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-    if (!supabaseUrl || !supabaseServiceKey) {
+    if (!supabaseUrl || !supabaseAnonKey) {
       return NextResponse.json(
         { error: "Server misconfiguration: missing Supabase keys" },
         { status: 500 }
@@ -33,8 +33,8 @@ export async function POST(request: NextRequest) {
     const body: NotifyCRPayload = await request.json();
     const { projectId, projectName, description, additionalCost, timeImpactDays } = body;
 
-    // Use service role to look up the project owner's email
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    // Use anon client to look up the project owner
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
     const { data: project } = await supabase
       .from("projects")
@@ -46,9 +46,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Project owner not found" }, { status: 404 });
     }
 
-    // Get the owner's email from auth.users
-    const { data: userData } = await supabase.auth.admin.getUserById(project.user_id);
-    const freelancerEmail = userData?.user?.email;
+    // Get the owner's email from user_profiles
+    const { data: profile } = await supabase
+      .from("user_profiles")
+      .select("email")
+      .eq("user_id", project.user_id)
+      .single();
+
+    const freelancerEmail = profile?.email;
 
     if (!freelancerEmail) {
       return NextResponse.json({ error: "Freelancer email not found" }, { status: 404 });
@@ -91,7 +96,7 @@ export async function POST(request: NextRequest) {
       </div>
     </div>
     <div style="background-color:#F1F5F9;border-radius:0 0 12px 12px;padding:20px 32px;text-align:center;border:1px solid #E2E8F0;border-top:none;">
-      <p style="color:#94A3B8;font-size:12px;margin:0;">Sent via ScopeGuard — scope creep protection for freelancers.</p>
+      <p style="color:#94A3B8;font-size:12px;margin:0;">Sent via ScopeGuard &middot; tryscopeguard.com</p>
     </div>
   </div>
 </body>

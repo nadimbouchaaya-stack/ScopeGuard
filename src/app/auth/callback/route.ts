@@ -29,9 +29,20 @@ export async function GET(request: NextRequest) {
       }
     );
 
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    const { data: sessionData, error } = await supabase.auth.exchangeCodeForSession(code);
 
-    if (!error) {
+    if (!error && sessionData?.user) {
+      // Ensure user_profiles has the user's email
+      const user = sessionData.user;
+      await supabase.from("user_profiles").upsert(
+        {
+          user_id: user.id,
+          email: user.email ?? "",
+          full_name: user.user_metadata?.full_name ?? "",
+        },
+        { onConflict: "user_id", ignoreDuplicates: false }
+      );
+
       return NextResponse.redirect(`${origin}/dashboard`);
     }
   }

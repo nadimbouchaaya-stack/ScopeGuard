@@ -97,7 +97,7 @@ export default function NewProject() {
         revisionLimit: parsedRevisionLimit,
         revisionsUsed: 0,
         price: projectPrice,
-        status: "Active",
+        status: "Pending Approval",
         changeRequests: [],
         createdAt: new Date().toISOString(),
         ...(deadline ? { deadline } : {}),

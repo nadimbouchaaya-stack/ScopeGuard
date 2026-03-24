@@ -5,62 +5,8 @@ import Link from "next/link";
 import { ChangeRequest } from "@/lib/types";
 import { createClient } from "@/lib/supabase/client";
 import { getProfile } from "@/lib/profile";
-
-interface CashDrop {
-  id: number;
-  left: number;
-  delay: number;
-  duration: number;
-  size: number;
-  rotation: number;
-}
-
-function CashRain({ onComplete, emoji = "💵" }: { onComplete: () => void; emoji?: string }) {
-  const [drops] = useState<CashDrop[]>(() =>
-    Array.from({ length: 200 }, (_, i) => ({
-      id: i,
-      left: Math.random() * 100,
-      delay: Math.random() * 0.8,
-      duration: 1.5 + Math.random() * 1.5,
-      size: 20 + Math.random() * 24,
-      rotation: Math.random() * 360,
-    }))
-  );
-
-  useEffect(() => {
-    const timer = setTimeout(onComplete, 3000);
-    return () => clearTimeout(timer);
-  }, [onComplete]);
-
-  return (
-    <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
-      {drops.map((drop) => (
-        <div
-          key={drop.id}
-          className="absolute animate-cash-fall"
-          style={{
-            left: `${drop.left}%`,
-            top: -50,
-            fontSize: drop.size,
-            animationDelay: `${drop.delay}s`,
-            animationDuration: `${drop.duration}s`,
-            ["--rotation" as string]: `${drop.rotation}deg`,
-          }}
-        >
-          {emoji}
-        </div>
-      ))}
-      <style jsx>{`
-        @keyframes cash-fall {
-          0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-          70% { opacity: 1; }
-          100% { transform: translateY(105vh) rotate(var(--rotation)); opacity: 0; }
-        }
-        .animate-cash-fall { animation: cash-fall linear forwards; }
-      `}</style>
-    </div>
-  );
-}
+import CashRain from "@/components/CashRain";
+import { PendingApprovalsSkeleton } from "@/components/LoadingSkeleton";
 
 interface DbCR {
   id: string;
@@ -143,18 +89,24 @@ export default function PendingApprovalsPage() {
       return;
     }
 
-    const items: CRWithProject[] = (allCRs ?? []).map((dbCr: DbCR) => ({
-      cr: {
-        id: dbCr.id,
-        projectId: dbCr.project_id,
-        description: dbCr.description,
-        additionalCost: Number(dbCr.additional_cost),
-        timeImpactDays: dbCr.time_impact_days,
-        status: (dbCr.status || "Pending") as ChangeRequest["status"],
-        createdAt: dbCr.created_at,
-      },
-      project: projects!.find((p: DbProject) => p.id === dbCr.project_id)!,
-    }));
+    const items: CRWithProject[] = (allCRs ?? [])
+      .map((dbCr: DbCR) => {
+        const matchedProject = projects?.find((p: DbProject) => p.id === dbCr.project_id);
+        if (!matchedProject) return null;
+        return {
+          cr: {
+            id: dbCr.id,
+            projectId: dbCr.project_id,
+            description: dbCr.description,
+            additionalCost: Number(dbCr.additional_cost) || 0,
+            timeImpactDays: Number(dbCr.time_impact_days) || 0,
+            status: (dbCr.status || "Pending") as ChangeRequest["status"],
+            createdAt: dbCr.created_at,
+          },
+          project: matchedProject,
+        };
+      })
+      .filter((item): item is CRWithProject => item !== null);
 
     setAllCRItems(items);
     setLoaded(true);
@@ -175,7 +127,12 @@ export default function PendingApprovalsPage() {
       .channel("pending-approvals-cr-changes")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "change_requests" },
+        {
+          event: "*",
+          schema: "public",
+          table: "change_requests",
+          filter: `project_id=in.(${userProjectIds.join(",")})`,
+        },
         () => fetchData()
       )
       .subscribe();
@@ -256,7 +213,7 @@ export default function PendingApprovalsPage() {
 
   const handleCashRainComplete = useCallback(() => setShowCashRain(false), []);
 
-  if (!loaded) return null;
+  if (!loaded) return <PendingApprovalsSkeleton />;
 
   const pendingCRs = allCRItems.filter((x) => x.cr.status?.toLowerCase().trim() === "pending");
   const approvedItems = allCRItems.filter((x) => x.cr.status?.toLowerCase().trim() === "approved");

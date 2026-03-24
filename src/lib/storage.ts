@@ -228,35 +228,3 @@ export async function getProjectPublic(id: string): Promise<Project | undefined>
   return mapProject(project as DbProject, ((crs || []) as DbChangeRequest[]));
 }
 
-/**
- * Public save for portal actions (approve/decline change requests).
- * Does not require auth — RLS policy allows UPDATE on specific conditions.
- */
-export async function saveProjectPublic(project: Project): Promise<void> {
-  const supabase = getSupabase();
-  const { changeRequests, ...rest } = project;
-
-  const { error: projectErr } = await supabase.from("projects").update({
-    deadline: rest.deadline || null,
-    status: rest.status,
-  }).eq("id", rest.id);
-
-  if (projectErr) {
-    console.error("Failed to update project (public):", projectErr);
-    throw new Error(projectErr.message);
-  }
-
-  if (changeRequests.length > 0) {
-    for (const cr of changeRequests) {
-      const { error: crErr } = await supabase
-        .from("change_requests")
-        .update({ status: cr.status })
-        .eq("id", cr.id);
-
-      if (crErr) {
-        console.error("Failed to update change request (public):", crErr);
-        throw new Error(crErr.message);
-      }
-    }
-  }
-}

@@ -5,11 +5,18 @@ import { useParams } from "next/navigation";
 import { Project } from "@/lib/types";
 import { getProjectPublic } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/client";
+import { PortalSkeleton } from "@/components/LoadingSkeleton";
 
 const statusColors: Record<string, string> = {
   Active: "bg-[#34D399]/15 text-[#34D399] border-[#34D399]/30",
   "Pending Approval": "bg-[#FBBF24]/15 text-[#FBBF24] border-[#FBBF24]/30",
   Completed: "bg-[#94A3B8]/15 text-[#94A3B8] border-[#94A3B8]/30",
+};
+
+const statusLabels: Record<string, string> = {
+  Active: "Active",
+  "Pending Approval": "Awaiting Approval",
+  Completed: "Completed",
 };
 
 export default function ClientPortal() {
@@ -47,32 +54,27 @@ export default function ClientPortal() {
     if (!project || scopeApproving) return;
     setScopeApproving(true);
 
-    const supabase = createClient();
-    const { error } = await supabase
-      .from("projects")
-      .update({ status: "Active" })
-      .eq("id", projectId);
+    try {
+      const res = await fetch("/api/approve-scope", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projectId }),
+      });
 
-    setScopeApproving(false);
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        console.error("[Portal] Scope approve error:", data.error);
+        setScopeApproving(false);
+        return;
+      }
 
-    if (error) {
-      console.error("[Portal] Scope approve error:", error);
-      return;
+      setScopeApproved(true);
+      setProject({ ...project, status: "Active" });
+    } catch (err) {
+      console.error("[Portal] Scope approve error:", err);
     }
 
-    setScopeApproved(true);
-    setProject({ ...project, status: "Active" });
-
-    // Notify freelancer via email (fire and forget)
-    fetch("/api/scope-approved", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        projectId,
-        projectName: project.name,
-        clientName: project.clientName,
-      }),
-    }).catch(() => {});
+    setScopeApproving(false);
   }
 
   async function handleSubmitCR(e: React.FormEvent) {
@@ -88,8 +90,8 @@ export default function ClientPortal() {
       .insert({
         project_id: projectId,
         description: crDescription.trim(),
-        additional_cost: Number(crCost) || 0,
-        time_impact_days: Number(crDays) || 0,
+        additional_cost: Math.max(0, Number(crCost) || 0),
+        time_impact_days: Math.max(0, Number(crDays) || 0),
         status: "Pending",
       });
 
@@ -115,8 +117,8 @@ export default function ClientPortal() {
         projectId,
         projectName: project?.name || "Unknown Project",
         description: crDescription.trim(),
-        additionalCost: Number(crCost) || 0,
-        timeImpactDays: Number(crDays) || 0,
+        additionalCost: Math.max(0, Number(crCost) || 0),
+        timeImpactDays: Math.max(0, Number(crDays) || 0),
       }),
     }).catch(() => {}); // Don't block on notification failure
 
@@ -124,7 +126,7 @@ export default function ClientPortal() {
     loadProject();
   }
 
-  if (!loaded) return null;
+  if (!loaded) return <PortalSkeleton />;
 
   if (!project) {
     return (
@@ -169,7 +171,7 @@ export default function ClientPortal() {
           <span
             className={`text-xs font-medium px-3 py-1.5 rounded-full border ${statusColors[project.status]}`}
           >
-            {project.status}
+            {statusLabels[project.status] || project.status}
           </span>
         </div>
 
@@ -274,7 +276,7 @@ export default function ClientPortal() {
       )}
 
       {/* Approve Scope Section */}
-      {project.status === "Active" && !scopeApproved && (
+      {project.status === "Pending Approval" && !scopeApproved && (
         <div className="bg-[#1E293B] border border-[#34D399]/30 rounded-xl overflow-hidden mb-6">
           <div className="border-l-4 border-[#34D399] p-5 sm:p-6">
             <h2 className="text-lg font-semibold text-[#F1F5F9] mb-1">Ready to get started?</h2>

@@ -13,15 +13,10 @@ interface EmailPayload {
 }
 
 export async function POST(request: NextRequest) {
-  console.log("[send-email] API route hit");
-
   try {
     const apiKey = process.env.RESEND_API_KEY;
-    console.log("[send-email] RESEND_API_KEY present:", !!apiKey);
-    console.log("[send-email] RESEND_API_KEY length:", apiKey?.length ?? 0);
 
     if (!apiKey) {
-      console.error("[send-email] RESEND_API_KEY is not set");
       return NextResponse.json(
         { error: "Server misconfiguration: missing RESEND_API_KEY" },
         { status: 500 }
@@ -31,14 +26,6 @@ export async function POST(request: NextRequest) {
     const resend = new Resend(apiKey);
 
     const body: EmailPayload = await request.json();
-    console.log("[send-email] Payload received:", {
-      clientName: body.clientName,
-      clientEmail: body.clientEmail,
-      projectName: body.projectName,
-      deliverableCount: body.deliverables?.length,
-      hasDeadline: !!body.deadline,
-      portalUrl: body.portalUrl,
-    });
 
     const {
       clientName,
@@ -156,7 +143,6 @@ export async function POST(request: NextRequest) {
 </body>
 </html>`;
 
-    console.log("[send-email] Calling resend.emails.send...");
     const { data, error } = await resend.emails.send({
       from: "ScopeGuard <noreply@tryscopeguard.com>",
       to: clientEmail,
@@ -169,7 +155,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    console.log("[send-email] Email sent successfully, id:", data?.id);
     return NextResponse.json({ success: true, id: data?.id });
   } catch (err) {
     console.error("[send-email] Unexpected error:", err);

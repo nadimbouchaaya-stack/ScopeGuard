@@ -5,73 +5,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Project } from "@/lib/types";
 import { getProjects, saveProject, deleteProject } from "@/lib/storage";
+import { createClient } from "@/lib/supabase/client";
 import { getProfile } from "@/lib/profile";
-
-interface CashDrop {
-  id: number;
-  left: number;
-  delay: number;
-  duration: number;
-  size: number;
-  rotation: number;
-}
-
-function CashRain({ onComplete, emoji = "💵" }: { onComplete: () => void; emoji?: string }) {
-  const [drops] = useState<CashDrop[]>(() =>
-    Array.from({ length: 200 }, (_, i) => ({
-      id: i,
-      left: Math.random() * 100,
-      delay: Math.random() * 0.8,
-      duration: 1.5 + Math.random() * 1.5,
-      size: 20 + Math.random() * 24,
-      rotation: Math.random() * 360,
-    }))
-  );
-
-  useEffect(() => {
-    const timer = setTimeout(onComplete, 3000);
-    return () => clearTimeout(timer);
-  }, [onComplete]);
-
-  return (
-    <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
-      {drops.map((drop) => (
-        <div
-          key={drop.id}
-          className="absolute animate-cash-fall"
-          style={{
-            left: `${drop.left}%`,
-            top: -50,
-            fontSize: drop.size,
-            animationDelay: `${drop.delay}s`,
-            animationDuration: `${drop.duration}s`,
-            ["--rotation" as string]: `${drop.rotation}deg`,
-          }}
-        >
-          {emoji}
-        </div>
-      ))}
-      <style jsx>{`
-        @keyframes cash-fall {
-          0% {
-            transform: translateY(0) rotate(0deg);
-            opacity: 1;
-          }
-          70% {
-            opacity: 1;
-          }
-          100% {
-            transform: translateY(105vh) rotate(var(--rotation));
-            opacity: 0;
-          }
-        }
-        .animate-cash-fall {
-          animation: cash-fall linear forwards;
-        }
-      `}</style>
-    </div>
-  );
-}
+import CashRain from "@/components/CashRain";
+import { ProjectsSkeleton } from "@/components/LoadingSkeleton";
 
 const statusColors: Record<string, string> = {
   Active: "bg-[#34D399]/15 text-[#34D399] border-[#34D399]/30",
@@ -113,31 +50,85 @@ export default function ActiveProjects() {
     if (!project) return;
 
     const cr = project.changeRequests.find((c) => c.id === crId);
-    let newDeadline = project.deadline;
+    if (!cr) return;
 
-    if (action === "Approved" && cr && cr.timeImpactDays > 0 && project.deadline) {
-      const current = new Date(project.deadline);
-      current.setDate(current.getDate() + cr.timeImpactDays);
-      newDeadline = current.toISOString().split("T")[0];
+    const supabase = createClient();
+
+    // Targeted CR status update
+    const { error: crErr } = await supabase
+      .from("change_requests")
+      .update({ status: action })
+      .eq("id", crId);
+
+    if (crErr) {
+      console.error("[Projects] update CR error:", crErr);
+      return;
     }
 
-    const updatedProject: Project = {
-      ...project,
-      deadline: newDeadline,
-      revisionsUsed: action === "Approved" ? project.revisionsUsed + 1 : project.revisionsUsed,
-      changeRequests: project.changeRequests.map((c) =>
-        c.id === crId ? { ...c, status: action } : c
-      ),
-    };
+    let newDeadline = project.deadline;
 
-    await saveProject(updatedProject);
+    // If approved, increment revisions_used and extend deadline
+    if (action === "Approved") {
+      const { data: proj } = await supabase
+        .from("projects")
+        .select("revisions_used, deadline")
+        .eq("id", projectId)
+        .single();
+
+      const currentUsed = proj?.revisions_used ?? project.revisionsUsed;
+      const updateFields: Record<string, unknown> = {
+        revisions_used: currentUsed + 1,
+      };
+
+      const deadline = proj?.deadline ?? project.deadline;
+      if (cr.timeImpactDays > 0 && deadline) {
+        const current = new Date(deadline);
+        current.setDate(current.getDate() + cr.timeImpactDays);
+        newDeadline = current.toISOString().split("T")[0];
+        updateFields.deadline = newDeadline;
+      }
+
+      await supabase
+        .from("projects")
+        .update(updateFields)
+        .eq("id", projectId);
+    }
+
+    // Update local state
     setProjects((prev) =>
-      prev.map((p) => (p.id === projectId ? updatedProject : p))
+      prev.map((p) =>
+        p.id === projectId
+          ? {
+              ...p,
+              deadline: newDeadline,
+              revisionsUsed: action === "Approved" ? p.revisionsUsed + 1 : p.revisionsUsed,
+              changeRequests: p.changeRequests.map((c) =>
+                c.id === crId ? { ...c, status: action } : c
+              ),
+            }
+          : p
+      )
     );
 
     if (action === "Approved") {
       setShowCashRain(true);
     }
+
+    // Send email notification to client (fire and forget)
+    fetch("/api/cr-action", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        projectId,
+        projectName: project.name,
+        clientName: project.clientName,
+        clientEmail: project.clientEmail,
+        action,
+        description: cr.description,
+        additionalCost: cr.additionalCost,
+        timeImpactDays: cr.timeImpactDays,
+      }),
+    }).catch(() => {});
   }
 
   const handleCashRainComplete = useCallback(() => setShowCashRain(false), []);
@@ -172,7 +163,7 @@ export default function ActiveProjects() {
     setDeleteConfirmId(null);
   }
 
-  if (!loaded) return null;
+  if (!loaded) return <ProjectsSkeleton />;
 
   return (
     <div>
@@ -363,7 +354,7 @@ export default function ActiveProjects() {
                           : statusColors[project.status]
                     }`}
                   >
-                    {isOverdue ? "Overdue" : pendingRequests > 0 ? "Pending Review" : project.status}
+                    {isOverdue ? "Overdue" : pendingRequests > 0 ? "Pending Review" : project.status === "Pending Approval" ? "Awaiting Approval" : project.status}
                   </span>
                 </div>
 

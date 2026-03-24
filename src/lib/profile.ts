@@ -3,6 +3,7 @@ import { createClient } from "./supabase/client";
 export interface UserProfile {
   user_id: string;
   full_name: string;
+  email: string;
   avatar_url: string;
   payment_link: string;
   cash_rain_emoji: string;
@@ -12,6 +13,7 @@ export interface UserProfile {
 
 const defaults: Omit<UserProfile, "user_id"> = {
   full_name: "",
+  email: "",
   avatar_url: "",
   payment_link: "",
   cash_rain_emoji: "💵",
@@ -37,8 +39,13 @@ export async function getProfile(): Promise<UserProfile> {
     .single();
 
   if (error || !data) {
-    // Profile doesn't exist yet — create one
-    const newProfile: UserProfile = { user_id: userId, ...defaults };
+    // Profile doesn't exist yet — create one with email from auth
+    const { data: { user } } = await supabase.auth.getUser();
+    const newProfile: UserProfile = {
+      user_id: userId,
+      ...defaults,
+      email: user?.email ?? "",
+    };
     await supabase.from("user_profiles").upsert(newProfile);
     return newProfile;
   }
@@ -46,6 +53,7 @@ export async function getProfile(): Promise<UserProfile> {
   return {
     user_id: data.user_id,
     full_name: data.full_name ?? "",
+    email: data.email ?? "",
     avatar_url: data.avatar_url ?? "",
     payment_link: data.payment_link ?? "",
     cash_rain_emoji: data.cash_rain_emoji ?? "💵",

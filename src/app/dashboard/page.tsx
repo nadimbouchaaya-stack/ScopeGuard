@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Project } from "@/lib/types";
 import { getProjects } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/client";
+import { DashboardSkeleton } from "@/components/LoadingSkeleton";
 
 export default function Dashboard() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -76,14 +77,19 @@ export default function Dashboard() {
       .channel("dashboard-cr-changes")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "change_requests" },
+        {
+          event: "*",
+          schema: "public",
+          table: "change_requests",
+          filter: `project_id=in.(${projectIds.join(",")})`,
+        },
         () => fetchPendingCount(supabase, projectIds)
       )
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, [projectIds]);
 
-  if (!loaded) return null;
+  if (!loaded) return <DashboardSkeleton />;
 
   const activeProjects = projects.filter(
     (p) => p.status === "Active" || p.status === "Pending Approval"
