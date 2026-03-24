@@ -237,7 +237,7 @@ export default function PendingApprovalsPage() {
   const donutOffset = approvalRate >= 0 ? circumference * (1 - approvalRate / 100) : circumference;
 
   return (
-    <div className="min-h-screen bg-[#07090F]">
+    <div className="min-h-screen" style={{ backgroundColor: "var(--bg-page, #07090F)" }}>
       <AppTopBar title="Pending Approvals" />
       <div className="p-5">
       {showCashRain && <CashRain onComplete={handleCashRainComplete} emoji={cashRainEmoji} />}

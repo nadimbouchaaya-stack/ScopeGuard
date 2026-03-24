@@ -89,10 +89,11 @@ export default function SettingsPage() {
 
   if (!loaded) return null;
 
-  const cardClass = "bg-[#0F1322] border border-[rgba(255,255,255,0.06)] rounded-[14px] p-6";
+  const cardStyle = { backgroundColor: "var(--bg-card, #0F1322)", borderColor: "var(--border-color, rgba(255,255,255,0.06))" };
+  const cardClass = "rounded-[14px] p-6 border";
 
   return (
-    <div className="min-h-screen bg-[#07090F]">
+    <div className="min-h-screen" style={{ backgroundColor: "var(--bg-page, #07090F)" }}>
       <AppTopBar title="Settings" />
       <div className="p-5">
 
@@ -107,7 +108,7 @@ export default function SettingsPage() {
 
       <div className="space-y-6">
         {/* Cash Rain Emoji Picker */}
-        <div className={cardClass}>
+        <div className={cardClass} style={cardStyle}>
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="text-lg font-semibold" style={{ color: "#F1F5F9" }}>
@@ -156,7 +157,7 @@ export default function SettingsPage() {
         </div>
 
         {/* Theme Switcher */}
-        <div className={cardClass}>
+        <div className={cardClass} style={cardStyle}>
           <h2 className="text-lg font-semibold mb-1" style={{ color: "#F1F5F9" }}>
             Theme
           </h2>
@@ -222,7 +223,7 @@ export default function SettingsPage() {
         </div>
 
         {/* Language Selector */}
-        <div className={cardClass}>
+        <div className={cardClass} style={cardStyle}>
           <h2 className="text-lg font-semibold mb-1" style={{ color: "#F1F5F9" }}>
             Language
           </h2>

@@ -34,9 +34,9 @@ export default function AppTopBar({ title, subtitle }: AppTopBarProps) {
   }, []);
 
   return (
-    <div className="h-[52px] bg-[#0B0E18] border-b border-[rgba(99,102,241,0.12)] flex items-center px-5 gap-4">
+    <div className="h-[52px] border-b flex items-center px-5 gap-4" style={{ backgroundColor: "var(--bg-topbar, #0B0E18)", borderColor: "var(--border-accent, rgba(99,102,241,0.12))" }}>
       <div className="flex items-center gap-2">
-        <span className="text-[14px] font-medium text-white">{title}</span>
+        <span className="text-[14px] font-medium" style={{ color: "var(--text-primary, white)" }}>{title}</span>
         {subtitle && (
           <span className="text-[12px] text-[rgba(255,255,255,0.35)] ml-2">{subtitle}</span>
         )}

@@ -28,3 +28,56 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+/* Theme CSS Variables */
+:root {
+  --bg-page: #07090F;
+  --bg-sidebar: #0B0E18;
+  --bg-card: #0F1322;
+  --bg-topbar: #0B0E18;
+  --text-primary: #FFFFFF;
+  --text-muted: rgba(255,255,255,0.35);
+  --text-hint: rgba(255,255,255,0.2);
+  --border-color: rgba(255,255,255,0.06);
+  --border-accent: rgba(99,102,241,0.18);
+  --accent: #6366F1;
+}
+
+[data-theme="light"] {
+  --bg-page: #F8FAFC;
+  --bg-sidebar: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --bg-topbar: #FFFFFF;
+  --text-primary: #0F172A;
+  --text-muted: #64748B;
+  --text-hint: #94A3B8;
+  --border-color: rgba(0,0,0,0.08);
+  --border-accent: rgba(99,102,241,0.2);
+  --accent: #6366F1;
+}
+
+[data-theme="neon"] {
+  --bg-page: #000000;
+  --bg-sidebar: #0A0A0A;
+  --bg-card: #0D0D0D;
+  --bg-topbar: #0A0A0A;
+  --text-primary: #FFFFFF;
+  --text-muted: rgba(255,255,255,0.5);
+  --text-hint: rgba(255,255,255,0.3);
+  --border-color: rgba(139,92,246,0.3);
+  --border-accent: rgba(139,92,246,0.4);
+  --accent: #A855F7;
+}
+
+[data-theme="colorblind"] {
+  --bg-page: #07090F;
+  --bg-sidebar: #0B0E18;
+  --bg-card: #0F1322;
+  --bg-topbar: #0B0E18;
+  --text-primary: #FFFFFF;
+  --text-muted: rgba(255,255,255,0.35);
+  --text-hint: rgba(255,255,255,0.2);
+  --border-color: rgba(255,255,255,0.06);
+  --border-accent: rgba(37,99,235,0.2);
+  --accent: #0EA5E9;
+}

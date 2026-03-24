@@ -53,7 +53,7 @@ export default function Deadlines() {
     .reduce((sum, p) => sum + p.price, 0);
 
   return (
-    <div className="min-h-screen bg-[#07090F]">
+    <div className="min-h-screen" style={{ backgroundColor: "var(--bg-page, #07090F)" }}>
       <AppTopBar title="Deadlines" />
       <div className="p-5">
 

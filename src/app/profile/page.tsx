@@ -74,7 +74,8 @@ export default function ProfilePage() {
 
   if (!loaded) return null;
 
-  const cardClass = "bg-[#0F1322] border border-[rgba(255,255,255,0.06)] rounded-[14px] p-6";
+  const cardStyle = { backgroundColor: "var(--bg-card, #0F1322)", borderColor: "var(--border-color, rgba(255,255,255,0.06))" };
+  const cardClass = "rounded-[14px] p-6 border";
   const inputClass =
     "w-full bg-[rgba(255,255,255,0.04)] border-[rgba(255,255,255,0.08)] text-white rounded-[10px] px-4 py-3 focus:outline-none focus:ring-1 transition-colors border";
   const labelClass = "block text-sm font-medium mb-2";
@@ -83,7 +84,7 @@ export default function ProfilePage() {
   const isEmojiAvatar = avatarUrl && !avatarUrl.startsWith("http");
 
   return (
-    <div className="min-h-screen bg-[#07090F]">
+    <div className="min-h-screen" style={{ backgroundColor: "var(--bg-page, #07090F)" }}>
       <AppTopBar title="Profile" />
       <div className="p-5">
 
@@ -98,7 +99,7 @@ export default function ProfilePage() {
 
       <div className="space-y-6">
         {/* Avatar Section */}
-        <div className={cardClass}>
+        <div className={cardClass} style={cardStyle}>
           <h2 className="text-lg font-semibold mb-4" style={{ color: "#F1F5F9" }}>
             Avatar
           </h2>
@@ -186,7 +187,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Personal Info */}
-        <div className={cardClass}>
+        <div className={cardClass} style={cardStyle}>
           <h2 className="text-lg font-semibold mb-4" style={{ color: "#F1F5F9" }}>
             Personal Information
           </h2>
@@ -247,7 +248,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Payment Link */}
-        <div className={cardClass}>
+        <div className={cardClass} style={cardStyle}>
           <h2 className="text-lg font-semibold mb-1" style={{ color: "#F1F5F9" }}>
             Default Payment Link
           </h2>

@@ -14,6 +14,8 @@ export default function Dashboard() {
   const [firstName, setFirstName] = useState<string | null>(null);
   const [pendingCRCount, setPendingCRCount] = useState(0);
   const [projectIds, setProjectIds] = useState<string[]>([]);
+  const [monthlyGoal, setMonthlyGoal] = useState(5000);
+  const [editingGoal, setEditingGoal] = useState(false);
 
   async function fetchPendingCount(supabase: ReturnType<typeof createClient>, pIds: string[]) {
     if (pIds.length === 0) return;
@@ -28,6 +30,9 @@ export default function Dashboard() {
   }
 
   useEffect(() => {
+    const savedGoal = localStorage.getItem("scopeguard_monthly_goal");
+    if (savedGoal) setMonthlyGoal(Number(savedGoal));
+
     getProjects().then((p) => {
       setProjects(p);
       setLoaded(true);
@@ -137,8 +142,7 @@ export default function Dashboard() {
     .sort((a, b) => new Date(a.deadline!).getTime() - new Date(b.deadline!).getTime())
     .slice(0, 4);
 
-  // Monthly goal
-  const goalTarget = Math.ceil((activeRevenue || 1000) / 1000) * 1000 * 1.5;
+  // Monthly goal uses editable state
 
   // Scope tips
   const tips = [
@@ -166,7 +170,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-[#07090F]">
+    <div className="min-h-screen" style={{ backgroundColor: "var(--bg-page, #07090F)" }}>
       <AppTopBar title="Dashboard" subtitle={dateStr} />
 
       <div className="p-5 flex flex-col gap-4">
@@ -480,20 +484,64 @@ export default function Dashboard() {
           </div>
 
           {/* Monthly goal */}
-          <div className="bg-[#0F1322] border border-[rgba(255,255,255,0.06)] rounded-[14px] p-4">
-            <span className="text-[11px] font-medium uppercase tracking-[0.07em] text-[rgba(255,255,255,0.35)] mb-3 block">Monthly Goal</span>
+          <div className="bg-[#0F1322] border border-[rgba(255,255,255,0.06)] rounded-[14px] p-4 relative">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[11px] font-medium uppercase tracking-[0.07em] text-[rgba(255,255,255,0.35)]">Monthly Goal</span>
+              <button
+                onClick={() => setEditingGoal(true)}
+                className="w-[24px] h-[24px] bg-[rgba(255,255,255,0.06)] rounded-[6px] flex items-center justify-center cursor-pointer hover:bg-[rgba(255,255,255,0.1)] transition-colors"
+                title="Edit goal"
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
+                </svg>
+              </button>
+            </div>
             <p className="text-[22px] font-medium text-white">${activeRevenue.toLocaleString()}</p>
-            <p className="text-[11px] text-[rgba(255,255,255,0.25)] mt-1">of ${goalTarget.toLocaleString()} goal</p>
+            {editingGoal ? (
+              <div className="mt-1">
+                <input
+                  type="number"
+                  autoFocus
+                  defaultValue={monthlyGoal}
+                  placeholder="Enter goal ($)"
+                  className="bg-[rgba(255,255,255,0.06)] border border-[rgba(99,102,241,0.3)] rounded-[8px] text-white px-3 py-1 text-[14px] w-[120px] focus:outline-none focus:border-[#6366F1]"
+                  onBlur={(e) => {
+                    const val = Number(e.target.value);
+                    if (val > 0) {
+                      setMonthlyGoal(val);
+                      localStorage.setItem("scopeguard_monthly_goal", String(val));
+                    }
+                    setEditingGoal(false);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      const val = Number((e.target as HTMLInputElement).value);
+                      if (val > 0) {
+                        setMonthlyGoal(val);
+                        localStorage.setItem("scopeguard_monthly_goal", String(val));
+                      }
+                      setEditingGoal(false);
+                    }
+                    if (e.key === "Escape") {
+                      setEditingGoal(false);
+                    }
+                  }}
+                />
+              </div>
+            ) : (
+              <p className="text-[11px] text-[rgba(255,255,255,0.25)] mt-1">of ${monthlyGoal.toLocaleString()} goal</p>
+            )}
             <div className="h-[4px] bg-[rgba(255,255,255,0.06)] rounded-full mt-3 overflow-hidden">
               <div
                 className="h-full bg-[#6366F1] rounded-full transition-all duration-500"
-                style={{ width: `${Math.min(100, (activeRevenue / goalTarget) * 100)}%` }}
+                style={{ width: `${Math.min(100, (activeRevenue / monthlyGoal) * 100)}%` }}
               />
             </div>
             <div className="flex items-center justify-between mt-1.5">
               <span className="text-[10px] text-[rgba(255,255,255,0.2)]">$0</span>
               <span className="text-[10px] text-[#6366F1]">${activeRevenue.toLocaleString()}</span>
-              <span className="text-[10px] text-[rgba(255,255,255,0.2)]">${goalTarget.toLocaleString()}</span>
+              <span className="text-[10px] text-[rgba(255,255,255,0.2)]">${monthlyGoal.toLocaleString()}</span>
             </div>
           </div>
 

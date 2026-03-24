@@ -29,7 +29,7 @@ export default function ProjectHistory() {
   const clientNames = Object.keys(grouped).sort();
 
   return (
-    <div className="min-h-screen bg-[#07090F]">
+    <div className="min-h-screen" style={{ backgroundColor: "var(--bg-page, #07090F)" }}>
       <AppTopBar title="History" />
       <div className="p-5">
 

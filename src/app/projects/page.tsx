@@ -167,7 +167,7 @@ export default function ActiveProjects() {
   if (!loaded) return <ProjectsSkeleton />;
 
   return (
-    <div className="min-h-screen bg-[#07090F]">
+    <div className="min-h-screen" style={{ backgroundColor: "var(--bg-page, #07090F)" }}>
       <AppTopBar title="Projects" />
       {showCashRain && <CashRain onComplete={handleCashRainComplete} emoji={cashRainEmoji} />}
       <div className="p-5">

@@ -86,6 +86,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<Theme>("dark");
 
   useEffect(() => {
+    // Load theme immediately from localStorage for instant apply
+    const saved = localStorage.getItem("scopeguard_theme") as Theme | null;
+    if (saved && themeVars[saved]) {
+      applyTheme(saved);
+    }
+    // Also load from profile (which may override localStorage)
     getProfile()
       .then((p) => {
         if (p.theme) applyTheme(p.theme);
@@ -100,6 +106,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     for (const [key, value] of Object.entries(vars)) {
       root.style.setProperty(key, value);
     }
+    // Set data-theme attribute for CSS selectors
+    root.setAttribute("data-theme", t);
+    // Persist to localStorage
+    localStorage.setItem("scopeguard_theme", t);
     // Update body classes for Tailwind overrides
     document.body.style.backgroundColor = vars["--bg-primary"];
     document.body.style.color = vars["--text-primary"];

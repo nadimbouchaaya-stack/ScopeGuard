@@ -106,7 +106,7 @@ export default function AppSidebar() {
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex fixed left-0 top-0 bottom-0 w-[52px] bg-[#0B0E18] border-r border-[rgba(255,255,255,0.05)] z-50 flex-col items-center py-4 gap-1">
+      <aside className="hidden md:flex fixed left-0 top-0 bottom-0 w-[52px] border-r z-50 flex-col items-center py-4 gap-1" style={{ backgroundColor: "var(--bg-sidebar, #0B0E18)", borderColor: "var(--border-color, rgba(255,255,255,0.05))" }}>
         {/* Logo */}
         <Link
           href="/dashboard"
@@ -172,7 +172,7 @@ export default function AppSidebar() {
       </aside>
 
       {/* Mobile bottom tab bar */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-[56px] bg-[#0B0E18] border-t border-[rgba(255,255,255,0.05)] z-50 flex items-center justify-around px-2">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-[56px] border-t z-50 flex items-center justify-around px-2" style={{ backgroundColor: "var(--bg-sidebar, #0B0E18)", borderColor: "var(--border-color, rgba(255,255,255,0.05))" }}>
         {navItems.map((item) => (
           <Link
             key={item.href}
