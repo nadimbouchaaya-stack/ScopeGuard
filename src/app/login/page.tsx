@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import PasswordInput from "@/components/PasswordInput";
@@ -30,7 +30,17 @@ function GoogleIcon() {
 }
 
 export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
+  );
+}
+
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirectTo") || "/dashboard";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -41,7 +51,7 @@ export default function LoginPage() {
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: window.location.origin + "/auth/callback",
+        redirectTo: window.location.origin + "/auth/callback?redirectTo=" + encodeURIComponent(redirectTo),
       },
     });
   }
@@ -63,7 +73,7 @@ export default function LoginPage() {
       return;
     }
 
-    router.push("/dashboard");
+    router.push(redirectTo);
     router.refresh();
   }
 
