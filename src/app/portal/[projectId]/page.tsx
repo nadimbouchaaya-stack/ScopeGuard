@@ -1,11 +1,52 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
-import { Project } from "@/lib/types";
-import { getProjectPublic } from "@/lib/storage";
-import { createClient } from "@/lib/supabase/client";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { PortalSkeleton } from "@/components/LoadingSkeleton";
+
+// Lightweight anon client for portal — no SSR cookie machinery, no realtime WebSocket
+function getPortalClient() {
+  return createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      auth: { persistSession: false },
+      realtime: { params: { eventsPerSecond: 0 } },
+    }
+  );
+}
+
+interface Deliverable {
+  id: string;
+  description: string;
+}
+
+interface ChangeRequest {
+  id: string;
+  projectId: string;
+  description: string;
+  additionalCost: number;
+  timeImpactDays: number;
+  status: string;
+  createdAt: string;
+}
+
+interface PortalProject {
+  id: string;
+  name: string;
+  clientName: string;
+  clientEmail: string;
+  price: number;
+  revisionLimit: number;
+  revisionsUsed: number;
+  status: string;
+  deadline?: string;
+  deliverablesLink?: string;
+  paymentLink?: string;
+  deliverables: Deliverable[];
+  changeRequests: ChangeRequest[];
+}
 
 const statusColors: Record<string, string> = {
   Active: "bg-[#34D399]/15 text-[#34D399] border-[#34D399]/30",
@@ -23,7 +64,7 @@ export default function ClientPortal() {
   const params = useParams();
   const projectId = params.projectId as string;
 
-  const [project, setProject] = useState<Project | null>(null);
+  const [project, setProject] = useState<PortalProject | null>(null);
   const [loaded, setLoaded] = useState(false);
 
   // Scope approval state
@@ -39,16 +80,58 @@ export default function ClientPortal() {
   const [crError, setCrError] = useState<string | null>(null);
   const [crSuccess, setCrSuccess] = useState(false);
 
-  useEffect(() => {
-    loadProject();
+  const loadProject = useCallback(async () => {
+    const supabase = getPortalClient();
+
+    const { data: row, error: pErr } = await supabase
+      .from("projects")
+      .select("*")
+      .eq("id", projectId)
+      .single();
+
+    if (pErr || !row) {
+      if (pErr) console.error("[Portal] project fetch error:", pErr);
+      setLoaded(true);
+      return;
+    }
+
+    const { data: crs } = await supabase
+      .from("change_requests")
+      .select("*")
+      .eq("project_id", projectId)
+      .order("created_at", { ascending: true });
+
+    const mapped: PortalProject = {
+      id: row.id,
+      name: row.name,
+      clientName: row.client_name,
+      clientEmail: row.client_email,
+      price: Number(row.price),
+      revisionLimit: row.revision_limit,
+      revisionsUsed: row.revisions_used,
+      status: row.status,
+      deadline: row.deadline ?? undefined,
+      deliverablesLink: row.deliverables_link ?? undefined,
+      paymentLink: row.payment_link ?? undefined,
+      deliverables: row.deliverables ?? [],
+      changeRequests: (crs ?? []).map((cr: Record<string, unknown>) => ({
+        id: cr.id as string,
+        projectId: cr.project_id as string,
+        description: cr.description as string,
+        additionalCost: Number(cr.additional_cost) || 0,
+        timeImpactDays: Number(cr.time_impact_days) || 0,
+        status: (cr.status as string) || "Pending",
+        createdAt: cr.created_at as string,
+      })),
+    };
+
+    setProject(mapped);
+    setLoaded(true);
   }, [projectId]);
 
-  function loadProject() {
-    getProjectPublic(projectId).then((p) => {
-      if (p) setProject(p);
-      setLoaded(true);
-    });
-  }
+  useEffect(() => {
+    loadProject();
+  }, [loadProject]);
 
   async function handleApproveScope() {
     if (!project || scopeApproving) return;
@@ -79,29 +162,37 @@ export default function ClientPortal() {
 
   async function handleSubmitCR(e: React.FormEvent) {
     e.preventDefault();
-    if (!crDescription.trim()) return;
+    const formDescription = crDescription.trim();
+    if (!formDescription) return;
+
+    const formCost = Math.max(0, Number(crCost) || 0);
+    const formDays = Math.max(0, Number(crDays) || 0);
 
     setCrSubmitting(true);
     setCrError(null);
 
-    const supabase = createClient();
-    const { error } = await supabase
+    const supabase = getPortalClient();
+    const { data, error } = await supabase
       .from("change_requests")
       .insert({
         project_id: projectId,
-        description: crDescription.trim(),
-        additional_cost: Math.max(0, Number(crCost) || 0),
-        time_impact_days: Math.max(0, Number(crDays) || 0),
+        description: formDescription,
+        additional_cost: formCost,
+        time_impact_days: formDays,
         status: "Pending",
-      });
+        user_id: null,
+      })
+      .select();
 
     setCrSubmitting(false);
 
     if (error) {
       console.error("[Portal] CR insert error:", error);
-      setCrError("Failed to submit request. Please try again.");
+      setCrError("Failed to submit request: " + error.message);
       return;
     }
+
+    console.log("[Portal] CR insert success:", data);
 
     setCrSuccess(true);
     setCrDescription("");
@@ -116,14 +207,14 @@ export default function ClientPortal() {
       body: JSON.stringify({
         projectId,
         projectName: project?.name || "Unknown Project",
-        description: crDescription.trim(),
-        additionalCost: Math.max(0, Number(crCost) || 0),
-        timeImpactDays: Math.max(0, Number(crDays) || 0),
+        description: formDescription,
+        additionalCost: formCost,
+        timeImpactDays: formDays,
       }),
-    }).catch(() => {}); // Don't block on notification failure
+    }).catch(() => {});
 
-    // Reload project to show the new CR
-    loadProject();
+    // Manual refetch to show new CR — no WebSocket needed
+    await loadProject();
   }
 
   if (!loaded) return <PortalSkeleton />;
