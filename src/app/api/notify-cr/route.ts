@@ -55,7 +55,11 @@ export async function POST(request: NextRequest) {
 
     const freelancerEmail = profile?.email;
 
+    console.log("[notify-cr] project.user_id:", project.user_id);
+    console.log("[notify-cr] Sending to freelancer:", freelancerEmail);
+
     if (!freelancerEmail) {
+      console.error("[notify-cr] No email found in user_profiles for user_id:", project.user_id);
       return NextResponse.json({ error: "Freelancer email not found" }, { status: 404 });
     }
 
