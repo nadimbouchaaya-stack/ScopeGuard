@@ -282,6 +282,20 @@ export default function ProjectDetailPage() {
                 Mark Complete
               </button>
             )}
+            {project.deadline && (
+              <button
+                onClick={() => {
+                  const d = new Date(project.deadline!);
+                  const startDate = d.toISOString().replace(/-|:|\.\d{3}/g, "").slice(0, 8);
+                  const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(project.name + " \u2014 Deadline")}&dates=${startDate}/${startDate}&details=${encodeURIComponent("Client: " + project.clientName + "\nProject value: $" + project.price + "\nPortal: https://tryscopeguard.com/portal/" + project.id)}&location=${encodeURIComponent("ScopeGuard")}`;
+                  window.open(url, "_blank");
+                }}
+                className="bg-[rgba(52,211,153,0.1)] border border-[rgba(52,211,153,0.2)] text-[#34D399] text-[12px] h-[32px] px-3 rounded-[8px] transition-colors hover:bg-[rgba(52,211,153,0.15)] flex items-center gap-1.5"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>
+                Add to Calendar
+              </button>
+            )}
             <button
               onClick={() => {
                 navigator.clipboard.writeText(`https://tryscopeguard.com/portal/${project.id}`);

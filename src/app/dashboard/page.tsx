@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Project } from "@/lib/types";
 import { getProjects } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/client";
@@ -16,6 +17,7 @@ export default function Dashboard() {
   const [projectIds, setProjectIds] = useState<string[]>([]);
   const [monthlyGoal, setMonthlyGoal] = useState(5000);
   const [editingGoal, setEditingGoal] = useState(false);
+  const router = useRouter();
 
   async function fetchPendingCount(supabase: ReturnType<typeof createClient>, pIds: string[]) {
     if (pIds.length === 0) return;
@@ -144,21 +146,23 @@ export default function Dashboard() {
 
   // Monthly goal uses editable state
 
-  // Scope tips
-  const tips = [
-    "Always get change requests in writing before starting extra work.",
-    "Set clear boundaries in your initial scope document.",
-    "Review your scope weekly to catch creep early.",
-  ];
+  // Nearest deadline for calendar action
+  const nearestDeadline = deadlineProjects[0] ?? null;
 
-  // Revenue months for chart
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"];
-  const currentMonth = now.getMonth();
-  const recentMonths = months.slice(Math.max(0, currentMonth - 6), currentMonth + 1);
-  if (recentMonths.length < 7) {
-    const needed = 7 - recentMonths.length;
-    recentMonths.unshift(...months.slice(0, needed));
+  // Client overview — group by client, sorted by total value
+  const clientMap = new Map<string, { name: string; count: number; totalValue: number }>();
+  for (const p of activeProjects) {
+    const existing = clientMap.get(p.clientName);
+    if (existing) {
+      existing.count++;
+      existing.totalValue += p.price;
+    } else {
+      clientMap.set(p.clientName, { name: p.clientName, count: 1, totalValue: p.price });
+    }
   }
+  const topClients = Array.from(clientMap.values())
+    .sort((a, b) => b.totalValue - a.totalValue)
+    .slice(0, 4);
 
   function timeAgo(dateStr: string) {
     const diff = now.getTime() - new Date(dateStr).getTime();
@@ -393,27 +397,25 @@ export default function Dashboard() {
 
           {/* RIGHT COLUMN */}
           <div className="flex flex-col gap-3">
-            {/* Revenue chart */}
+            {/* Client overview */}
             <div className="bg-[#0F1322] border border-[rgba(255,255,255,0.06)] rounded-[14px] p-4">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-[11px] font-medium uppercase tracking-[0.07em] text-[rgba(255,255,255,0.35)]">Revenue</span>
-                <span className="text-[10px] text-[rgba(255,255,255,0.2)]">{now.getFullYear()}</span>
-              </div>
-              <div className="flex items-end gap-[5px] h-[80px]">
-                {recentMonths.slice(-7).map((month, i) => {
-                  const isCurrentMonth = i === recentMonths.slice(-7).length - 1;
-                  const barHeight = isCurrentMonth ? 100 : 20 + Math.random() * 60;
-                  return (
-                    <div key={month} className="flex-1 flex flex-col items-center gap-1">
-                      <div
-                        className={`w-full rounded-[3px] ${isCurrentMonth ? "bg-[#6366F1]" : "bg-[rgba(99,102,241,0.2)]"}`}
-                        style={{ height: `${barHeight}%` }}
-                      />
-                      <span className={`text-[9px] ${isCurrentMonth ? "text-[#6366F1]" : "text-[rgba(255,255,255,0.2)]"}`}>{month}</span>
+              <span className="text-[11px] font-medium uppercase tracking-[0.07em] text-[rgba(255,255,255,0.35)] mb-3 block">Clients</span>
+              {topClients.length === 0 ? (
+                <p className="text-[12px] text-[rgba(255,255,255,0.3)] text-center py-4">No clients yet</p>
+              ) : (
+                <div>
+                  {topClients.map((client, i) => (
+                    <div key={client.name} className={`flex items-center gap-3 py-2 ${i < topClients.length - 1 ? "border-b border-[rgba(255,255,255,0.04)]" : ""}`}>
+                      <div className="w-[28px] h-[28px] rounded-full bg-[rgba(99,102,241,0.2)] flex items-center justify-center flex-shrink-0">
+                        <span className="text-[11px] font-medium text-[#818CF8]">{client.name[0].toUpperCase()}</span>
+                      </div>
+                      <span className="text-[12px] font-medium text-white flex-1 truncate">{client.name}</span>
+                      <span className="text-[10px] text-[rgba(255,255,255,0.3)] flex-shrink-0">{client.count} project{client.count !== 1 ? "s" : ""}</span>
+                      <span className="text-[12px] font-medium text-white flex-shrink-0">${client.totalValue.toLocaleString()}</span>
                     </div>
-                  );
-                })}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Recent activity */}
@@ -545,18 +547,66 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Scope tips */}
+          {/* Quick actions */}
           <div className="bg-[#0F1322] border border-[rgba(255,255,255,0.06)] rounded-[14px] p-4">
-            <span className="text-[11px] font-medium uppercase tracking-[0.07em] text-[rgba(255,255,255,0.35)] mb-3 block">Scope Tips</span>
-            <div className="space-y-2.5">
-              {tips.map((tip, i) => (
-                <div key={i} className="flex items-start gap-2">
-                  <div className="w-[18px] h-[18px] bg-[rgba(99,102,241,0.2)] rounded-[5px] flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <span className="text-[9px] font-medium text-[#A5B4FC]">{i + 1}</span>
-                  </div>
-                  <p className="text-[11px] text-[rgba(255,255,255,0.4)] leading-snug">{tip}</p>
+            <span className="text-[11px] font-medium uppercase tracking-[0.07em] text-[rgba(255,255,255,0.35)] mb-3 block">Quick Actions</span>
+            <div className="space-y-2">
+              {/* New Project */}
+              <button
+                onClick={() => router.push("/projects/new")}
+                className="w-full bg-[rgba(99,102,241,0.15)] border border-[rgba(99,102,241,0.2)] rounded-[10px] p-3 flex items-center gap-3 text-left hover:bg-[rgba(99,102,241,0.2)] transition-colors"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#818CF8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14" /></svg>
+                <div>
+                  <p className="text-[13px] text-white">New project</p>
+                  <p className="text-[11px] text-[rgba(255,255,255,0.3)]">Create and send to client</p>
                 </div>
-              ))}
+              </button>
+
+              {/* Pending Approvals */}
+              {pendingCRCount > 0 && (
+                <button
+                  onClick={() => router.push("/pending-approvals")}
+                  className="w-full bg-[rgba(239,68,68,0.08)] border border-[rgba(239,68,68,0.2)] rounded-[10px] p-3 flex items-center gap-3 text-left hover:bg-[rgba(239,68,68,0.12)] transition-colors"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FCA5A5" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 3" /></svg>
+                  <div>
+                    <p className="text-[13px] text-white">Review {pendingCRCount} request{pendingCRCount !== 1 ? "s" : ""}</p>
+                    <p className="text-[11px] text-[rgba(255,255,255,0.3)]">Pending change requests</p>
+                  </div>
+                </button>
+              )}
+
+              {/* Add deadline to Calendar */}
+              {nearestDeadline && (
+                <button
+                  onClick={() => {
+                    const d = new Date(nearestDeadline.deadline!);
+                    const startDate = d.toISOString().replace(/-|:|\.\d{3}/g, "").slice(0, 8);
+                    const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(nearestDeadline.name + " \u2014 Deadline")}&dates=${startDate}/${startDate}&details=${encodeURIComponent("Client: " + nearestDeadline.clientName + "\nManage on ScopeGuard: https://tryscopeguard.com")}`;
+                    window.open(url, "_blank");
+                  }}
+                  className="w-full bg-[rgba(52,211,153,0.08)] border border-[rgba(52,211,153,0.15)] rounded-[10px] p-3 flex items-center gap-3 text-left hover:bg-[rgba(52,211,153,0.12)] transition-colors"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34D399" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>
+                  <div>
+                    <p className="text-[13px] text-white">Add deadline to Calendar</p>
+                    <p className="text-[11px] text-[rgba(255,255,255,0.3)]">{nearestDeadline.name} · {new Date(nearestDeadline.deadline!).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</p>
+                  </div>
+                </button>
+              )}
+
+              {/* View all projects */}
+              <button
+                onClick={() => router.push("/projects")}
+                className="w-full bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.06)] rounded-[10px] p-3 flex items-center gap-3 text-left hover:bg-[rgba(255,255,255,0.06)] transition-colors"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" /></svg>
+                <div>
+                  <p className="text-[13px] text-white">View all projects</p>
+                  <p className="text-[11px] text-[rgba(255,255,255,0.3)]">{activeCount} active project{activeCount !== 1 ? "s" : ""}</p>
+                </div>
+              </button>
             </div>
           </div>
         </div>
