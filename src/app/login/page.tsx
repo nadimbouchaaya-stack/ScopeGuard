@@ -78,7 +78,7 @@ function LoginForm() {
   }
 
   const inputClass =
-    "w-full bg-[#0F172A] border border-[#475569] rounded-lg px-4 py-3 text-[#F1F5F9] placeholder-[#94A3B8]/50 focus:outline-none focus:border-[#6366F1] focus:ring-1 focus:ring-[#6366F1] transition-colors";
+    "w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder-[#94A3B8]/50 focus:outline-none focus:border-[#6366F1] focus:ring-1 focus:ring-[#6366F1] transition-colors";
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4">
@@ -86,7 +86,7 @@ function LoginForm() {
         <div className="text-center mb-8">
           <div className="w-12 h-12 bg-[#6366F1] rounded-xl flex items-center justify-center mx-auto mb-4">
             <svg
-              className="w-7 h-7 text-[#F1F5F9]"
+              className="w-7 h-7 text-white"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -99,8 +99,8 @@ function LoginForm() {
               />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-[#F1F5F9]">Welcome back</h1>
-          <p className="text-[#94A3B8] text-sm mt-1">
+          <h1 className="text-2xl font-bold text-white">Welcome back</h1>
+          <p className="text-[#A3A3A3] text-sm mt-1">
             Sign in to your ScopeGuard account
           </p>
         </div>
@@ -109,7 +109,7 @@ function LoginForm() {
           {/* Google Sign In */}
           <button
             onClick={handleGoogleSignIn}
-            className="w-full bg-[#1E293B] border border-[#475569] hover:bg-[#334155] text-[#F1F5F9] font-medium py-3 rounded-xl transition-colors flex items-center justify-center gap-3"
+            className="w-full bg-[#111111] border border-[#2A2A2A] hover:bg-[#1A1A1A] text-white font-medium py-3 rounded-xl transition-colors flex items-center justify-center gap-3"
           >
             <GoogleIcon />
             Continue with Google
@@ -118,13 +118,13 @@ function LoginForm() {
           {/* Divider */}
           <div className="flex items-center gap-4">
             <div className="flex-1 h-px bg-[#475569]" />
-            <span className="text-xs text-[#94A3B8] uppercase tracking-wider">or</span>
+            <span className="text-xs text-[#A3A3A3] uppercase tracking-wider">or</span>
             <div className="flex-1 h-px bg-[#475569]" />
           </div>
 
           {/* Email form */}
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="bg-[#1E293B] border border-[#475569] rounded-xl p-6 space-y-4">
+            <div className="bg-[#111111] border border-[#2A2A2A] rounded-xl p-6 space-y-4">
               {error && (
                 <div className="bg-[#F87171]/10 border border-[#F87171]/30 rounded-lg px-4 py-3">
                   <p className="text-[#F87171] text-sm">{error}</p>
@@ -132,7 +132,7 @@ function LoginForm() {
               )}
 
               <div>
-                <label className="block text-sm font-medium text-[#94A3B8] mb-2">
+                <label className="block text-sm font-medium text-[#A3A3A3] mb-2">
                   Email
                 </label>
                 <input
@@ -146,7 +146,7 @@ function LoginForm() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-[#94A3B8] mb-2">
+                <label className="block text-sm font-medium text-[#A3A3A3] mb-2">
                   Password
                 </label>
                 <PasswordInput
@@ -162,14 +162,14 @@ function LoginForm() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#6366F1] hover:bg-[#5558E6] disabled:opacity-50 disabled:cursor-not-allowed text-[#F1F5F9] font-semibold py-3 rounded-xl transition-colors"
+              className="w-full bg-[#6366F1] hover:bg-[#5254CC] disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition-colors"
             >
               {loading ? "Signing in..." : "Sign In"}
             </button>
           </form>
         </div>
 
-        <p className="text-center text-sm text-[#94A3B8] mt-6">
+        <p className="text-center text-sm text-[#A3A3A3] mt-6">
           Don&apos;t have an account?{" "}
           <Link
             href="/signup"

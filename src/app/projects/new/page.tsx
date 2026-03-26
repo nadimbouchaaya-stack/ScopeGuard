@@ -149,23 +149,23 @@ export default function NewProject() {
   }
 
   const inputBase =
-    "w-full bg-[#0F172A] rounded-lg px-4 py-3 text-[#F1F5F9] placeholder-[#94A3B8]/50 focus:outline-none focus:ring-1 transition-colors";
+    "w-full bg-[#0A0A0A] rounded-lg px-4 py-3 text-white placeholder-[#94A3B8]/50 focus:outline-none focus:ring-1 transition-colors";
   const inputClass = (field?: string) =>
-    `${inputBase} border ${field && fieldErrors[field] ? "border-red-500 focus:border-red-500 focus:ring-red-500" : "border-[#475569] focus:border-[#6366F1] focus:ring-[#6366F1]"}`;
-  const labelClass = "block text-sm font-medium text-[#94A3B8] mb-2";
+    `${inputBase} border ${field && fieldErrors[field] ? "border-red-500 focus:border-red-500 focus:ring-red-500" : "border-[#2A2A2A] focus:border-[#6366F1] focus:ring-[#6366F1]"}`;
+  const labelClass = "block text-sm font-medium text-[#A3A3A3] mb-2";
 
   if (success) {
     return (
       <div className="max-w-2xl mx-auto">
-        <div className="bg-[#1E293B] border border-[#475569] rounded-xl p-8 text-center">
+        <div className="bg-[#111111] border border-[#2A2A2A] rounded-xl p-8 text-center">
           <div className="w-16 h-16 bg-[#34D399]/15 rounded-2xl flex items-center justify-center mx-auto mb-5">
             <svg className="w-8 h-8 text-[#34D399]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-[#F1F5F9] mb-2">Project Created</h1>
-          <p className="text-[#94A3B8] mb-2">
-            <strong className="text-[#F1F5F9]">{name}</strong> has been saved and a scope review email has been sent to <strong className="text-[#F1F5F9]">{clientEmail}</strong>.
+          <h1 className="text-2xl font-bold text-white mb-2">Project Created</h1>
+          <p className="text-[#A3A3A3] mb-2">
+            <strong className="text-white">{name}</strong> has been saved and a scope review email has been sent to <strong className="text-white">{clientEmail}</strong>.
           </p>
 
           {error && (
@@ -178,13 +178,13 @@ export default function NewProject() {
           <div className="flex gap-3 justify-center mt-6">
             <button
               onClick={() => router.push("/dashboard")}
-              className="bg-[#6366F1] hover:bg-[#5558E6] text-[#F1F5F9] font-semibold px-6 py-3 rounded-xl transition-colors text-sm"
+              className="bg-[#6366F1] hover:bg-[#5254CC] text-white font-semibold px-6 py-3 rounded-xl transition-colors text-sm"
             >
               Back to Dashboard
             </button>
             <button
               onClick={() => router.push("/projects")}
-              className="bg-[#334155] hover:bg-[#475569] text-[#F1F5F9] font-semibold px-6 py-3 rounded-xl transition-colors text-sm"
+              className="bg-[#1A1A1A] hover:bg-[#1A1A1A] text-white font-semibold px-6 py-3 rounded-xl transition-colors text-sm"
             >
               View Projects
             </button>
@@ -197,8 +197,8 @@ export default function NewProject() {
   return (
     <div className="max-w-2xl mx-auto">
       <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-[#F1F5F9]">New Project</h1>
-        <p className="text-[#94A3B8] mt-1 text-sm sm:text-base">
+        <h1 className="text-2xl sm:text-3xl font-bold text-white">New Project</h1>
+        <p className="text-[#A3A3A3] mt-1 text-sm sm:text-base">
           Define your project scope and protect it from day one.
         </p>
       </div>
@@ -230,8 +230,8 @@ export default function NewProject() {
       )}
 
       <form onSubmit={handleSubmit} noValidate className="space-y-6 pb-24">
-        <div className="bg-[#1E293B] border border-[#475569] rounded-xl p-6 space-y-5">
-          <h2 className="text-lg font-semibold text-[#F1F5F9] border-b border-[#475569] pb-3">
+        <div className="bg-[#111111] border border-[#2A2A2A] rounded-xl p-6 space-y-5">
+          <h2 className="text-lg font-semibold text-white border-b border-[#2A2A2A] pb-3">
             Project Details
           </h2>
 
@@ -351,9 +351,9 @@ export default function NewProject() {
           </div>
         </div>
 
-        <div className="bg-[#1E293B] border border-[#475569] rounded-xl p-6 space-y-4">
-          <div className="flex items-center justify-between border-b border-[#475569] pb-3">
-            <h2 className="text-lg font-semibold text-[#F1F5F9]">Deliverables</h2>
+        <div className="bg-[#111111] border border-[#2A2A2A] rounded-xl p-6 space-y-4">
+          <div className="flex items-center justify-between border-b border-[#2A2A2A] pb-3">
+            <h2 className="text-lg font-semibold text-white">Deliverables</h2>
             <button
               type="button"
               onClick={addDeliverable}
@@ -378,7 +378,7 @@ export default function NewProject() {
 
           {deliverables.map((d, index) => (
             <div key={index} className="flex gap-3">
-              <div className="flex items-center justify-center w-8 h-12 text-sm font-medium text-[#94A3B8]/60">
+              <div className="flex items-center justify-center w-8 h-12 text-sm font-medium text-[#A3A3A3]/60">
                 {index + 1}.
               </div>
               <input
@@ -392,7 +392,7 @@ export default function NewProject() {
                 type="button"
                 onClick={() => removeDeliverable(index)}
                 disabled={deliverables.length === 1}
-                className="text-[#94A3B8] hover:text-[#F87171] disabled:opacity-30 disabled:cursor-not-allowed transition-colors p-2"
+                className="text-[#A3A3A3] hover:text-[#F87171] disabled:opacity-30 disabled:cursor-not-allowed transition-colors p-2"
               >
                 <svg
                   className="w-5 h-5"
@@ -415,7 +415,7 @@ export default function NewProject() {
         <button
           type="submit"
           disabled={saving}
-          className="w-full bg-[#6366F1] hover:bg-[#5558E6] disabled:opacity-50 disabled:cursor-not-allowed text-[#F1F5F9] font-semibold py-3.5 rounded-xl transition-colors text-base"
+          className="w-full bg-[#6366F1] hover:bg-[#5254CC] disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3.5 rounded-xl transition-colors text-base"
         >
           {saving ? (
             <span className="flex items-center justify-center gap-2">

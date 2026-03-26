@@ -94,30 +94,30 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
   }
 
   const chipBase = "px-4 py-2 rounded-full text-[12px] cursor-pointer transition-colors border";
-  const chipInactive = "bg-[rgba(255,255,255,0.06)] border-[rgba(255,255,255,0.1)] text-white hover:bg-[rgba(99,102,241,0.15)]";
+  const chipInactive = "bg-[#1A1A1A] border-[#2A2A2A] text-white hover:bg-[rgba(99,102,241,0.15)]";
   const chipActive = "bg-[rgba(99,102,241,0.2)] border-[rgba(99,102,241,0.4)] text-[#A5B4FC]";
 
   return (
     <div className="fixed inset-0 z-[100] flex items-start justify-center">
       <div className="absolute inset-0 bg-[rgba(0,0,0,0.7)]" />
       <div
-        className="relative mt-[10vh] w-full max-w-lg mx-4 bg-[#0F1322] border border-[rgba(99,102,241,0.2)] rounded-[20px] p-8 animate-fade-in"
+        className="relative mt-[10vh] w-full max-w-lg mx-4 bg-[#111111] border border-[rgba(99,102,241,0.25)] rounded-[20px] p-8 animate-fade-in"
       >
         {/* Progress dots */}
         <div className="flex items-center justify-center gap-2 mb-6">
-          <div className={`w-[8px] h-[8px] rounded-full ${step === 1 ? "bg-[#6366F1]" : "bg-[rgba(255,255,255,0.2)]"}`} />
-          <div className={`w-[8px] h-[8px] rounded-full ${step === 2 ? "bg-[#6366F1]" : "bg-[rgba(255,255,255,0.2)]"}`} />
+          <div className={`w-[8px] h-[8px] rounded-full ${step === 1 ? "bg-[#6366F1]" : "bg-[#3A3A3A]"}`} />
+          <div className={`w-[8px] h-[8px] rounded-full ${step === 2 ? "bg-[#6366F1]" : "bg-[#3A3A3A]"}`} />
         </div>
 
         {step === 1 ? (
           <>
             <h2 className="text-[22px] font-medium text-white">Welcome to ScopeGuard &#x1F6E1;&#xFE0F;</h2>
-            <p className="text-[13px] text-[rgba(255,255,255,0.4)] mb-6">
+            <p className="text-[13px] text-[#525252] mb-6">
               Quick questions to personalize your experience
             </p>
 
             {/* Q1: Work types */}
-            <label className="text-[12px] text-[rgba(255,255,255,0.5)] font-medium block mb-2">
+            <label className="text-[12px] text-[#A3A3A3] font-medium block mb-2">
               What type of freelance work do you do?
             </label>
             <div className="flex flex-wrap gap-2 mb-5">
@@ -133,7 +133,7 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
             </div>
 
             {/* Q2: Client count */}
-            <label className="text-[12px] text-[rgba(255,255,255,0.5)] font-medium block mb-2">
+            <label className="text-[12px] text-[#A3A3A3] font-medium block mb-2">
               How many active clients do you have right now?
             </label>
             <div className="flex flex-wrap gap-2 mb-5">
@@ -149,7 +149,7 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
             </div>
 
             {/* Q3: Scope creep */}
-            <label className="text-[12px] text-[rgba(255,255,255,0.5)] font-medium block mb-2">
+            <label className="text-[12px] text-[#A3A3A3] font-medium block mb-2">
               Have you experienced scope creep before?
             </label>
             <div className="flex flex-wrap gap-2 mb-6">
@@ -166,7 +166,7 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
 
             <button
               onClick={() => setStep(2)}
-              className="w-full h-[44px] bg-[#6366F1] hover:bg-[#5558E6] rounded-[10px] text-white font-medium text-[14px] transition-colors"
+              className="w-full h-[44px] bg-[#6366F1] hover:bg-[#5254CC] rounded-[10px] text-white font-medium text-[14px] transition-colors"
             >
               Next →
             </button>
@@ -174,10 +174,10 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
         ) : (
           <>
             <h2 className="text-[22px] font-medium text-white">Almost done! &#x1F389;</h2>
-            <p className="text-[13px] text-[rgba(255,255,255,0.4)] mb-6">One last thing</p>
+            <p className="text-[13px] text-[#525252] mb-6">One last thing</p>
 
             {/* Q4: How found */}
-            <label className="text-[12px] text-[rgba(255,255,255,0.5)] font-medium block mb-2">
+            <label className="text-[12px] text-[#A3A3A3] font-medium block mb-2">
               How did you find ScopeGuard?
             </label>
             <div className="flex flex-wrap gap-2 mb-5">
@@ -193,7 +193,7 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
             </div>
 
             {/* Q5: Main goal */}
-            <label className="text-[12px] text-[rgba(255,255,255,0.5)] font-medium block mb-2">
+            <label className="text-[12px] text-[#A3A3A3] font-medium block mb-2">
               What&apos;s your main goal with ScopeGuard?
             </label>
             <div className="flex flex-wrap gap-2 mb-5">
@@ -209,7 +209,7 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
             </div>
 
             {/* Q6: Notes */}
-            <label className="text-[12px] text-[rgba(255,255,255,0.5)] font-medium block mb-2">
+            <label className="text-[12px] text-[#A3A3A3] font-medium block mb-2">
               Anything else you want us to know?
             </label>
             <textarea
@@ -217,20 +217,20 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
               placeholder="Optional — any feedback, feature requests, or how you've been handling scope creep..."
-              className="w-full bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] rounded-[10px] text-white p-3 text-[13px] resize-none focus:outline-none focus:border-[rgba(99,102,241,0.4)] placeholder-[rgba(255,255,255,0.25)] mb-6"
+              className="w-full bg-[#141414] border border-[#222222] rounded-[10px] text-white p-3 text-[13px] resize-none focus:outline-none focus:border-[rgba(99,102,241,0.4)] placeholder-[#525252] mb-6"
             />
 
             <div className="flex gap-3">
               <button
                 onClick={() => setStep(1)}
-                className="h-[44px] px-5 bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.1)] rounded-[10px] text-[rgba(255,255,255,0.5)] text-[14px] hover:bg-[rgba(255,255,255,0.08)] transition-colors"
+                className="h-[44px] px-5 bg-[#1A1A1A] border border-[#2A2A2A] rounded-[10px] text-[#A3A3A3] text-[14px] hover:bg-[#1A1A1A] transition-colors"
               >
                 Back
               </button>
               <button
                 onClick={handleFinish}
                 disabled={submitting}
-                className="flex-1 h-[44px] bg-[#6366F1] hover:bg-[#5558E6] rounded-[10px] text-white font-medium text-[14px] transition-colors disabled:opacity-50"
+                className="flex-1 h-[44px] bg-[#6366F1] hover:bg-[#5254CC] rounded-[10px] text-white font-medium text-[14px] transition-colors disabled:opacity-50"
               >
                 {submitting ? "Saving..." : "Let's go \uD83D\uDE80"}
               </button>

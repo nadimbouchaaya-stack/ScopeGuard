@@ -90,7 +90,7 @@ export default function SettingsPage() {
   if (!loaded) return null;
 
   const cardStyle = { backgroundColor: "var(--bg-card, #0F1322)", borderColor: "var(--border-color, rgba(255,255,255,0.06))" };
-  const cardClass = "rounded-[14px] p-6 border";
+  const cardClass = "rounded-[12px] p-6 border";
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "var(--bg-page, #07090F)" }}>

@@ -75,9 +75,9 @@ export default function ProfilePage() {
   if (!loaded) return null;
 
   const cardStyle = { backgroundColor: "var(--bg-card, #0F1322)", borderColor: "var(--border-color, rgba(255,255,255,0.06))" };
-  const cardClass = "rounded-[14px] p-6 border";
+  const cardClass = "rounded-[12px] p-6 border";
   const inputClass =
-    "w-full bg-[rgba(255,255,255,0.04)] border-[rgba(255,255,255,0.08)] text-white rounded-[10px] px-4 py-3 focus:outline-none focus:ring-1 transition-colors border";
+    "w-full bg-[#141414] border-[#222222] text-white rounded-[10px] px-4 py-3 focus:outline-none focus:ring-1 transition-colors border";
   const labelClass = "block text-sm font-medium mb-2";
 
   // Check if avatar is a preset emoji (single character / emoji) or a URL

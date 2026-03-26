@@ -126,8 +126,8 @@ export default function ChangeRequestDetailPage() {
   if (!project) {
     return (
       <div className="text-center py-20">
-        <h2 className="text-2xl font-bold text-[#F1F5F9] mb-2">Project not found</h2>
-        <p className="text-[#94A3B8] mb-6">This project may have been deleted.</p>
+        <h2 className="text-2xl font-bold text-white mb-2">Project not found</h2>
+        <p className="text-[#A3A3A3] mb-6">This project may have been deleted.</p>
         <Link href="/pending-approvals" className="text-[#818CF8] hover:text-[#A5B4FC] font-medium">
           Back to Pending Approvals
         </Link>
@@ -140,8 +140,8 @@ export default function ChangeRequestDetailPage() {
   if (!cr) {
     return (
       <div className="text-center py-20">
-        <h2 className="text-2xl font-bold text-[#F1F5F9] mb-2">Change request not found</h2>
-        <p className="text-[#94A3B8] mb-6">This request may have been removed.</p>
+        <h2 className="text-2xl font-bold text-white mb-2">Change request not found</h2>
+        <p className="text-[#A3A3A3] mb-6">This request may have been removed.</p>
         <Link href="/pending-approvals" className="text-[#818CF8] hover:text-[#A5B4FC] font-medium">
           Back to Pending Approvals
         </Link>
@@ -159,7 +159,7 @@ export default function ChangeRequestDetailPage() {
       <div className="mb-8">
         <Link
           href="/pending-approvals"
-          className="text-sm text-[#94A3B8] hover:text-[#F1F5F9] transition-colors flex items-center gap-1 mb-4"
+          className="text-sm text-[#A3A3A3] hover:text-white transition-colors flex items-center gap-1 mb-4"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
@@ -167,7 +167,7 @@ export default function ChangeRequestDetailPage() {
           Back to Pending Approvals
         </Link>
         <div className="flex items-center justify-between gap-4">
-          <h1 className="text-2xl sm:text-3xl font-bold text-[#F1F5F9]">Change Request Review</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white">Change Request Review</h1>
           <span className={`text-xs font-medium px-3 py-1.5 rounded-full border whitespace-nowrap ${
             isPending
               ? "bg-[#FBBF24]/15 text-[#FBBF24] border-[#FBBF24]/30"
@@ -182,11 +182,11 @@ export default function ChangeRequestDetailPage() {
 
       <div className="space-y-6">
         {/* Project context card */}
-        <div className="bg-[#1E293B] border border-[#475569] rounded-xl p-6">
-          <h2 className="text-xs font-medium text-[#94A3B8] uppercase tracking-wider mb-4">Project Context</h2>
+        <div className="bg-[#111111] border border-[#2A2A2A] rounded-xl p-6">
+          <h2 className="text-xs font-medium text-[#A3A3A3] uppercase tracking-wider mb-4">Project Context</h2>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="text-xs text-[#94A3B8] mb-0.5">Project</p>
+              <p className="text-xs text-[#A3A3A3] mb-0.5">Project</p>
               <Link
                 href={`/projects/${project.id}`}
                 className="text-sm font-semibold text-[#818CF8] hover:text-[#A5B4FC] transition-colors"
@@ -195,16 +195,16 @@ export default function ChangeRequestDetailPage() {
               </Link>
             </div>
             <div>
-              <p className="text-xs text-[#94A3B8] mb-0.5">Client</p>
-              <p className="text-sm font-medium text-[#F1F5F9]">{project.clientName}</p>
+              <p className="text-xs text-[#A3A3A3] mb-0.5">Client</p>
+              <p className="text-sm font-medium text-white">{project.clientName}</p>
             </div>
             <div>
-              <p className="text-xs text-[#94A3B8] mb-0.5">Contract Value</p>
-              <p className="text-sm font-medium text-[#F1F5F9]">${project.price.toLocaleString()}</p>
+              <p className="text-xs text-[#A3A3A3] mb-0.5">Contract Value</p>
+              <p className="text-sm font-medium text-white">${project.price.toLocaleString()}</p>
             </div>
             <div>
-              <p className="text-xs text-[#94A3B8] mb-0.5">Deadline</p>
-              <p className="text-sm font-medium text-[#F1F5F9]">
+              <p className="text-xs text-[#A3A3A3] mb-0.5">Deadline</p>
+              <p className="text-sm font-medium text-white">
                 {project.deadline
                   ? new Date(project.deadline).toLocaleDateString("en-US", {
                       month: "short", day: "numeric", year: "numeric",
@@ -213,13 +213,13 @@ export default function ChangeRequestDetailPage() {
               </p>
             </div>
             <div className="col-span-2">
-              <p className="text-xs text-[#94A3B8] mb-0.5">Revisions</p>
+              <p className="text-xs text-[#A3A3A3] mb-0.5">Revisions</p>
               <div className="flex items-center gap-3">
-                <span className="text-sm font-medium text-[#F1F5F9]">
+                <span className="text-sm font-medium text-white">
                   <span className={project.revisionsUsed >= project.revisionLimit ? "text-[#F87171]" : ""}>
                     {project.revisionsUsed}
                   </span>
-                  <span className="text-[#94A3B8]/60">/{project.revisionLimit}</span>
+                  <span className="text-[#A3A3A3]/60">/{project.revisionLimit}</span>
                 </span>
                 <div className="flex-1 bg-[#475569]/50 rounded-full h-1.5 max-w-[120px]">
                   <div
@@ -241,25 +241,25 @@ export default function ChangeRequestDetailPage() {
         </div>
 
         {/* The Request card */}
-        <div className="bg-[#1E293B] border border-[#475569] rounded-xl p-6 border-l-[3px] border-l-[#FBBF24]">
-          <h2 className="text-xs font-medium text-[#94A3B8] uppercase tracking-wider mb-4">Change Request</h2>
+        <div className="bg-[#111111] border border-[#2A2A2A] rounded-xl p-6 border-l-[3px] border-l-[#FBBF24]">
+          <h2 className="text-xs font-medium text-[#A3A3A3] uppercase tracking-wider mb-4">Change Request</h2>
 
-          <p className="text-lg font-semibold text-[#F1F5F9] mb-5">{cr.description}</p>
+          <p className="text-lg font-semibold text-white mb-5">{cr.description}</p>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
-            <div className="bg-[#0F172A] rounded-lg p-4">
-              <p className="text-xs text-[#94A3B8] mb-1">Cost Impact</p>
+            <div className="bg-[#0A0A0A] rounded-lg p-4">
+              <p className="text-xs text-[#A3A3A3] mb-1">Cost Impact</p>
               <p className="text-xl font-bold text-[#FBBF24]">+${cr.additionalCost.toLocaleString()}</p>
             </div>
-            <div className="bg-[#0F172A] rounded-lg p-4">
-              <p className="text-xs text-[#94A3B8] mb-1">Time Impact</p>
+            <div className="bg-[#0A0A0A] rounded-lg p-4">
+              <p className="text-xs text-[#A3A3A3] mb-1">Time Impact</p>
               <p className="text-xl font-bold text-[#FBBF24]">
                 +{cr.timeImpactDays} day{cr.timeImpactDays === 1 ? "" : "s"}
               </p>
             </div>
-            <div className="bg-[#0F172A] rounded-lg p-4">
-              <p className="text-xs text-[#94A3B8] mb-1">Submitted</p>
-              <p className="text-sm font-medium text-[#F1F5F9]">
+            <div className="bg-[#0A0A0A] rounded-lg p-4">
+              <p className="text-xs text-[#A3A3A3] mb-1">Submitted</p>
+              <p className="text-sm font-medium text-white">
                 {new Date(cr.createdAt).toLocaleDateString("en-US", {
                   month: "long", day: "numeric", year: "numeric",
                 })}

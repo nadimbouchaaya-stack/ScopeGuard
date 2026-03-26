@@ -186,7 +186,7 @@ export default function Dashboard() {
 
       <div className="p-5 flex flex-col gap-4">
         {/* SECTION A — HERO BANNER */}
-        <div className="bg-[#0F1322] border border-[rgba(99,102,241,0.18)] rounded-[16px] p-6 md:p-8 flex items-center gap-6 relative overflow-hidden min-h-[160px]">
+        <div className="bg-[#111111] border border-[rgba(99,102,241,0.25)] rounded-[16px] p-6 md:p-8 flex items-center gap-6 relative overflow-hidden min-h-[160px]">
           {/* Background decorations */}
           <div
             className="absolute inset-0 pointer-events-none"
@@ -213,7 +213,7 @@ export default function Dashboard() {
               Your scope is protected.
             </h1>
 
-            <p className="text-[13px] text-[rgba(255,255,255,0.35)] mb-4">
+            <p className="text-[13px] text-[#A3A3A3] mb-4">
               ${activeRevenue.toLocaleString()} active across {activeCount} project{activeCount !== 1 ? "s" : ""}
             </p>
 
@@ -221,7 +221,7 @@ export default function Dashboard() {
               {pendingCRCount > 0 && (
                 <Link
                   href="/pending-approvals"
-                  className="inline-flex items-center gap-2 bg-[#6366F1] rounded-[9px] h-[34px] px-4 text-white text-[12px] font-medium hover:bg-[#5558E6] transition-colors"
+                  className="inline-flex items-center gap-2 bg-[#6366F1] rounded-[8px] h-[34px] px-4 text-white text-[12px] font-medium hover:bg-[#5254CC] transition-colors"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
@@ -231,7 +231,7 @@ export default function Dashboard() {
               )}
               <Link
                 href="/projects"
-                className="inline-flex items-center gap-2 bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.1)] rounded-[9px] h-[34px] px-4 text-[rgba(255,255,255,0.5)] text-[12px] hover:bg-[rgba(255,255,255,0.08)] transition-colors"
+                className="inline-flex items-center gap-2 bg-[#1A1A1A] border border-[#2A2A2A] rounded-[8px] h-[34px] px-4 text-[#A3A3A3] text-[12px] hover:bg-[#1A1A1A] transition-colors"
               >
                 View all projects
               </Link>
@@ -267,20 +267,20 @@ export default function Dashboard() {
         {/* SECTION B — CR ALERT */}
         {pendingCRs.length > 0 && mostRecentCR && (
           <div className="bg-[rgba(239,68,68,0.07)] border border-[rgba(239,68,68,0.2)] rounded-[12px] p-3.5 pl-4 flex items-center gap-3">
-            <div className="w-[34px] h-[34px] bg-[rgba(239,68,68,0.15)] rounded-[9px] flex items-center justify-center flex-shrink-0">
+            <div className="w-[34px] h-[34px] bg-[rgba(239,68,68,0.15)] rounded-[8px] flex items-center justify-center flex-shrink-0">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
               </svg>
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-[13px] font-medium text-white">{mostRecentCR.projectName} — change requested</p>
-              <p className="text-[11px] text-[rgba(255,255,255,0.3)] truncate">
+              <p className="text-[11px] text-[#525252] truncate">
                 {mostRecentCR.clientName} · {mostRecentCR.description.slice(0, 60)}
               </p>
             </div>
             <Link
               href="/pending-approvals"
-              className="ml-auto bg-[#6366F1] h-[30px] px-3.5 rounded-[8px] text-white text-[11px] font-medium flex items-center hover:bg-[#5558E6] transition-colors flex-shrink-0"
+              className="ml-auto bg-[#6366F1] h-[30px] px-3.5 rounded-[8px] text-white text-[11px] font-medium flex items-center hover:bg-[#5254CC] transition-colors flex-shrink-0"
             >
               Review now
             </Link>
@@ -290,7 +290,7 @@ export default function Dashboard() {
         {/* SECTION C — STATS GRID */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-[10px]">
           {/* Revenue */}
-          <div className="bg-[#0F1322] border border-[rgba(255,255,255,0.06)] rounded-[14px] p-4 relative overflow-hidden hover:border-[rgba(99,102,241,0.3)] transition-colors cursor-default group">
+          <div className="bg-[#111111] border border-[#2A2A2A] rounded-[12px] p-4 relative overflow-hidden hover:border-[rgba(99,102,241,0.3)] transition-colors cursor-default group">
             <div className="absolute top-0 left-0 right-0 h-[2px] rounded-t-[14px] bg-[#6366F1]" />
             <svg className="absolute bottom-0 right-0 opacity-30" width="60" height="30" viewBox="0 0 60 30"><path d="M0 25 Q15 10 30 18 T60 8" fill="none" stroke="rgba(99,102,241,0.5)" strokeWidth="1.5" /></svg>
             <div className="w-[32px] h-[32px] rounded-[10px] bg-[rgba(99,102,241,0.12)] flex items-center justify-center mb-2">
@@ -299,11 +299,11 @@ export default function Dashboard() {
               </svg>
             </div>
             <p className="text-[18px] font-semibold text-white">${activeRevenue.toLocaleString()}</p>
-            <p className="text-[11px] text-[rgba(255,255,255,0.35)] mt-0.5">Active revenue</p>
+            <p className="text-[11px] text-[#A3A3A3] mt-0.5">Active revenue</p>
           </div>
 
           {/* Active projects */}
-          <div className="bg-[#0F1322] border border-[rgba(255,255,255,0.06)] rounded-[14px] p-4 relative overflow-hidden hover:border-[rgba(99,102,241,0.3)] transition-colors cursor-default">
+          <div className="bg-[#111111] border border-[#2A2A2A] rounded-[12px] p-4 relative overflow-hidden hover:border-[rgba(99,102,241,0.3)] transition-colors cursor-default">
             <div className="absolute top-0 left-0 right-0 h-[2px] rounded-t-[14px] bg-[#34D399]" />
             <svg className="absolute bottom-0 right-0 opacity-30" width="60" height="30" viewBox="0 0 60 30"><path d="M0 22 Q15 5 30 15 T60 5" fill="none" stroke="rgba(52,211,153,0.5)" strokeWidth="1.5" /></svg>
             <div className="w-[32px] h-[32px] rounded-[10px] bg-[rgba(52,211,153,0.12)] flex items-center justify-center mb-2">
@@ -312,11 +312,11 @@ export default function Dashboard() {
               </svg>
             </div>
             <p className="text-[18px] font-semibold text-white">{activeCount}</p>
-            <p className="text-[11px] text-[rgba(255,255,255,0.35)] mt-0.5">Active projects</p>
+            <p className="text-[11px] text-[#A3A3A3] mt-0.5">Active projects</p>
           </div>
 
           {/* Pending CRs */}
-          <div className="bg-[#0F1322] border border-[rgba(255,255,255,0.06)] rounded-[14px] p-4 relative overflow-hidden hover:border-[rgba(99,102,241,0.3)] transition-colors cursor-default">
+          <div className="bg-[#111111] border border-[#2A2A2A] rounded-[12px] p-4 relative overflow-hidden hover:border-[rgba(99,102,241,0.3)] transition-colors cursor-default">
             <div className="absolute top-0 left-0 right-0 h-[2px] rounded-t-[14px] bg-[#EF4444]" />
             <svg className="absolute bottom-0 right-0 opacity-30" width="60" height="30" viewBox="0 0 60 30"><path d="M0 20 Q15 8 30 22 T60 10" fill="none" stroke="rgba(239,68,68,0.5)" strokeWidth="1.5" /></svg>
             <div className="w-[32px] h-[32px] rounded-[10px] bg-[rgba(239,68,68,0.12)] flex items-center justify-center mb-2">
@@ -325,14 +325,14 @@ export default function Dashboard() {
               </svg>
             </div>
             <p className="text-[18px] font-semibold text-white">{pendingCRCount}</p>
-            <p className="text-[11px] text-[rgba(255,255,255,0.35)] mt-0.5">Pending CRs</p>
+            <p className="text-[11px] text-[#A3A3A3] mt-0.5">Pending CRs</p>
             <p className={`text-[10px] mt-1 ${pendingCRCount > 0 ? "text-[#FCA5A5]" : "text-[#34D399]"}`}>
               {pendingCRCount > 0 ? "Needs review" : "All clear"}
             </p>
           </div>
 
           {/* Completed */}
-          <div className="bg-[#0F1322] border border-[rgba(255,255,255,0.06)] rounded-[14px] p-4 relative overflow-hidden hover:border-[rgba(99,102,241,0.3)] transition-colors cursor-default">
+          <div className="bg-[#111111] border border-[#2A2A2A] rounded-[12px] p-4 relative overflow-hidden hover:border-[rgba(99,102,241,0.3)] transition-colors cursor-default">
             <div className="absolute top-0 left-0 right-0 h-[2px] rounded-t-[14px] bg-[#FCD34D]" />
             <svg className="absolute bottom-0 right-0 opacity-30" width="60" height="30" viewBox="0 0 60 30"><path d="M0 28 Q15 12 30 20 T60 4" fill="none" stroke="rgba(251,191,36,0.5)" strokeWidth="1.5" /></svg>
             <div className="w-[32px] h-[32px] rounded-[10px] bg-[rgba(251,191,36,0.12)] flex items-center justify-center mb-2">
@@ -341,23 +341,23 @@ export default function Dashboard() {
               </svg>
             </div>
             <p className="text-[18px] font-semibold text-white">{completedCount}</p>
-            <p className="text-[11px] text-[rgba(255,255,255,0.35)] mt-0.5">Completed</p>
-            <p className="text-[10px] mt-1 text-[rgba(255,255,255,0.2)]">All time</p>
+            <p className="text-[11px] text-[#A3A3A3] mt-0.5">Completed</p>
+            <p className="text-[10px] mt-1 text-[#3A3A3A]">All time</p>
           </div>
         </div>
 
         {/* SECTION D — TWO COLUMN */}
         <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-3">
           {/* LEFT — Active projects */}
-          <div className="bg-[#0F1322] border border-[rgba(255,255,255,0.06)] rounded-[14px] p-4">
+          <div className="bg-[#111111] border border-[#2A2A2A] rounded-[12px] p-4">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-[11px] font-medium uppercase tracking-[0.07em] text-[rgba(255,255,255,0.35)]">Active Projects</span>
+              <span className="text-[11px] font-medium uppercase tracking-[0.07em] text-[#A3A3A3]">Active Projects</span>
               <Link href="/projects" className="text-[11px] text-[#6366F1] hover:text-[#818CF8] transition-colors">See all →</Link>
             </div>
 
             {activeProjects.length === 0 ? (
               <div className="text-center py-8">
-                <p className="text-[12px] text-[rgba(255,255,255,0.3)]">No active projects yet</p>
+                <p className="text-[12px] text-[#525252]">No active projects yet</p>
                 <Link href="/projects/new" className="text-[11px] text-[#6366F1] hover:text-[#818CF8] mt-2 inline-block">Create a project</Link>
               </div>
             ) : (
@@ -381,13 +381,13 @@ export default function Dashboard() {
                     <Link
                       key={project.id}
                       href={`/projects/${project.id}`}
-                      className={`py-[9px] flex items-center gap-[10px] ${i < activeProjects.slice(0, 4).length - 1 ? "border-b border-[rgba(255,255,255,0.04)]" : ""}`}
+                      className={`py-[9px] flex items-center gap-[10px] ${i < activeProjects.slice(0, 4).length - 1 ? "border-b border-[#1E1E1E]" : ""}`}
                     >
                       <div className="w-[3px] self-stretch rounded-[2px] min-h-[36px]" style={{ backgroundColor: barColor }} />
                       <div className="flex-1 min-w-0">
                         <p className="text-[12px] font-medium text-white truncate">{project.name}</p>
-                        <p className="text-[10px] text-[rgba(255,255,255,0.25)] mt-0.5">{project.clientName} · {project.deliverables.filter((d) => d.completed).length}/{project.deliverables.length} deliverables</p>
-                        <div className="h-[2px] bg-[rgba(255,255,255,0.06)] rounded mt-1.5">
+                        <p className="text-[10px] text-[#525252] mt-0.5">{project.clientName} · {project.deliverables.filter((d) => d.completed).length}/{project.deliverables.length} deliverables</p>
+                        <div className="h-[2px] bg-[#1A1A1A] rounded mt-1.5">
                           <div className="h-full rounded" style={{ width: `${progress}%`, backgroundColor: barColor }} />
                         </div>
                       </div>
@@ -405,19 +405,19 @@ export default function Dashboard() {
           {/* RIGHT COLUMN */}
           <div className="flex flex-col gap-3">
             {/* Client overview */}
-            <div className="bg-[#0F1322] border border-[rgba(255,255,255,0.06)] rounded-[14px] p-4">
-              <span className="text-[11px] font-medium uppercase tracking-[0.07em] text-[rgba(255,255,255,0.35)] mb-3 block">Clients</span>
+            <div className="bg-[#111111] border border-[#2A2A2A] rounded-[12px] p-4">
+              <span className="text-[11px] font-medium uppercase tracking-[0.07em] text-[#A3A3A3] mb-3 block">Clients</span>
               {topClients.length === 0 ? (
-                <p className="text-[12px] text-[rgba(255,255,255,0.3)] text-center py-4">No clients yet</p>
+                <p className="text-[12px] text-[#525252] text-center py-4">No clients yet</p>
               ) : (
                 <div>
                   {topClients.map((client, i) => (
-                    <div key={client.name} className={`flex items-center gap-3 py-2 ${i < topClients.length - 1 ? "border-b border-[rgba(255,255,255,0.04)]" : ""}`}>
+                    <div key={client.name} className={`flex items-center gap-3 py-2 ${i < topClients.length - 1 ? "border-b border-[#1E1E1E]" : ""}`}>
                       <div className="w-[28px] h-[28px] rounded-full bg-[rgba(99,102,241,0.2)] flex items-center justify-center flex-shrink-0">
                         <span className="text-[11px] font-medium text-[#818CF8]">{client.name[0].toUpperCase()}</span>
                       </div>
                       <span className="text-[12px] font-medium text-white flex-1 truncate">{client.name}</span>
-                      <span className="text-[10px] text-[rgba(255,255,255,0.3)] flex-shrink-0">{client.count} project{client.count !== 1 ? "s" : ""}</span>
+                      <span className="text-[10px] text-[#525252] flex-shrink-0">{client.count} project{client.count !== 1 ? "s" : ""}</span>
                       <span className="text-[12px] font-medium text-white flex-shrink-0">${client.totalValue.toLocaleString()}</span>
                     </div>
                   ))}
@@ -426,18 +426,18 @@ export default function Dashboard() {
             </div>
 
             {/* Recent activity */}
-            <div className="bg-[#0F1322] border border-[rgba(255,255,255,0.06)] rounded-[14px] p-4">
-              <span className="text-[11px] font-medium uppercase tracking-[0.07em] text-[rgba(255,255,255,0.35)] mb-3 block">Activity</span>
+            <div className="bg-[#111111] border border-[#2A2A2A] rounded-[12px] p-4">
+              <span className="text-[11px] font-medium uppercase tracking-[0.07em] text-[#A3A3A3] mb-3 block">Activity</span>
               {recentActivity.length === 0 ? (
-                <p className="text-[11px] text-[rgba(255,255,255,0.25)] text-center py-4">No activity yet</p>
+                <p className="text-[11px] text-[#525252] text-center py-4">No activity yet</p>
               ) : (
                 <div>
                   {recentActivity.map((item, i) => {
                     const isPending = item.status?.toLowerCase().trim() === "pending";
                     const isApproved = item.status?.toLowerCase().trim() === "approved";
                     return (
-                      <div key={i} className={`flex gap-[10px] py-2 ${i < recentActivity.length - 1 ? "border-b border-[rgba(255,255,255,0.04)]" : ""}`}>
-                        <div className={`w-[30px] h-[30px] rounded-[9px] flex items-center justify-center flex-shrink-0 ${
+                      <div key={i} className={`flex gap-[10px] py-2 ${i < recentActivity.length - 1 ? "border-b border-[#1E1E1E]" : ""}`}>
+                        <div className={`w-[30px] h-[30px] rounded-[8px] flex items-center justify-center flex-shrink-0 ${
                           isPending ? "bg-[rgba(239,68,68,0.12)]" : isApproved ? "bg-[rgba(52,211,153,0.12)]" : "bg-[rgba(99,102,241,0.12)]"
                         }`}>
                           {isPending ? (
@@ -450,9 +450,9 @@ export default function Dashboard() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-[12px] text-white truncate">{item.description}</p>
-                          <p className="text-[10px] text-[rgba(255,255,255,0.25)] mt-0.5">{item.projectName} · {item.clientName}</p>
+                          <p className="text-[10px] text-[#525252] mt-0.5">{item.projectName} · {item.clientName}</p>
                         </div>
-                        <span className="text-[10px] text-[rgba(255,255,255,0.2)] flex-shrink-0">{timeAgo(item.createdAt)}</span>
+                        <span className="text-[10px] text-[#3A3A3A] flex-shrink-0">{timeAgo(item.createdAt)}</span>
                       </div>
                     );
                   })}
@@ -465,10 +465,10 @@ export default function Dashboard() {
         {/* SECTION E — BOTTOM ROW */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {/* Upcoming deadlines */}
-          <div className="bg-[#0F1322] border border-[rgba(255,255,255,0.06)] rounded-[14px] p-4">
-            <span className="text-[11px] font-medium uppercase tracking-[0.07em] text-[rgba(255,255,255,0.35)] mb-3 block">Upcoming Deadlines</span>
+          <div className="bg-[#111111] border border-[#2A2A2A] rounded-[12px] p-4">
+            <span className="text-[11px] font-medium uppercase tracking-[0.07em] text-[#A3A3A3] mb-3 block">Upcoming Deadlines</span>
             {deadlineProjects.length === 0 ? (
-              <p className="text-[11px] text-[rgba(255,255,255,0.25)] text-center py-4">No upcoming deadlines</p>
+              <p className="text-[11px] text-[#525252] text-center py-4">No upcoming deadlines</p>
             ) : (
               <div className="space-y-2">
                 {deadlineProjects.map((project) => {
@@ -480,7 +480,7 @@ export default function Dashboard() {
                     <div key={project.id} className="flex items-center gap-2">
                       <span className="w-[6px] h-[6px] rounded-full flex-shrink-0" style={{ backgroundColor: dotColor }} />
                       <span className="flex-1 text-[12px] text-white truncate">{project.name}</span>
-                      <span className="text-[10px] text-[rgba(255,255,255,0.25)] flex-shrink-0">
+                      <span className="text-[10px] text-[#525252] flex-shrink-0">
                         {new Date(project.deadline!).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                         {" · "}
                         {daysLeft <= 0 ? "Overdue" : `${daysLeft}d`}
@@ -493,12 +493,12 @@ export default function Dashboard() {
           </div>
 
           {/* Monthly goal */}
-          <div className="bg-[#0F1322] border border-[rgba(255,255,255,0.06)] rounded-[14px] p-4 relative">
+          <div className="bg-[#111111] border border-[#2A2A2A] rounded-[12px] p-4 relative">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-[11px] font-medium uppercase tracking-[0.07em] text-[rgba(255,255,255,0.35)]">Monthly Goal</span>
+              <span className="text-[11px] font-medium uppercase tracking-[0.07em] text-[#A3A3A3]">Monthly Goal</span>
               <button
                 onClick={() => setEditingGoal(true)}
-                className="w-[24px] h-[24px] bg-[rgba(255,255,255,0.06)] rounded-[6px] flex items-center justify-center cursor-pointer hover:bg-[rgba(255,255,255,0.1)] transition-colors"
+                className="w-[24px] h-[24px] bg-[#1A1A1A] rounded-[6px] flex items-center justify-center cursor-pointer hover:bg-[rgba(255,255,255,0.1)] transition-colors"
                 title="Edit goal"
               >
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -514,7 +514,7 @@ export default function Dashboard() {
                   autoFocus
                   defaultValue={monthlyGoal}
                   placeholder="Enter goal ($)"
-                  className="bg-[rgba(255,255,255,0.06)] border border-[rgba(99,102,241,0.3)] rounded-[8px] text-white px-3 py-1 text-[14px] w-[120px] focus:outline-none focus:border-[#6366F1]"
+                  className="bg-[#1A1A1A] border border-[rgba(99,102,241,0.3)] rounded-[8px] text-white px-3 py-1 text-[14px] w-[120px] focus:outline-none focus:border-[#6366F1]"
                   onBlur={(e) => {
                     const val = Number(e.target.value);
                     if (val > 0) {
@@ -539,24 +539,24 @@ export default function Dashboard() {
                 />
               </div>
             ) : (
-              <p className="text-[11px] text-[rgba(255,255,255,0.25)] mt-1">of ${monthlyGoal.toLocaleString()} goal</p>
+              <p className="text-[11px] text-[#525252] mt-1">of ${monthlyGoal.toLocaleString()} goal</p>
             )}
-            <div className="h-[4px] bg-[rgba(255,255,255,0.06)] rounded-full mt-3 overflow-hidden">
+            <div className="h-[4px] bg-[#1A1A1A] rounded-full mt-3 overflow-hidden">
               <div
                 className="h-full bg-[#6366F1] rounded-full transition-all duration-500"
                 style={{ width: `${Math.min(100, (activeRevenue / monthlyGoal) * 100)}%` }}
               />
             </div>
             <div className="flex items-center justify-between mt-1.5">
-              <span className="text-[10px] text-[rgba(255,255,255,0.2)]">$0</span>
+              <span className="text-[10px] text-[#3A3A3A]">$0</span>
               <span className="text-[10px] text-[#6366F1]">${activeRevenue.toLocaleString()}</span>
-              <span className="text-[10px] text-[rgba(255,255,255,0.2)]">${monthlyGoal.toLocaleString()}</span>
+              <span className="text-[10px] text-[#3A3A3A]">${monthlyGoal.toLocaleString()}</span>
             </div>
           </div>
 
           {/* Quick actions */}
-          <div className="bg-[#0F1322] border border-[rgba(255,255,255,0.06)] rounded-[14px] p-4">
-            <span className="text-[11px] font-medium uppercase tracking-[0.07em] text-[rgba(255,255,255,0.35)] mb-3 block">Quick Actions</span>
+          <div className="bg-[#111111] border border-[#2A2A2A] rounded-[12px] p-4">
+            <span className="text-[11px] font-medium uppercase tracking-[0.07em] text-[#A3A3A3] mb-3 block">Quick Actions</span>
             <div className="space-y-2">
               {/* New Project */}
               <button
@@ -566,7 +566,7 @@ export default function Dashboard() {
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#818CF8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14" /></svg>
                 <div>
                   <p className="text-[13px] text-white">New project</p>
-                  <p className="text-[11px] text-[rgba(255,255,255,0.3)]">Create and send to client</p>
+                  <p className="text-[11px] text-[#525252]">Create and send to client</p>
                 </div>
               </button>
 
@@ -579,7 +579,7 @@ export default function Dashboard() {
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FCA5A5" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 3" /></svg>
                   <div>
                     <p className="text-[13px] text-white">Review {pendingCRCount} request{pendingCRCount !== 1 ? "s" : ""}</p>
-                    <p className="text-[11px] text-[rgba(255,255,255,0.3)]">Pending change requests</p>
+                    <p className="text-[11px] text-[#525252]">Pending change requests</p>
                   </div>
                 </button>
               )}
@@ -598,7 +598,7 @@ export default function Dashboard() {
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34D399" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>
                   <div>
                     <p className="text-[13px] text-white">Add deadline to Calendar</p>
-                    <p className="text-[11px] text-[rgba(255,255,255,0.3)]">{nearestDeadline.name} · {new Date(nearestDeadline.deadline!).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</p>
+                    <p className="text-[11px] text-[#525252]">{nearestDeadline.name} · {new Date(nearestDeadline.deadline!).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</p>
                   </div>
                 </button>
               )}
@@ -606,12 +606,12 @@ export default function Dashboard() {
               {/* View all projects */}
               <button
                 onClick={() => router.push("/projects")}
-                className="w-full bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.06)] rounded-[10px] p-3 flex items-center gap-3 text-left hover:bg-[rgba(255,255,255,0.06)] transition-colors"
+                className="w-full bg-[#141414] border border-[#2A2A2A] rounded-[10px] p-3 flex items-center gap-3 text-left hover:bg-[#1A1A1A] transition-colors"
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" /></svg>
                 <div>
                   <p className="text-[13px] text-white">View all projects</p>
-                  <p className="text-[11px] text-[rgba(255,255,255,0.3)]">{activeCount} active project{activeCount !== 1 ? "s" : ""}</p>
+                  <p className="text-[11px] text-[#525252]">{activeCount} active project{activeCount !== 1 ? "s" : ""}</p>
                 </div>
               </button>
             </div>

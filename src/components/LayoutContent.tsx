@@ -20,7 +20,7 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
   if (isPublic) {
     return (
       <>
-        <Navbar />
+        {!isLanding && <Navbar />}
         {isLanding ? (
           <main>{children}</main>
         ) : (

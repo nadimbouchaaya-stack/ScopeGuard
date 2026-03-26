@@ -30,10 +30,10 @@ export default function ChangeRequestPage() {
   if (!project) {
     return (
       <div className="text-center py-20">
-        <h2 className="text-2xl font-bold text-[#F1F5F9] mb-2">
+        <h2 className="text-2xl font-bold text-white mb-2">
           Project not found
         </h2>
-        <p className="text-[#94A3B8] mb-6">
+        <p className="text-[#A3A3A3] mb-6">
           This project may have been deleted.
         </p>
         <Link
@@ -95,24 +95,24 @@ export default function ChangeRequestPage() {
             />
           </svg>
         </div>
-        <h2 className="text-2xl font-bold text-[#F1F5F9] mb-2">
+        <h2 className="text-2xl font-bold text-white mb-2">
           Change Request Sent
         </h2>
-        <p className="text-[#94A3B8] mb-8">
+        <p className="text-[#A3A3A3] mb-8">
           The change request has been sent to{" "}
-          <span className="text-[#F1F5F9] font-medium">{project.clientName}</span>{" "}
+          <span className="text-white font-medium">{project.clientName}</span>{" "}
           at {project.clientEmail}. They can review it in the client portal.
         </p>
         <div className="flex gap-3 justify-center">
           <Link
             href="/dashboard"
-            className="bg-[#334155] hover:bg-[#475569] text-[#F1F5F9] font-medium px-5 py-2.5 rounded-lg transition-colors"
+            className="bg-[#1A1A1A] hover:bg-[#1A1A1A] text-white font-medium px-5 py-2.5 rounded-lg transition-colors"
           >
             Back to Dashboard
           </Link>
           <Link
             href={`/portal/${project.id}`}
-            className="bg-[#6366F1] hover:bg-[#5558E6] text-[#F1F5F9] font-medium px-5 py-2.5 rounded-lg transition-colors"
+            className="bg-[#6366F1] hover:bg-[#5254CC] text-white font-medium px-5 py-2.5 rounded-lg transition-colors"
           >
             View Client Portal
           </Link>
@@ -122,15 +122,15 @@ export default function ChangeRequestPage() {
   }
 
   const inputClass =
-    "w-full bg-[#0F172A] border border-[#475569] rounded-lg px-4 py-3 text-[#F1F5F9] placeholder-[#94A3B8]/50 focus:outline-none focus:border-[#6366F1] focus:ring-1 focus:ring-[#6366F1] transition-colors";
-  const labelClass = "block text-sm font-medium text-[#94A3B8] mb-2";
+    "w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder-[#94A3B8]/50 focus:outline-none focus:border-[#6366F1] focus:ring-1 focus:ring-[#6366F1] transition-colors";
+  const labelClass = "block text-sm font-medium text-[#A3A3A3] mb-2";
 
   return (
     <div className="max-w-2xl mx-auto">
       <div className="mb-8">
         <Link
           href="/dashboard"
-          className="text-sm text-[#94A3B8] hover:text-[#F1F5F9] transition-colors flex items-center gap-1 mb-4"
+          className="text-sm text-[#A3A3A3] hover:text-white transition-colors flex items-center gap-1 mb-4"
         >
           <svg
             className="w-4 h-4"
@@ -147,10 +147,10 @@ export default function ChangeRequestPage() {
           </svg>
           Back to Dashboard
         </Link>
-        <h1 className="text-2xl sm:text-3xl font-bold text-[#F1F5F9]">Change Request</h1>
-        <p className="text-[#94A3B8] mt-1">
+        <h1 className="text-2xl sm:text-3xl font-bold text-white">Change Request</h1>
+        <p className="text-[#A3A3A3] mt-1">
           For{" "}
-          <span className="text-[#F1F5F9] font-medium">{project.name}</span> —{" "}
+          <span className="text-white font-medium">{project.name}</span> —{" "}
           {project.clientName}
         </p>
       </div>
@@ -174,7 +174,7 @@ export default function ChangeRequestPage() {
           </div>
           <Link
             href="/dashboard"
-            className="bg-[#334155] hover:bg-[#475569] text-[#F1F5F9] font-medium px-5 py-2.5 rounded-lg transition-colors inline-block"
+            className="bg-[#1A1A1A] hover:bg-[#1A1A1A] text-white font-medium px-5 py-2.5 rounded-lg transition-colors inline-block"
           >
             Back to Dashboard
           </Link>
@@ -207,8 +207,8 @@ export default function ChangeRequestPage() {
           </div>
 
           <form onSubmit={handleSubmit}>
-            <div className="bg-[#1E293B] border border-[#475569] rounded-xl p-6 space-y-5">
-              <h2 className="text-lg font-semibold text-[#F1F5F9] border-b border-[#475569] pb-3">
+            <div className="bg-[#111111] border border-[#2A2A2A] rounded-xl p-6 space-y-5">
+              <h2 className="text-lg font-semibold text-white border-b border-[#2A2A2A] pb-3">
                 Request Details
               </h2>
 
@@ -255,7 +255,7 @@ export default function ChangeRequestPage() {
 
             <button
               type="submit"
-              className="w-full mt-6 bg-[#6366F1] hover:bg-[#5558E6] text-[#F1F5F9] font-semibold py-3.5 rounded-xl transition-colors text-base"
+              className="w-full mt-6 bg-[#6366F1] hover:bg-[#5254CC] text-white font-semibold py-3.5 rounded-xl transition-colors text-base"
             >
               Send Change Request
             </button>

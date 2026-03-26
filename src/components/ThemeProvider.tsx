@@ -21,43 +21,43 @@ export function useTheme() {
 
 const themeVars: Record<Theme, Record<string, string>> = {
   dark: {
-    "--bg-primary": "#0F172A",
-    "--bg-card": "#1E293B",
-    "--bg-input": "#0F172A",
-    "--bg-hover": "#334155",
-    "--border": "#475569",
-    "--text-primary": "#F1F5F9",
-    "--text-secondary": "#94A3B8",
+    "--bg-primary": "#0A0A0A",
+    "--bg-card": "#111111",
+    "--bg-input": "#0A0A0A",
+    "--bg-hover": "#1A1A1A",
+    "--border": "#2A2A2A",
+    "--text-primary": "#FFFFFF",
+    "--text-secondary": "#A3A3A3",
     "--accent": "#6366F1",
-    "--accent-hover": "#5558E6",
+    "--accent-hover": "#5254CC",
     "--accent-text": "#818CF8",
     "--success": "#34D399",
-    "--warning": "#FBBF24",
-    "--danger": "#F87171",
+    "--warning": "#F59E0B",
+    "--danger": "#EF4444",
   },
   light: {
-    "--bg-primary": "#F8FAFC",
+    "--bg-primary": "#FAFAFA",
     "--bg-card": "#FFFFFF",
-    "--bg-input": "#F1F5F9",
-    "--bg-hover": "#E2E8F0",
-    "--border": "#CBD5E1",
-    "--text-primary": "#0F172A",
-    "--text-secondary": "#475569",
+    "--bg-input": "#F5F5F5",
+    "--bg-hover": "#EEEEEE",
+    "--border": "#E5E5E5",
+    "--text-primary": "#0A0A0A",
+    "--text-secondary": "#525252",
     "--accent": "#6366F1",
-    "--accent-hover": "#5558E6",
+    "--accent-hover": "#5254CC",
     "--accent-text": "#4F46E5",
     "--success": "#059669",
     "--warning": "#D97706",
     "--danger": "#DC2626",
   },
   colorblind: {
-    "--bg-primary": "#0F172A",
-    "--bg-card": "#1E293B",
-    "--bg-input": "#0F172A",
-    "--bg-hover": "#334155",
-    "--border": "#475569",
-    "--text-primary": "#F1F5F9",
-    "--text-secondary": "#94A3B8",
+    "--bg-primary": "#0A0A0A",
+    "--bg-card": "#111111",
+    "--bg-input": "#0A0A0A",
+    "--bg-hover": "#1A1A1A",
+    "--border": "#2A2A2A",
+    "--text-primary": "#FFFFFF",
+    "--text-secondary": "#A3A3A3",
     "--accent": "#2563EB",
     "--accent-hover": "#1D4ED8",
     "--accent-text": "#60A5FA",
@@ -66,13 +66,13 @@ const themeVars: Record<Theme, Record<string, string>> = {
     "--danger": "#EA580C",
   },
   neon: {
-    "--bg-primary": "#0A0A0F",
-    "--bg-card": "#12121A",
-    "--bg-input": "#0A0A0F",
-    "--bg-hover": "#1A1A2E",
-    "--border": "#2D2D44",
-    "--text-primary": "#EEEEFF",
-    "--text-secondary": "#8888AA",
+    "--bg-primary": "#000000",
+    "--bg-card": "#0A0A0A",
+    "--bg-input": "#000000",
+    "--bg-hover": "#141414",
+    "--border": "#1A1A1A",
+    "--text-primary": "#FFFFFF",
+    "--text-secondary": "#888888",
     "--accent": "#A855F7",
     "--accent-hover": "#9333EA",
     "--accent-text": "#C084FC",
@@ -86,12 +86,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<Theme>("dark");
 
   useEffect(() => {
-    // Load theme immediately from localStorage for instant apply
     const saved = localStorage.getItem("scopeguard_theme") as Theme | null;
     if (saved && themeVars[saved]) {
       applyTheme(saved);
     }
-    // Also load from profile (which may override localStorage)
     getProfile()
       .then((p) => {
         if (p.theme) applyTheme(p.theme);
@@ -106,11 +104,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     for (const [key, value] of Object.entries(vars)) {
       root.style.setProperty(key, value);
     }
-    // Set data-theme attribute for CSS selectors
     root.setAttribute("data-theme", t);
-    // Persist to localStorage
     localStorage.setItem("scopeguard_theme", t);
-    // Update body classes for Tailwind overrides
     document.body.style.backgroundColor = vars["--bg-primary"];
     document.body.style.color = vars["--text-primary"];
   }

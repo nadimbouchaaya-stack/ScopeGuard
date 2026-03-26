@@ -42,7 +42,7 @@ export default function PasswordInput({ value, onChange, placeholder, className,
       <button
         type="button"
         onClick={() => setShow(!show)}
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#F1F5F9] transition-colors"
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#A3A3A3] hover:text-white transition-colors"
         tabIndex={-1}
       >
         <EyeIcon open={show} />

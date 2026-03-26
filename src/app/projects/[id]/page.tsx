@@ -714,7 +714,7 @@ export default function ProjectDetailPage() {
               <button
                 onClick={handleEditSave}
                 disabled={editSaving}
-                className="flex-1 bg-[#6366F1] hover:bg-[#5558E6] disabled:opacity-50 text-[#F1F5F9] font-medium py-2.5 rounded-lg transition-colors text-sm"
+                className="flex-1 bg-[#6366F1] hover:bg-[#5254CC] disabled:opacity-50 text-[#F1F5F9] font-medium py-2.5 rounded-lg transition-colors text-sm"
               >
                 {editSaving ? "Saving..." : "Save Changes"}
               </button>

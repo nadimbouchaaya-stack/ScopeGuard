@@ -49,12 +49,12 @@ export default function Navbar() {
   const showLandingNav = isLanding && !user;
 
   return (
-    <nav className={`${isLanding ? `fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-[#0F172A]/95 backdrop-blur-md border-b border-white/10 shadow-lg" : "bg-transparent border-b border-transparent"}` : "bg-[#0F172A] border-b border-[#475569]"}`}>
+    <nav className={`${isLanding ? `fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-[#0A0A0A]/80 backdrop-blur-md border-b border-white/10 shadow-lg" : "bg-transparent border-b border-transparent"}` : "bg-[#0A0A0A] border-b border-[#2A2A2A]"}`}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         <Link href={user ? "/dashboard" : "/"} className="flex items-center gap-2.5">
           <div className="w-8 h-8 bg-[#6366F1] rounded-lg flex items-center justify-center">
             <svg
-              className="w-5 h-5 text-[#F1F5F9]"
+              className="w-5 h-5 text-white"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -67,7 +67,7 @@ export default function Navbar() {
               />
             </svg>
           </div>
-          <span className="text-[#F1F5F9] font-bold text-xl tracking-tight">
+          <span className="text-white font-bold text-xl tracking-tight">
             ScopeGuard
           </span>
         </Link>
@@ -77,13 +77,13 @@ export default function Navbar() {
           <div className="flex items-center gap-3">
             <Link
               href="/login"
-              className="text-sm font-medium text-[#94A3B8] hover:text-[#F1F5F9] transition-colors px-3 py-2"
+              className="text-sm font-medium text-[#A3A3A3] hover:text-white transition-colors px-3 py-2"
             >
               Log In
             </Link>
             <Link
               href="/signup"
-              className="text-sm font-medium bg-[#6366F1] hover:bg-[#5558E6] text-[#F1F5F9] px-4 py-2 rounded-lg transition-colors"
+              className="text-sm font-medium bg-[#6366F1] hover:bg-[#5254CC] text-white px-4 py-2 rounded-lg transition-colors"
             >
               Sign Up
             </Link>
@@ -101,8 +101,8 @@ export default function Navbar() {
                   href={link.href}
                   className={`text-sm font-medium transition-colors ${
                     pathname === link.href
-                      ? "text-[#F1F5F9]"
-                      : "text-[#94A3B8] hover:text-[#F1F5F9]"
+                      ? "text-white"
+                      : "text-[#A3A3A3] hover:text-white"
                   }`}
                 >
                   {link.label}
@@ -110,7 +110,7 @@ export default function Navbar() {
               ))}
               <Link
                 href="/projects/new"
-                className="text-sm font-medium bg-[#6366F1] hover:bg-[#5558E6] text-[#F1F5F9] px-4 py-2 rounded-lg transition-colors"
+                className="text-sm font-medium bg-[#6366F1] hover:bg-[#5254CC] text-white px-4 py-2 rounded-lg transition-colors"
               >
                 New Project
               </Link>
@@ -119,8 +119,8 @@ export default function Navbar() {
                 href="/profile"
                 className={`text-sm font-medium transition-colors ${
                   pathname === "/profile"
-                    ? "text-[#F1F5F9]"
-                    : "text-[#94A3B8] hover:text-[#F1F5F9]"
+                    ? "text-white"
+                    : "text-[#A3A3A3] hover:text-white"
                 }`}
               >
                 Profile
@@ -129,8 +129,8 @@ export default function Navbar() {
                 href="/settings"
                 className={`text-sm font-medium transition-colors ${
                   pathname === "/settings"
-                    ? "text-[#F1F5F9]"
-                    : "text-[#94A3B8] hover:text-[#F1F5F9]"
+                    ? "text-white"
+                    : "text-[#A3A3A3] hover:text-white"
                 }`}
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -140,7 +140,7 @@ export default function Navbar() {
               </Link>
               <button
                 onClick={handleSignOut}
-                className="text-sm font-medium text-[#94A3B8] hover:text-[#F87171] transition-colors"
+                className="text-sm font-medium text-[#A3A3A3] hover:text-[#F87171] transition-colors"
               >
                 Sign Out
               </button>
@@ -149,7 +149,7 @@ export default function Navbar() {
             {/* Mobile hamburger */}
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="md:hidden p-2 text-[#94A3B8] hover:text-[#F1F5F9] transition-colors"
+              className="md:hidden p-2 text-[#A3A3A3] hover:text-white transition-colors"
               aria-label="Toggle menu"
             >
               {menuOpen ? (
@@ -166,7 +166,7 @@ export default function Navbar() {
         )}
 
         {isPortal && (
-          <span className="text-sm text-[#94A3B8] font-medium">
+          <span className="text-sm text-[#A3A3A3] font-medium">
             Client Portal
           </span>
         )}
@@ -174,7 +174,7 @@ export default function Navbar() {
 
       {/* Mobile menu dropdown */}
       {showAppNav && menuOpen && (
-        <div className="md:hidden border-t border-[#475569] bg-[#0F172A] px-4 pb-4 pt-2 space-y-1">
+        <div className="md:hidden border-t border-[#2A2A2A] bg-[#0A0A0A] px-4 pb-4 pt-2 space-y-1">
           {navLinks.map((link) => (
             <Link
               key={link.href}
@@ -182,8 +182,8 @@ export default function Navbar() {
               onClick={() => setMenuOpen(false)}
               className={`block px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 pathname === link.href
-                  ? "text-[#F1F5F9] bg-[#1E293B]"
-                  : "text-[#94A3B8] hover:text-[#F1F5F9] hover:bg-[#1E293B]"
+                  ? "text-white bg-[#1A1A1A]"
+                  : "text-[#A3A3A3] hover:text-white hover:bg-[#1A1A1A]"
               }`}
             >
               {link.label}
@@ -192,18 +192,18 @@ export default function Navbar() {
           <Link
             href="/projects/new"
             onClick={() => setMenuOpen(false)}
-            className="block text-center text-sm font-medium bg-[#6366F1] hover:bg-[#5558E6] text-[#F1F5F9] px-4 py-2.5 rounded-lg transition-colors mt-2"
+            className="block text-center text-sm font-medium bg-[#6366F1] hover:bg-[#5254CC] text-white px-4 py-2.5 rounded-lg transition-colors mt-2"
           >
             New Project
           </Link>
-          <div className="border-t border-[#475569] mt-3 pt-3 space-y-1">
+          <div className="border-t border-[#2A2A2A] mt-3 pt-3 space-y-1">
             <Link
               href="/profile"
               onClick={() => setMenuOpen(false)}
               className={`block px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 pathname === "/profile"
-                  ? "text-[#F1F5F9] bg-[#1E293B]"
-                  : "text-[#94A3B8] hover:text-[#F1F5F9] hover:bg-[#1E293B]"
+                  ? "text-white bg-[#1A1A1A]"
+                  : "text-[#A3A3A3] hover:text-white hover:bg-[#1A1A1A]"
               }`}
             >
               Profile
@@ -213,14 +213,14 @@ export default function Navbar() {
               onClick={() => setMenuOpen(false)}
               className={`block px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 pathname === "/settings"
-                  ? "text-[#F1F5F9] bg-[#1E293B]"
-                  : "text-[#94A3B8] hover:text-[#F1F5F9] hover:bg-[#1E293B]"
+                  ? "text-white bg-[#1A1A1A]"
+                  : "text-[#A3A3A3] hover:text-white hover:bg-[#1A1A1A]"
               }`}
             >
               Settings
             </Link>
             <div className="px-3 pt-2 flex items-center justify-between">
-              <span className="text-xs text-[#94A3B8] truncate max-w-[200px]">
+              <span className="text-xs text-[#A3A3A3] truncate max-w-[200px]">
                 {user.email}
               </span>
               <button
@@ -228,7 +228,7 @@ export default function Navbar() {
                   setMenuOpen(false);
                   handleSignOut();
                 }}
-                className="text-sm font-medium text-[#94A3B8] hover:text-[#F87171] transition-colors"
+                className="text-sm font-medium text-[#A3A3A3] hover:text-[#F87171] transition-colors"
               >
                 Sign Out
               </button>

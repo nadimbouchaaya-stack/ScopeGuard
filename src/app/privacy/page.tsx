@@ -2,9 +2,9 @@ import Link from "next/link";
 
 export default function PrivacyPolicy() {
   return (
-    <div className="max-w-3xl mx-auto px-4 py-16 text-[#94A3B8]">
+    <div className="max-w-3xl mx-auto px-4 py-16 text-[#A3A3A3]">
       <h1 className="text-3xl font-bold text-white mb-2">Privacy Policy</h1>
-      <p className="text-sm text-slate-500 mb-8">Last updated: March 26, 2026</p>
+      <p className="text-sm text-[#525252] mb-8">Last updated: March 26, 2026</p>
 
       <div className="space-y-8 text-sm leading-relaxed">
         <section>
@@ -70,7 +70,7 @@ export default function PrivacyPolicy() {
         </section>
       </div>
 
-      <div className="mt-12 pt-6 border-t border-white/10 text-center">
+      <div className="mt-12 pt-6 border-t border-[#2A2A2A] text-center">
         <Link href="/" className="text-indigo-400 hover:text-indigo-300 text-sm">
           &larr; Back to Home
         </Link>

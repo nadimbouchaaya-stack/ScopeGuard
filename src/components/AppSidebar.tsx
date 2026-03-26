@@ -17,7 +17,6 @@ export default function AppSidebar() {
     supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (!user) return;
 
-      // Get user initial
       const metaName = user.user_metadata?.full_name;
       if (metaName?.trim()) {
         setUserInitial(metaName.trim()[0].toUpperCase());
@@ -38,7 +37,6 @@ export default function AppSidebar() {
         }
       }
 
-      // Fetch pending CR count
       const { data: projects } = await supabase
         .from("projects")
         .select("id")
@@ -108,13 +106,16 @@ export default function AppSidebar() {
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex fixed left-0 top-0 bottom-0 w-[52px] border-r z-50 flex-col items-center py-4 gap-1" style={{ backgroundColor: "var(--bg-sidebar, #0B0E18)", borderColor: "var(--border-color, rgba(255,255,255,0.05))" }}>
+      <aside
+        className="hidden md:flex fixed left-0 top-0 bottom-0 w-[52px] border-r z-50 flex-col items-center py-4 gap-1"
+        style={{ backgroundColor: "var(--bg-sidebar, #111111)", borderColor: "var(--border-color, #2A2A2A)" }}
+      >
         {/* Logo */}
         <Link
           href="/dashboard"
-          className="w-[36px] h-[36px] bg-[#6366F1] rounded-[10px] flex items-center justify-center mb-4 hover:opacity-90 transition-opacity"
+          className="w-[34px] h-[34px] bg-[#6366F1] rounded-[8px] flex items-center justify-center mb-4 hover:bg-[#5254CC] transition-colors"
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
           </svg>
         </Link>
@@ -124,22 +125,18 @@ export default function AppSidebar() {
           <Link
             key={item.href}
             href={item.href}
-            className={`relative w-[36px] h-[36px] rounded-[10px] flex items-center justify-center transition-colors ${
+            className={`relative w-[36px] h-[36px] rounded-[8px] flex items-center justify-center transition-colors ${
               isActive(item.href)
-                ? "bg-[rgba(99,102,241,0.18)]"
-                : "hover:bg-[rgba(255,255,255,0.05)]"
+                ? "bg-[rgba(99,102,241,0.12)]"
+                : "hover:bg-[#1A1A1A]"
             }`}
             title={item.label}
           >
-            <span
-              className={`${
-                isActive(item.href) ? "text-[#818CF8] opacity-100" : "text-white opacity-40"
-              }`}
-            >
+            <span className={isActive(item.href) ? "text-[#818CF8]" : "text-[#525252]"}>
               {item.icon}
             </span>
             {item.showPip && (
-              <span className="absolute top-[7px] right-[7px] w-[5px] h-[5px] bg-[#EF4444] rounded-full border-[1.5px] border-[#0B0E18]" />
+              <span className="absolute top-[7px] right-[7px] w-[5px] h-[5px] bg-[#EF4444] rounded-full border-[1.5px]" style={{ borderColor: "var(--bg-sidebar, #111111)" }} />
             )}
           </Link>
         ))}
@@ -148,10 +145,10 @@ export default function AppSidebar() {
         <div className="mt-auto flex flex-col items-center gap-1">
           <button
             onClick={() => setBugModalOpen(true)}
-            className="w-[36px] h-[36px] rounded-[10px] flex items-center justify-center transition-colors hover:bg-[rgba(255,255,255,0.05)]"
+            className="w-[36px] h-[36px] rounded-[8px] flex items-center justify-center transition-colors hover:bg-[#1A1A1A]"
             title="Report a bug"
           >
-            <span className="text-white opacity-40">
+            <span className="text-[#525252]">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M3 8l4 0m-4 8l4 0m13-8l4 0m-4 8l4 0" />
                 <path d="M5.5 4.5l2.5 3m10.5-3l-2.5 3" />
@@ -163,14 +160,14 @@ export default function AppSidebar() {
 
           <Link
             href="/settings"
-            className={`w-[36px] h-[36px] rounded-[10px] flex items-center justify-center transition-colors ${
+            className={`w-[36px] h-[36px] rounded-[8px] flex items-center justify-center transition-colors ${
               isActive("/settings")
-                ? "bg-[rgba(99,102,241,0.18)]"
-                : "hover:bg-[rgba(255,255,255,0.05)]"
+                ? "bg-[rgba(99,102,241,0.12)]"
+                : "hover:bg-[#1A1A1A]"
             }`}
             title="Settings"
           >
-            <span className={`${isActive("/settings") ? "text-[#818CF8] opacity-100" : "text-white opacity-40"}`}>
+            <span className={isActive("/settings") ? "text-[#818CF8]" : "text-[#525252]"}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 010 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 010-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28z" />
                 <circle cx="12" cy="12" r="3" />
@@ -180,7 +177,7 @@ export default function AppSidebar() {
 
           <Link
             href="/profile"
-            className="w-[28px] h-[28px] rounded-full bg-[#6366F1] border-2 border-[rgba(99,102,241,0.4)] flex items-center justify-center mt-1"
+            className="w-[28px] h-[28px] rounded-full bg-[#6366F1] border-2 border-[rgba(99,102,241,0.4)] flex items-center justify-center mt-1 hover:bg-[#5254CC] transition-colors"
             title="Profile"
           >
             <span className="text-[11px] font-medium text-white leading-none">{userInitial || "U"}</span>
@@ -189,21 +186,22 @@ export default function AppSidebar() {
       </aside>
 
       {/* Mobile bottom tab bar */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-[56px] border-t z-50 flex items-center justify-around px-2" style={{ backgroundColor: "var(--bg-sidebar, #0B0E18)", borderColor: "var(--border-color, rgba(255,255,255,0.05))" }}>
+      <nav
+        className="md:hidden fixed bottom-0 left-0 right-0 h-[56px] border-t z-50 flex items-center justify-around px-2"
+        style={{ backgroundColor: "var(--bg-sidebar, #111111)", borderColor: "var(--border-color, #2A2A2A)" }}
+      >
         {navItems.map((item) => (
           <Link
             key={item.href}
             href={item.href}
-            className={`relative flex flex-col items-center justify-center w-[48px] h-[44px] rounded-[10px] transition-colors ${
-              isActive(item.href)
-                ? "bg-[rgba(99,102,241,0.18)]"
-                : ""
+            className={`relative flex flex-col items-center justify-center w-[48px] h-[44px] rounded-[8px] transition-colors ${
+              isActive(item.href) ? "bg-[rgba(99,102,241,0.12)]" : ""
             }`}
           >
-            <span className={`${isActive(item.href) ? "text-[#818CF8] opacity-100" : "text-white opacity-40"}`}>
+            <span className={isActive(item.href) ? "text-[#818CF8]" : "text-[#525252]"}>
               {item.icon}
             </span>
-            <span className={`text-[9px] mt-0.5 ${isActive(item.href) ? "text-[#818CF8]" : "text-[rgba(255,255,255,0.3)]"}`}>
+            <span className={`text-[9px] mt-0.5 ${isActive(item.href) ? "text-[#818CF8]" : "text-[#3A3A3A]"}`}>
               {item.label}
             </span>
             {item.showPip && (
@@ -213,17 +211,17 @@ export default function AppSidebar() {
         ))}
         <Link
           href="/settings"
-          className={`flex flex-col items-center justify-center w-[48px] h-[44px] rounded-[10px] transition-colors ${
-            isActive("/settings") ? "bg-[rgba(99,102,241,0.18)]" : ""
+          className={`flex flex-col items-center justify-center w-[48px] h-[44px] rounded-[8px] transition-colors ${
+            isActive("/settings") ? "bg-[rgba(99,102,241,0.12)]" : ""
           }`}
         >
-          <span className={`${isActive("/settings") ? "text-[#818CF8] opacity-100" : "text-white opacity-40"}`}>
+          <span className={isActive("/settings") ? "text-[#818CF8]" : "text-[#525252]"}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 010 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 010-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28z" />
               <circle cx="12" cy="12" r="3" />
             </svg>
           </span>
-          <span className={`text-[9px] mt-0.5 ${isActive("/settings") ? "text-[#818CF8]" : "text-[rgba(255,255,255,0.3)]"}`}>
+          <span className={`text-[9px] mt-0.5 ${isActive("/settings") ? "text-[#818CF8]" : "text-[#3A3A3A]"}`}>
             Settings
           </span>
         </Link>
