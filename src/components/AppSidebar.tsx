@@ -4,11 +4,13 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import BugReportModal from "@/components/BugReportModal";
 
 export default function AppSidebar() {
   const pathname = usePathname();
   const [pendingCount, setPendingCount] = useState(0);
   const [userInitial, setUserInitial] = useState("");
+  const [bugModalOpen, setBugModalOpen] = useState(false);
 
   useEffect(() => {
     const supabase = createClient();
@@ -144,6 +146,21 @@ export default function AppSidebar() {
 
         {/* Bottom section */}
         <div className="mt-auto flex flex-col items-center gap-1">
+          <button
+            onClick={() => setBugModalOpen(true)}
+            className="w-[36px] h-[36px] rounded-[10px] flex items-center justify-center transition-colors hover:bg-[rgba(255,255,255,0.05)]"
+            title="Report a bug"
+          >
+            <span className="text-white opacity-40">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 8l4 0m-4 8l4 0m13-8l4 0m-4 8l4 0" />
+                <path d="M5.5 4.5l2.5 3m10.5-3l-2.5 3" />
+                <path d="M7 12a5 5 0 0 0 10 0V9a5 5 0 0 0-10 0v3z" />
+                <path d="M12 16v2" />
+              </svg>
+            </span>
+          </button>
+
           <Link
             href="/settings"
             className={`w-[36px] h-[36px] rounded-[10px] flex items-center justify-center transition-colors ${
@@ -211,6 +228,8 @@ export default function AppSidebar() {
           </span>
         </Link>
       </nav>
+
+      <BugReportModal isOpen={bugModalOpen} onClose={() => setBugModalOpen(false)} />
     </>
   );
 }
