@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import AppSidebar from "@/components/AppSidebar";
 import Navbar from "@/components/Navbar";
 
-const PUBLIC_ROUTES = ["/", "/login", "/signup", "/auth"];
+const PUBLIC_ROUTES = ["/", "/login", "/signup", "/auth", "/privacy", "/terms"];
 
 function isPublicRoute(pathname: string) {
   if (pathname.startsWith("/portal")) return true;

@@ -8,6 +8,7 @@ import { getProjects } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/client";
 import { DashboardSkeleton } from "@/components/LoadingSkeleton";
 import AppTopBar from "@/components/AppTopBar";
+import OnboardingModal from "@/components/OnboardingModal";
 
 export default function Dashboard() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -17,6 +18,7 @@ export default function Dashboard() {
   const [projectIds, setProjectIds] = useState<string[]>([]);
   const [monthlyGoal, setMonthlyGoal] = useState(5000);
   const [editingGoal, setEditingGoal] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const router = useRouter();
 
   async function fetchPendingCount(supabase: ReturnType<typeof createClient>, pIds: string[]) {
@@ -34,6 +36,10 @@ export default function Dashboard() {
   useEffect(() => {
     const savedGoal = localStorage.getItem("scopeguard_monthly_goal");
     if (savedGoal) setMonthlyGoal(Number(savedGoal));
+
+    if (!localStorage.getItem("scopeguard_onboarding_done")) {
+      setShowOnboarding(true);
+    }
 
     getProjects().then((p) => {
       setProjects(p);
@@ -174,6 +180,7 @@ export default function Dashboard() {
   }
 
   return (
+    <>
     <div className="min-h-screen" style={{ backgroundColor: "var(--bg-page, #07090F)" }}>
       <AppTopBar title="Dashboard" subtitle={dateStr} />
 
@@ -612,5 +619,8 @@ export default function Dashboard() {
         </div>
       </div>
     </div>
+
+    <OnboardingModal isOpen={showOnboarding} onClose={() => setShowOnboarding(false)} />
+    </>
   );
 }

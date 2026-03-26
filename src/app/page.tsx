@@ -253,6 +253,8 @@ export default function LandingPage() {
           <div className="flex gap-6 text-slate-400 text-sm">
             <Link href="/login" className="hover:text-white transition-colors">Login</Link>
             <Link href="/signup" className="hover:text-white transition-colors">Sign Up</Link>
+            <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+            <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
           </div>
           <p className="text-slate-600 text-xs">&copy; 2025 ScopeGuard. Made for freelancers.</p>
         </div>

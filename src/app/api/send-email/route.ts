@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 import { NextRequest, NextResponse } from "next/server";
+import { rateLimit } from "@/lib/rateLimit";
 
 interface EmailPayload {
   clientName: string;
@@ -14,6 +15,11 @@ interface EmailPayload {
 
 export async function POST(request: NextRequest) {
   try {
+    const ip = request.headers.get("x-forwarded-for") ?? "unknown";
+    if (!rateLimit(ip, 10, 60000)) {
+      return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+    }
+
     const apiKey = process.env.RESEND_API_KEY;
 
     if (!apiKey) {
